@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 public class Card {
 
+    private Long id;
+    private String loginId;     // 로그인 아이디
     private String cardName;
     private String serialNumber;  // 총 12자리(4자리씩)
     private String pinNumber;    //  Pin 번호, 총 8자리

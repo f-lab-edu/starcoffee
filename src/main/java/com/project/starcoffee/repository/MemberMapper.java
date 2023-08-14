@@ -13,16 +13,14 @@ public interface MemberMapper {
 
     int saveMember(MemberDTO memberInfo);
 
-    Optional<Member> findById(Long id);
+    Optional<Member> findById(String loginId);
 
     Member findByIdAndPassword(@Param("id") String id, @Param("password") String password);
 
     int checkId(String id);
 
-    int deleteMember(Long id);
+    int deleteMember(String loginId);
 
     int updatePassword(String id, String password);
-
-
 
 }

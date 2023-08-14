@@ -26,11 +26,6 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
-    @GetMapping("/home")
-    public String home() {
-        return "ok";
-    }
-
     /**
      * 회원가입 진행
      * 필수입력 정보에 누락이 있으면 NullPointerException 을 처리한다.
@@ -94,15 +89,17 @@ public class MemberController {
 
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/member")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<Member> findById(@PathVariable Long id) {
-        return memberService.findById(id);
+    public Optional<Member> findById(HttpSession session) {
+        String loginId = SessionUtil.getLoginMemberId(session);
+        return memberService.findById(loginId);
     }
 
-    @DeleteMapping("/myInfo/{id}")
+    @DeleteMapping("/member")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteMemberInfo(@PathVariable Long id) {
-        memberService.deleteMember(id);
+    public void deleteMemberInfo(HttpSession session) {
+        String loginId = SessionUtil.getLoginMemberId(session);
+        memberService.deleteMember(loginId);
     }
 }

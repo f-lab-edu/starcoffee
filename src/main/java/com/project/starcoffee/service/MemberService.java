@@ -50,15 +50,25 @@ public class MemberService {
         return memberMapper.checkId(id) == 1;
     }
 
-
+    /**
+     * 로그인을 한다.
+     * @param id 로그인 아이디
+     * @param password 로그인 비밀번호
+     * @return
+     */
     public Member login(String id, String password) {
         String cryptoPassword = SHA256Util.encryptSHA256(password);
         Member memberInfo = memberMapper.findByIdAndPassword(id, cryptoPassword);
         return memberInfo;
     }
 
-    public Optional<Member> findById(Long id) {
-        Optional<Member> member = memberMapper.findById(id);
+    /**
+     * 로그인 아이디로 회원정보를 찾는다.
+     * @param loginId 로그인 아이디
+     * @return
+     */
+    public Optional<Member> findById(String loginId) {
+        Optional<Member> member = memberMapper.findById(loginId);
 
         if (member.isPresent() == false) {
             log.error("not found Member ERROR! : {}", member);
@@ -94,13 +104,13 @@ public class MemberService {
     /**
      * 회원의 Status 를 'DELETED' 로 변경한다.
      *
-     * @param id 탈퇴할 아이디
+     * @param loginId 탈퇴할 아이디
      */
     @Transactional
-    public void deleteMember(Long id) {
-        int result = memberMapper.deleteMember(id);
+    public void deleteMember(String loginId) {
+        int result = memberMapper.deleteMember(loginId);
         if (result != 1) {
-            log.error("delete Member ERROR! id={}", id);
+            log.error("delete Member ERROR! id={}", loginId);
             throw new RuntimeException("delete Member ERROR! 회원을 삭제할 수 없습니다.");
         }
     }
