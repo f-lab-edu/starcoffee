@@ -17,15 +17,15 @@
     <select id="findByIdAndPassword" resultType="com.project.starcoffee.domain.member.Member">
         SELECT *
         FROM MEMBERS
-        WHERE id = #{id}
+        WHERE login_id = #{id}
         AND password = #{password}
-        AND satatus != 'DELETED'
+        AND status != 'DELETED'
     </select>
 
     <select id="checkId" resultType="int">
         SELECT count(*)
         FROM MEMBERS
-        where id = #{id}
+        where login_id = #{id}
     </select>
 
     <update id="deleteMember">
@@ -36,9 +36,8 @@
 
     <update id="updatePassword">
         UPDATE MEMBERS
-        SET password = #{password},
-            updated_at = NOW()
-        WHERE id = #{id}
+        SET password = #{password}, updated_at = NOW()
+        WHERE login_id = #{id}
     </update>
 
 </mapper>

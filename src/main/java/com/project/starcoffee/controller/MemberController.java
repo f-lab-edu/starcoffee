@@ -72,7 +72,6 @@ public class MemberController {
             log.error("Login ERROR! {}", responseEntity);
             throw new RuntimeException("로그인 에러입니다.");
         }
-
         return responseEntity;
     }
 
@@ -94,7 +93,6 @@ public class MemberController {
         }
 
     }
-
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
