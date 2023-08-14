@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.starcoffee.repository.MemberMapper">
+
+    <insert id="saveMember" parameterType="com.project.starcoffee.dto.MemberDTO">
+        INSERT INTO MEMBERS (name, tel, email, gender, nick_name, login_id, password)
+        VALUES (#{name}, #{tel}, #{email}, #{gender}, #{nickName}, #{loginId}, #{password})
+    </insert>
+
+    <select id="findById" resultType="com.project.starcoffee.domain.member.Member">
+        SELECT *
+        FROM MEMBERS
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByIdAndPassword" resultType="com.project.starcoffee.domain.member.Member">
+        SELECT *
+        FROM MEMBERS
+        WHERE id = #{id}
+        AND password = #{password}
+        AND satatus != 'DELETED'
+    </select>
+
+    <select id="checkId" resultType="int">
+        SELECT count(*)
+        FROM MEMBERS
+        where id = #{id}
+    </select>
+
+    <update id="deleteMember">
+        UPDATE MEMBERS
+        SET status = 'DELETED'
+        WHERE id = #{id} AND status != 'DELETED'
+    </update>
+
+    <update id="updatePassword">
+        UPDATE MEMBERS
+        SET password = #{password},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
