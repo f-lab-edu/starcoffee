@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 @Setter
 public class MemberDTO {
 
-    @NonNull    // 안붙이는게 좋을까 ? @NonNull 이라도 붙이는 게 좋을까 ?
+    // 안붙이는게 좋을까 ? @NonNull 이라도 붙이는 게 좋을까 ?
+    @NonNull
     private Long id;
 
     @NotNull(message = "이름을 입력해주세요.")
