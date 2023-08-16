@@ -1,8 +1,6 @@
 package com.project.starcoffee.dto;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
@@ -10,6 +8,9 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberDTO {
 
     @NonNull    // 안붙이는게 좋을까 ? @NonNull 이라도 붙이는 게 좋을까 ?
@@ -31,15 +32,15 @@ public class MemberDTO {
     private String gender;  // 성별
 
     @NotNull(message = "닉네임은 필수값 입니다.")
-    private String nickName;    // 닉네임
+    private String nickName;
 
     @NotNull(message = "아이디는 필수값 입니다.")
-    private String loginId;     // 로그인 아이디
+    private String loginId;
 
     @NotNull(message = "비밀번호는 필수값 입니다.")
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$",
             message = "비밀번호는 영문, 특수문자, 숫자포함 8~20자 사이로 입력가능합니다.")
-    private String password;    // 비밀번호
+    private String password;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime birth;   // 생년월일
 

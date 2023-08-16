@@ -22,10 +22,7 @@ public class MemberService {
     public void saveMember(MemberDTO memberInfo) {
 
         // ID 중복체크
-        boolean resultId = duplicatedId(memberInfo.getLoginId());
-        if (resultId) {
-            throw new DuplicateIdException("중복된 아이디 입니다.");
-        }
+        DuplicatedId(memberInfo);
 
         // 비밀번호 암호화 후, 저장
         memberInfo.setPassword(SHA256Util.encryptSHA256(memberInfo.getPassword()));
@@ -41,12 +38,15 @@ public class MemberService {
 
     /**
      * 중복된 아이디가 있는지 확인한다.
-     * @param id 확인하고자 하는 아이디
-     * @return
+     * @param memberInfo 회원정보
      */
-    public boolean duplicatedId(String id) {
-        return memberRepository.checkId(id) == 1;
+    public void DuplicatedId(MemberDTO memberInfo) {
+        boolean resultId = memberRepository.checkId(memberInfo.getLoginId()) == 1;
+        if (resultId) {
+            throw new DuplicateIdException("중복된 아이디 입니다.");
+        }
     }
+
 
     /**
      * 로그인을 한다.
@@ -88,15 +88,20 @@ public class MemberService {
     public void updatePassword(String id, String beforePw, String afterPw) {
         String enBeforePassword = SHA256Util.encryptSHA256(beforePw);
 
-        if (memberRepository.findByIdAndPassword(id, enBeforePassword) == null) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
+        // 이전 비밀번호 확인
+        checkBeforePassword(id, enBeforePassword);
 
         String enAfterPassword = SHA256Util.encryptSHA256(afterPw);
         int result = memberRepository.updatePassword(id, enAfterPassword);
         if (result != 1) {
             log.error("update Member ERROR! id={}, pw={}", id, enAfterPassword);
             throw new RuntimeException("비밀번호 업데이트가 실패하였습니다.");
+        }
+    }
+
+    private void checkBeforePassword(String id, String enBeforePassword) {
+        if (memberRepository.findByIdAndPassword(id, enBeforePassword) == null) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
     }
 
