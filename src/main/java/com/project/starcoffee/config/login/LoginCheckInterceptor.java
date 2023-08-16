@@ -1,4 +1,4 @@
-package com.project.starcoffee.web.login;
+package com.project.starcoffee.config.login;
 
 import com.project.starcoffee.utils.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
