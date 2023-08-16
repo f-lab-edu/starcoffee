@@ -1,5 +1,6 @@
 package com.project.starcoffee.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 public class MemberDTO {
 
     // 안붙이는게 좋을까 ? @NonNull 이라도 붙이는 게 좋을까 ?
