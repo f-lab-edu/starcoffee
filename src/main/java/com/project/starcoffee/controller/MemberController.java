@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -34,7 +35,7 @@ public class MemberController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void signUp(@RequestBody MemberDTO memberInfo) {
+    public void signUp(@RequestBody @Validated MemberDTO memberInfo) {
         if (MemberDTO.hasNullDataBeforeSignUp(memberInfo)) {
             throw new NullPointerException("회원가입 시, 필수 데이터를 모두 입력해야합니다.");
         }
@@ -50,15 +51,16 @@ public class MemberController {
         String password = loginRequest.getPassword();
         LoginResponse loginResponse;
 
-        Member memberInfo = memberService.login(id, password);
+        Optional<Member> memberInfo = memberService.login(id, password);
+
         // 회원을 찾지 못했을 경우
-        if (memberInfo == null) {
+        if (memberInfo.isEmpty()) {
             loginResponse = LoginResponse.FAIL;
             responseEntity = new ResponseEntity<>(loginResponse, HttpStatus.UNAUTHORIZED);
 
         // 회원을 찾았을 경우, 세션에 ID를 저장
-        } else if (MemberStatus.DEFAULT.equals(memberInfo.getStatus())) {
-            loginResponse = LoginResponse.success(memberInfo);
+        } else if (MemberStatus.DEFAULT.equals(memberInfo.get().getStatus())) {
+            loginResponse = LoginResponse.success(memberInfo.get());
             SessionUtil.setLoginMemberId(session, id);
             responseEntity = new ResponseEntity<>(loginResponse, HttpStatus.OK);
 
