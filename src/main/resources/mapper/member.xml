@@ -29,8 +29,8 @@
 
 
     <insert id="saveMember" parameterType="com.project.starcoffee.controller.request.member.MemberRequest">
-        INSERT INTO MEMBERS (name, tel, email, gender, nick_name, login_id, password)
-        VALUES (#{name}, #{tel}, #{email}, #{gender}, #{nickName}, #{loginId}, #{password})
+        INSERT INTO MEMBERS (name, login_id, password, tel, email, gender, nick_name)
+        VALUES (#{name}, #{loginId}, #{password}, #{tel}, #{email}, #{gender}, #{nickName})
     </insert>
 
     <select id="findById" resultType="com.project.starcoffee.domain.member.Member">
@@ -55,7 +55,7 @@
 
     <update id="deleteMember">
         UPDATE MEMBERS
-        SET status = 'DELETED'
+        SET status = 'DELETED', update_at = NOW()
         WHERE login_id = #{id} AND status != 'DELETED'
     </update>
 
