@@ -6,8 +6,6 @@ import com.project.starcoffee.controller.request.member.MemberLoginRequest;
 import com.project.starcoffee.controller.request.member.MemberRequest;
 import com.project.starcoffee.controller.response.member.LoginResponse;
 import com.project.starcoffee.domain.member.Member;
-import com.project.starcoffee.domain.member.MemberStatus;
-import com.project.starcoffee.dto.MemberDTO;
 import com.project.starcoffee.service.MemberService;
 import com.project.starcoffee.utils.SessionUtil;
 import com.project.starcoffee.validation.password.ValidPassword;
@@ -16,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -63,7 +60,7 @@ public class MemberController {
 
     @PatchMapping("/password")
     @ResponseStatus(HttpStatus.OK)
-    public void updateMemberPassword(@RequestBody @ValidPassword PasswordRequest passwordRequest,
+    public void updateMemberPassword(@RequestBody @Valid PasswordRequest passwordRequest,
                                      HttpSession session) {
 
         String beforePassword = passwordRequest.getBeforePassword();
@@ -76,7 +73,6 @@ public class MemberController {
         해당 예외를 적절히 처리하거나 예외 핸들러를 등록하여 처리할 수 있다.
          */
         memberService.updatePassword(memberId, beforePassword, afterPassword);
-
     }
 
     @GetMapping("/member")
