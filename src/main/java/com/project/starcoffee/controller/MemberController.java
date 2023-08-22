@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Slf4j
 @RestController
@@ -77,9 +78,16 @@ public class MemberController {
 
     @GetMapping("/member")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<Member> findById(HttpSession session) {
+    public ResponseEntity<Member> findById(HttpSession session) {
         String loginId = SessionUtil.getLoginMemberId(session);
-        return memberService.findById(loginId);
+        Optional<Member> memberInfo = memberService.findById(loginId);
+
+        return Stream.of(memberInfo)
+                .filter(Optional::isPresent)
+                .findFirst()
+                .map(Optional::get)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @DeleteMapping("/member")

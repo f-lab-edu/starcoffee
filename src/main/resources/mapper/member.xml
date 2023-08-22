@@ -55,7 +55,7 @@
 
     <update id="deleteMember">
         UPDATE MEMBERS
-        SET status = 'DELETED', update_at = NOW()
+        SET status = 'DELETED', updated_at = NOW()
         WHERE login_id = #{id} AND status != 'DELETED'
     </update>
 

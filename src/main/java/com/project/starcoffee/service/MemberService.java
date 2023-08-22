@@ -72,19 +72,9 @@ public class MemberService {
             throw new RuntimeException("not found Member ERROR! 회원을 찾을 수 없습니다.");
         }
 
-        memberInfo.ifPresent(member -> {
-            if (!isMemberStatusDefault(member)){
-                log.error("already delete Member!");
-                throw new RuntimeException("회원은 이미 탈퇴한 회원입니다.");
-            }
-        });
-
         return memberInfo;
     }
 
-    private static boolean isMemberStatusDefault(Member member) {
-        return MemberStatus.DEFAULT.equals(member.getStatus());
-    }
 
     /**
      * 로그인 아이디로 회원정보를 찾는다.
