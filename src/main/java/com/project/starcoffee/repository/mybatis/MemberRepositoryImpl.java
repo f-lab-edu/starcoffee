@@ -1,5 +1,6 @@
 package com.project.starcoffee.repository.mybatis;
 
+import com.project.starcoffee.controller.request.member.MemberRequest;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.dto.MemberDTO;
 import com.project.starcoffee.repository.MemberRepository;
@@ -16,7 +17,7 @@ public class MemberRepositoryImpl implements MemberRepository {
     private final MemberMapper memberMapper;
 
     @Override
-    public int saveMember(MemberDTO memberInfo) {
+    public int saveMember(MemberRequest memberInfo) {
         return memberMapper.saveMember(memberInfo);
     }
 

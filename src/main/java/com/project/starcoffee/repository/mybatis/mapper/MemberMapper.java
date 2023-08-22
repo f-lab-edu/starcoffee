@@ -1,5 +1,6 @@
 package com.project.starcoffee.repository.mybatis.mapper;
 
+import com.project.starcoffee.controller.request.member.MemberRequest;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.dto.MemberDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -10,7 +11,7 @@ import java.util.Optional;
 @Mapper
 public interface MemberMapper {
 
-    int saveMember(MemberDTO memberInfo);
+    int saveMember(MemberRequest memberInfo);
 
     Optional<Member> findById(String loginId);
 

@@ -1,6 +1,9 @@
 package com.project.starcoffee.service;
 
+import com.project.starcoffee.controller.request.member.MemberLoginRequest;
+import com.project.starcoffee.controller.request.member.MemberRequest;
 import com.project.starcoffee.domain.member.Member;
+import com.project.starcoffee.domain.member.MemberStatus;
 import com.project.starcoffee.dto.MemberDTO;
 import com.project.starcoffee.exception.DuplicateIdException;
 import com.project.starcoffee.repository.MemberRepository;
@@ -29,6 +32,8 @@ public class MemberServiceTest {
     MemberRepository repository;
 
     private MemberDTO member;
+    private MemberRequest member2;
+
     private Optional<Member> resultMember;
 
     @BeforeEach
@@ -45,19 +50,31 @@ public class MemberServiceTest {
                 .birth(LocalDateTime.now())
                 .build();
 
+        member2 = MemberRequest.builder()
+                .id(1L)
+                .name("testName")
+                .tel("010-1111-1111")
+                .email("test@test.com")
+                .gender("M")
+                .nickName("nickName")
+                .loginId("testLogin")
+                .password("password1234#")
+                .birth(LocalDateTime.now())
+                .build();
+
         resultMember = Optional.of(new Member());
         resultMember.ifPresent(memberInfo -> {
-            member.setLoginId("testLogin");
-            // password1234# 비밀번호의 암호화
-            member.setPassword("984da22aa86418be811bc17828ebaa91cc9b058de869f223c9461fc85c734b27");
+            memberInfo.setLoginId("testLogin");
+            memberInfo.setPassword("984da22aa86418be811bc17828ebaa91cc9b058de869f223c9461fc85c734b27");
+            memberInfo.setStatus(MemberStatus.DEFAULT);
         });
     }
 
     @Test
     public void 고객_회원가입_성공() {
-        given(repository.saveMember(member)).willReturn(1);
+        given(repository.saveMember(member2)).willReturn(1);
 
-        service.saveMember(member);
+        service.saveMember(member2);
     }
 
     @Test
@@ -65,23 +82,27 @@ public class MemberServiceTest {
         given(repository.checkId(member.getLoginId())).willReturn(1);
 
         assertThatCode(() -> {
-            service.DuplicatedId(member); }).isInstanceOf(DuplicateIdException.class);
+            service.DuplicatedId(member2); }).isInstanceOf(DuplicateIdException.class);
     }
 
     @Test
     public void 고객_회원가입_실패() {
-        given(repository.saveMember(member)).willReturn(0);
+        given(repository.saveMember(member2)).willReturn(0);
         assertThatCode(() -> {
-            service.saveMember(member);
+            service.saveMember(member2);
         }).isInstanceOf(RuntimeException.class);
     }
 
     @Test
     public void 고객_로그인_성공() {
+        MemberLoginRequest memberLoginRequest = new MemberLoginRequest();
+        memberLoginRequest.setLoginId("testLogin");
+        memberLoginRequest.setPassword("password1234#");
+
         given(repository.findByIdAndPassword("testLogin", SHA256Util.encryptSHA256("password1234#")))
                 .willReturn(resultMember);
 
-        assertThat(service.login("testLogin", "password1234#")).isEqualTo(resultMember);
+        assertThat(service.login(memberLoginRequest)).isEqualTo(resultMember);
     }
 
     @Test
@@ -101,10 +122,17 @@ public class MemberServiceTest {
     }
     @Test
     public void 고객_로그인_실패_비밀번호_불일치() {
+        MemberLoginRequest memberLoginRequest = new MemberLoginRequest();
+        memberLoginRequest.setLoginId("testLogin");
+        memberLoginRequest.setPassword("testPassword");
+
         given(repository.findByIdAndPassword("testLogin", SHA256Util.encryptSHA256("testPassword")))
                 .willReturn(null);
 
-        assertThat(service.login("testLogin", "testPassword")).isNull();
+        assertThatCode(() -> {
+            service.login(memberLoginRequest);
+        }).isInstanceOf(RuntimeException.class);
+
     }
 
     @Test

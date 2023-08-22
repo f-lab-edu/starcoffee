@@ -1,15 +1,20 @@
 package com.project.starcoffee.service;
 
+import com.project.starcoffee.controller.request.member.MemberLoginRequest;
+import com.project.starcoffee.controller.request.member.MemberRequest;
 import com.project.starcoffee.domain.member.Member;
+import com.project.starcoffee.domain.member.MemberStatus;
 import com.project.starcoffee.dto.MemberDTO;
 import com.project.starcoffee.exception.DuplicateIdException;
 import com.project.starcoffee.repository.MemberRepository;
 import com.project.starcoffee.utils.SHA256Util;
+import com.project.starcoffee.validation.password.ValidPassword;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @Slf4j
@@ -19,20 +24,20 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public void saveMember(MemberDTO memberInfo) {
+    public void saveMember(MemberRequest memberRequest) {
 
         // ID 중복체크
-        DuplicatedId(memberInfo);
+        DuplicatedId(memberRequest);
 
         // 비밀번호 암호화 후, 저장
-        memberInfo.setPassword(SHA256Util.encryptSHA256(memberInfo.getPassword()));
+        memberRequest.setPassword(SHA256Util.encryptSHA256(memberRequest.getPassword()));
 
         // 회원가입 진행
-        int result = memberRepository.saveMember(memberInfo);
+        int result = memberRepository.saveMember(memberRequest);
         if (result != 1) {
-            log.error("save Member ERROR! : {}", memberInfo);
+            log.error("save Member ERROR! : {}", memberRequest);
             throw new RuntimeException("insert Member ERROR! 회원가입 메서드를 확인해주세요.\n"
-                    + "Param : " + memberInfo);
+                    + "Param : " + memberRequest);
         }
     }
 
@@ -40,7 +45,7 @@ public class MemberService {
      * 중복된 아이디가 있는지 확인한다.
      * @param memberInfo 회원정보
      */
-    public void DuplicatedId(MemberDTO memberInfo) {
+    public void DuplicatedId(MemberRequest memberInfo) {
         boolean resultId = memberRepository.checkId(memberInfo.getLoginId()) == 1;
         if (resultId) {
             throw new DuplicateIdException("중복된 아이디 입니다.");
@@ -51,14 +56,34 @@ public class MemberService {
     /**
      * 로그인을 한다.
      *
-     * @param id       로그인 아이디
-     * @param password 로그인 비밀번호
+     * @param loginRequest
      * @return
      */
-    public Optional<Member> login(String id, String password) {
+    public Optional<Member> login(MemberLoginRequest loginRequest) {
+
+        String id = loginRequest.getLoginId();
+        String password = loginRequest.getPassword();
+
         String cryptoPassword = SHA256Util.encryptSHA256(password);
         Optional<Member> memberInfo = memberRepository.findByIdAndPassword(id, cryptoPassword);
+
+        if (memberInfo.isEmpty()) {
+            log.error("not found Member ERROR! {}", memberInfo);
+            throw new RuntimeException("not found Member ERROR! 회원을 찾을 수 없습니다.");
+        }
+
+        memberInfo.ifPresent(member -> {
+            if (!isMemberStatusDefault(member)){
+                log.error("already delete Member!");
+                throw new RuntimeException("회원은 이미 탈퇴한 회원입니다.");
+            }
+        });
+
         return memberInfo;
+    }
+
+    private static boolean isMemberStatusDefault(Member member) {
+        return MemberStatus.DEFAULT.equals(member.getStatus());
     }
 
     /**
@@ -82,7 +107,7 @@ public class MemberService {
      * 회원의 비밀번호를 변경한다.
      * @param id 회원의 아이디
      * @param beforePw 변경 전 비밀번호
-     * @param afterPw 변경 할 비밀번료
+     * @param afterPw 변경 할 비밀번호
      */
     @Transactional
     public void updatePassword(String id, String beforePw, String afterPw) {

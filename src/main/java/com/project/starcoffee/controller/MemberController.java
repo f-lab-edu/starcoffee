@@ -1,13 +1,16 @@
 package com.project.starcoffee.controller;
 
+import com.project.starcoffee.controller.argument.IdPass;
 import com.project.starcoffee.controller.request.PasswordRequest;
 import com.project.starcoffee.controller.request.member.MemberLoginRequest;
+import com.project.starcoffee.controller.request.member.MemberRequest;
 import com.project.starcoffee.controller.response.member.LoginResponse;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.domain.member.MemberStatus;
 import com.project.starcoffee.dto.MemberDTO;
 import com.project.starcoffee.service.MemberService;
 import com.project.starcoffee.utils.SessionUtil;
+import com.project.starcoffee.validation.password.ValidPassword;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.Optional;
 
 @Slf4j
@@ -31,51 +35,35 @@ public class MemberController {
      * 회원가입 진행
      * 필수입력 정보에 누락이 있으면 NullPointerException 을 처리한다.
      *
-     * @param memberInfo
+     * @param memberRequest
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void signUp(@RequestBody @Validated MemberDTO memberInfo) {
-        if (MemberDTO.hasNullDataBeforeSignUp(memberInfo)) {
-            throw new NullPointerException("회원가입 시, 필수 데이터를 모두 입력해야합니다.");
-        }
-
-        memberService.saveMember(memberInfo);
+    public void signUp(@RequestBody @Valid MemberRequest memberRequest) {
+        memberService.saveMember(memberRequest);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody @NonNull MemberLoginRequest loginRequest,
+    public ResponseEntity<LoginResponse> login(@RequestBody @IdPass @NonNull MemberLoginRequest loginRequest,
                                                HttpSession session) {
         ResponseEntity<LoginResponse> responseEntity = null;
-        String id = loginRequest.getLoginId();
-        String password = loginRequest.getPassword();
         LoginResponse loginResponse;
 
-        Optional<Member> memberInfo = memberService.login(id, password);
+        Optional<Member> memberInfo = memberService.login(loginRequest);
 
-        // 회원을 찾지 못했을 경우
-        if (memberInfo.isEmpty()) {
-            loginResponse = LoginResponse.FAIL;
-            responseEntity = new ResponseEntity<>(loginResponse, HttpStatus.UNAUTHORIZED);
+        loginResponse = LoginResponse.success(memberInfo.get());
+        SessionUtil.setLoginMemberId(session, loginRequest.getLoginId());
+        responseEntity = new ResponseEntity<>(loginResponse, HttpStatus.OK);
 
-        // 회원을 찾았을 경우, 세션에 ID를 저장
-        } else if (MemberStatus.DEFAULT.equals(memberInfo.get().getStatus())) {
-            loginResponse = LoginResponse.success(memberInfo.get());
-            SessionUtil.setLoginMemberId(session, id);
-            responseEntity = new ResponseEntity<>(loginResponse, HttpStatus.OK);
 
-        // 그 외 오류
-        } else {
-            log.error("Login ERROR! {}", responseEntity);
-            throw new RuntimeException("로그인 에러입니다.");
-        }
         return responseEntity;
     }
 
 
+
     @PatchMapping("/password")
     @ResponseStatus(HttpStatus.OK)
-    public void updateMemberPassword(@RequestBody PasswordRequest passwordRequest,
+    public void updateMemberPassword(@RequestBody @ValidPassword PasswordRequest passwordRequest,
                                      HttpSession session) {
 
         String beforePassword = passwordRequest.getBeforePassword();
@@ -83,11 +71,11 @@ public class MemberController {
 
         String memberId = SessionUtil.getLoginMemberId(session);
 
-        if (beforePassword == null || afterPassword == null) {
-            throw new NullPointerException("패스워드를 입력하세요.");
-        } else {
-            memberService.updatePassword(memberId, beforePassword, afterPassword);
-        }
+        /*
+        유효성 검사에 실패하면 ConstraintViolationException 이 발생하고,
+        해당 예외를 적절히 처리하거나 예외 핸들러를 등록하여 처리할 수 있다.
+         */
+        memberService.updatePassword(memberId, beforePassword, afterPassword);
 
     }
 

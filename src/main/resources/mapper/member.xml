@@ -28,7 +28,7 @@
     </select>
 
 
-    <insert id="saveMember" parameterType="com.project.starcoffee.dto.MemberDTO">
+    <insert id="saveMember" parameterType="com.project.starcoffee.controller.request.member.MemberRequest">
         INSERT INTO MEMBERS (name, tel, email, gender, nick_name, login_id, password)
         VALUES (#{name}, #{tel}, #{email}, #{gender}, #{nickName}, #{loginId}, #{password})
     </insert>
@@ -61,8 +61,9 @@
 
     <update id="updatePassword">
         UPDATE MEMBERS
-        SET password = #{password}, updated_at = NOW()
-        WHERE login_id = #{id}
+        SET password = #{arg1},
+            updated_at = NOW()
+        WHERE login_id = #{arg0}
     </update>
 
 </mapper>
