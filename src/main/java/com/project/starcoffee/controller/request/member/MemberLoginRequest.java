@@ -1,16 +1,17 @@
 package com.project.starcoffee.controller.request.member;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
+
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
 public class MemberLoginRequest {
 
-    @NonNull
+    @NotNull
     private String loginId;
 
-    @NonNull
+    @NotNull
     private String password;
 }

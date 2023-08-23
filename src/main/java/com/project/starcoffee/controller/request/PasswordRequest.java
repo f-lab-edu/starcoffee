@@ -4,13 +4,15 @@ import com.project.starcoffee.validation.password.ValidPassword;
 import lombok.Getter;
 import lombok.NonNull;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @ValidPassword
 public class PasswordRequest {
 
-    @NonNull
+    @NotNull
     private String beforePassword;
 
-    @NonNull
+    @NotNull
     private String afterPassword;
 }

@@ -24,6 +24,10 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
+    /**
+     * 회원 가입을 진행한다.
+     * @param memberRequest 사용자가 입력한 고객정보
+     */
     public void saveMember(MemberRequest memberRequest) {
 
         // ID 중복체크
@@ -101,12 +105,12 @@ public class MemberService {
      */
     @Transactional
     public void updatePassword(String id, String beforePw, String afterPw) {
-        String enBeforePassword = SHA256Util.encryptSHA256(beforePw);
+        Optional<Member> memberOptional = memberRepository.findById(id);
+        Member memberInfo = memberOptional.orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
 
-        // 이전 비밀번호 확인
-        checkBeforePassword(id, enBeforePassword);
+        // 이전 비밀번호 확인 및 비밀번호 변경
+        String enAfterPassword = memberInfo.matchesPasswordChangePassword(id, beforePw, afterPw);
 
-        String enAfterPassword = SHA256Util.encryptSHA256(afterPw);
         int result = memberRepository.updatePassword(id, enAfterPassword);
         if (result != 1) {
             log.error("update Member ERROR! id={}, pw={}", id, enAfterPassword);
@@ -114,6 +118,11 @@ public class MemberService {
         }
     }
 
+    /**
+     * 비밀번호 변경 시, 이전 비밀번호가 데이터베이스에 존재하는지 확인합니다.
+     * @param id 아이디
+     * @param enBeforePassword 변경 전 비밀번호
+     */
     private void checkBeforePassword(String id, String enBeforePassword) {
         if (memberRepository.findByIdAndPassword(id, enBeforePassword) == null) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
@@ -122,7 +131,6 @@ public class MemberService {
 
     /**
      * 회원의 Status 를 'DELETED' 로 변경한다.
-     *
      * @param loginId 탈퇴할 아이디
      */
     @Transactional
