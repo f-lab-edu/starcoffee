@@ -1,0 +1,56 @@
+@startuml
+!define APP class backgroundColor LightSkyBlue
+!define STORE class backgroundColor PaleGreen
+!define ORDER class backgroundColor LightCyan
+!define PAYMENT class backgroundColor LightGoldenRodYellow
+
+title 주문 시퀀스
+
+
+actor Customer as customer
+
+box "App"
+participant "Avatar" as avatar
+participant "Order-1" as order_1
+participant "Order-2" as order_2
+participant "Payment" as payment
+end box
+database PaymentSystem as paymentSystem
+participant "Store" as store
+
+
+customer -> avatar: app 접속
+avatar -> order_1 : 주문 버튼 클릭
+avatar -> order_1: [주문할 매장] 선택
+avatar -> order_1: 전체 메뉴 클릭
+avatar -> order_1: 음료 카테고리 클릭
+avatar -> order_1: 음료 종류 카테고리 클릭
+avatar -> order_1: [실제 음료] 선택
+avatar -> order_1: [ICE, HOT] 선택
+avatar -> order_1: 주문하기 클릭
+order_1 -> order_2: [음료 사이즈] 선택
+order_1 -> order_2: [음료 컵] 선택
+order_1 -> order_2: [음료 수량] 선택
+order_1 -> order_2: 주문하기 클릭
+order_2 -> payment: [결제 수단] 선택
+order_2 -> payment: [쿠폰 및 할인] 선택
+order_2 -> payment: [현금영수증] 입력
+order_2 -> payment: 결제하기 클릭
+payment -> avatar : 매장 확인 요청
+avatar -> payment : 매장 확인 완료
+payment -> paymentSystem : 결제 승인 요청
+
+paymentSystem -> payment : 결제 완료
+payment -> store : 주문 요청
+store --> avatar : [알람] 주문 취소
+store --> paymentSystem : 환불 요청
+paymentSystem -> store : 환불 요청 완료
+store -> avatar : [알람] 환불 완료
+
+
+
+
+
+
+
+@enduml
