@@ -18,7 +18,6 @@ end box
 database PaymentSystem as paymentSystem
 participant "Store" as store
 
-
 customer -> avatar: app 접속
 avatar -> order_1 : 주문 버튼 클릭
 avatar -> order_1: [주문할 매장] 선택

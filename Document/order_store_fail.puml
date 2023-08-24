@@ -39,7 +39,6 @@ order_2 -> payment: 결제하기 클릭
 payment -> avatar : 매장 확인 요청
 avatar -> payment : 매장 확인 완료
 payment -> paymentSystem : 결제 승인 요청
-
 paymentSystem -> payment : 결제 완료
 payment -> store : 주문 요청
 store --> avatar : [알람] 주문 취소

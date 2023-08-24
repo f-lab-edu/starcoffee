@@ -44,7 +44,6 @@ payment -> store : 주문 요청
 paymentSystem --> store : 환불 요청
 store -> paymentSystem : 결제취소 요청
 paymentSystem -> store : 결제취소 완료
-
 store --> avatar : [알람] 주문 취소
 store --> avatar : [알람] 환불 완료
 
