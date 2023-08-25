@@ -4,7 +4,7 @@
 !define ORDER class backgroundColor LightCyan
 !define PAYMENT class backgroundColor LightGoldenRodYellow
 
-title 주문 시퀀스
+title 주문성공 시퀀스
 
 
 actor Customer as customer
