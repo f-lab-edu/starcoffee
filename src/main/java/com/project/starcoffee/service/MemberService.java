@@ -11,18 +11,20 @@ import com.project.starcoffee.utils.SHA256Util;
 import com.project.starcoffee.validation.password.ValidPassword;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class MemberService {
 
-    private final MemberRepository memberRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     /**
      * 회원 가입을 진행한다.
@@ -30,7 +32,7 @@ public class MemberService {
      */
     public void saveMember(MemberRequest memberRequest) {
 
-        // ID 중복체크
+        // 로그인 ID 중복 체크
         DuplicatedId(memberRequest);
 
         // 비밀번호 암호화 후, 저장
@@ -108,7 +110,7 @@ public class MemberService {
         Optional<Member> memberOptional = memberRepository.findById(id);
         Member memberInfo = memberOptional.orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
 
-        // 이전 비밀번호 확인 및 비밀번호 변경
+        // 이전 비밀번호 확인 및 비밀번호 변
         String enAfterPassword = memberInfo.matchesPasswordChangePassword(id, beforePw, afterPw);
 
         int result = memberRepository.updatePassword(id, enAfterPassword);

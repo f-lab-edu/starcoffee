@@ -4,7 +4,7 @@
 <mapper namespace="com.project.starcoffee.repository.mybatis.mapper.MemberMapper">
 
     <resultMap id="memberInfo" type="com.project.starcoffee.domain.member.Member">
-        <result property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
         <result property="name" column="name"/>
         <result property="loginId" column="login_id"/>
         <result property="password" column="password"/>
@@ -14,8 +14,8 @@
         <result property="birth" column="birth"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
-        <result property="gender" column="gender"/>
         <result property="nickName" column="nick_name"/>
+        <result property="gender" column="gender"/>
         <collection property="card" column="card"
                     javaType="com.project.starcoffee.domain.card.Card"
                     select="findCardInfo"></collection>
@@ -23,26 +23,26 @@
 
     <select id="findCardInfo" resultType="com.project.starcoffee.domain.card.Card">
         SELECT *
-        FROM CARD
-        WHERE login_id = #{loginId}
+        FROM STAR_CARD
+        WHERE login_id = #{id}
     </select>
 
 
     <insert id="saveMember" parameterType="com.project.starcoffee.controller.request.member.MemberRequest">
-        INSERT INTO MEMBERS (name, login_id, password, tel, email, gender, nick_name)
-        VALUES (#{name}, #{loginId}, #{password}, #{tel}, #{email}, #{gender}, #{nickName})
+        INSERT INTO MEMBERS (member_id, name, login_id, password, tel, email, birth,  nick_name, gender)
+        VALUES (#{memberId}, #{name}, #{loginId}, #{password}, #{tel}, #{email}, #{birth}, #{nickName}, #{gender})
     </insert>
 
     <select id="findById" resultType="com.project.starcoffee.domain.member.Member">
         SELECT *
         FROM MEMBERS
-        WHERE login_id = #{id}
+        WHERE login_id = #{loginId}
     </select>
 
     <select id="findByIdAndPassword" resultType="com.project.starcoffee.domain.member.Member">
         SELECT *
         FROM MEMBERS
-        WHERE login_id = #{id}
+        WHERE login_id = #{loginId}
         AND password = #{password}
         AND status != 'DELETED'
     </select>
@@ -50,13 +50,13 @@
     <select id="checkId" resultType="int">
         SELECT count(*)
         FROM MEMBERS
-        where login_id = #{id}
+        WHERE login_id = #{loginId}
     </select>
 
     <update id="deleteMember">
         UPDATE MEMBERS
         SET status = 'DELETED', updated_at = NOW()
-        WHERE login_id = #{id} AND status != 'DELETED'
+        WHERE login_id = #{loginId} AND status != 'DELETED'
     </update>
 
     <update id="updatePassword">

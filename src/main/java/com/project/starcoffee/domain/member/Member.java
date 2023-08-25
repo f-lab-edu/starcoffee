@@ -6,38 +6,46 @@ import com.project.starcoffee.utils.SHA256Util;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
+@Setter
 @ToString
 @EqualsAndHashCode
 public class Member {
 
     private MemberRepository memberRepository;
 
-    @NonNull
-    private Long id;
-    @NonNull
+    private UUID memberId;
+
     private String name;
+
     private String loginId;
+
     private String password;
-    @NonNull
+
     private String tel;
-    @NonNull
+
     private String email;
-    private MemberStatus status;  //   회원상태
+
+    private MemberStatus status;  //   회원 상태
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime birth;   // 생년월일
+    private Timestamp birth;   // 생년월일
+
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime createdAt;  // 가입일
+    private Timestamp createdAt;  // 가입일
+
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime updatedAt;  // 수정일
-    @NonNull
-    private String gender;  // 성별
-    @NonNull
+    private Timestamp updatedAt;  // 수정일
+
     private String nickName;    // 닉네임
-    private Card card;  // 스타커피 카드정보
+
+    private String gender;  // 성별
+
+    private List<Card> card;  // 스타커피 카드정보
 
 
     /**

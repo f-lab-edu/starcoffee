@@ -1,30 +1,38 @@
 package com.project.starcoffee.controller.request.member;
 
-import com.project.starcoffee.domain.member.Member;
-import com.project.starcoffee.dto.MemberDTO;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class MemberRequest {
 
-    @NonNull    // 안붙이는게 좋을까 ? @NonNull 이라도 붙이는 게 좋을까 ?
-    private Long id;
+    private UUID memberId;
+
+    public MemberRequest() {
+        this.memberId = UUID.randomUUID();
+    }
 
     @NotNull(message = "이름을 입력해주세요.")
     @Size(min = 2, max = 8, message = "이름을 2~8자까지 입력가능합니다.")
     private String name;
+
+    @NotNull(message = "로그인 ID는 필수값 입니다.")
+    private String loginId;
+
+    @NotNull(message = "비밀번호는 필수값 입니다.")
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$",
+            message = "비밀번호는 영문, 특수문자, 숫자포함 8~20자 사이로 입력가능합니다.")
+    private String password;
 
     @NotNull(message = "휴대폰 번호를 입력해주세요.")
     @Pattern(regexp = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$",
@@ -35,34 +43,12 @@ public class MemberRequest {
     @Email(message = "이메일 형식을 맞춰주세요.")
     private String email;
 
-    private String gender;  // 성별
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Timestamp birth;   // 생년월일
 
     @NotNull(message = "닉네임은 필수값 입니다.")
     private String nickName;
 
-    @NotNull(message = "아이디는 필수값 입니다.")
-    private String loginId;
-
-    @NotNull(message = "비밀번호는 필수값 입니다.")
-    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$",
-            message = "비밀번호는 영문, 특수문자, 숫자포함 8~20자 사이로 입력가능합니다.")
-    private String password;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime birth;   // 생년월일
-
-    /**
-     * 회원가입 전 필수 데이터중 null 값이 있는지 검사한다.
-     * null 값이 존재하여 회원가입 진행이 불가능 하다면 false 를 반환한다.
-     * 검사 후 이상이 없다면 true 를 반환한다.
-     * @param memberInfo
-     * @return
-     */
-    public static boolean hasNullDataBeforeSignUp(@Valid MemberRequest memberInfo) {
-        return memberInfo.getName()==null || memberInfo.getTel()==null
-                || memberInfo.getEmail()==null || memberInfo.getGender()==null
-                || memberInfo.getNickName() == null || memberInfo.getLoginId() == null
-                || memberInfo.getPassword() == null;
-    }
-
+    private String gender;  // 성별
 
 }

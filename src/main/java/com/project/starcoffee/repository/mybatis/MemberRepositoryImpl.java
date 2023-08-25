@@ -6,15 +6,15 @@ import com.project.starcoffee.dto.MemberDTO;
 import com.project.starcoffee.repository.MemberRepository;
 import com.project.starcoffee.repository.mybatis.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-
 @Repository
-@RequiredArgsConstructor
 public class MemberRepositoryImpl implements MemberRepository {
 
-    private final MemberMapper memberMapper;
+    @Autowired
+    private MemberMapper memberMapper;
 
     @Override
     public int saveMember(MemberRequest memberInfo) {
