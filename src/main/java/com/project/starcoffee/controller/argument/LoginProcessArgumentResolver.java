@@ -25,7 +25,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LoginProcessArgumentResolver implements HandlerMethodArgumentResolver {
 
-
     private final MemberRepository memberRepository;
 
     @Override

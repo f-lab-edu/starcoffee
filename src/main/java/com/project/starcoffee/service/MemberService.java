@@ -97,7 +97,7 @@ public class MemberService {
 
     /**
      * 회원의 비밀번호를 변경한다.
-     * @param id 회원의 아이디
+     * @param loginId 회원 아이디
      * @param beforePw 변경 전 비밀번호
      * @param afterPw 변경 할 비밀번호
      */

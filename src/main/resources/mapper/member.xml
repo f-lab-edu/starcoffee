@@ -16,13 +16,13 @@
         <result property="updatedAt" column="updated_at"/>
         <result property="nickName" column="nick_name"/>
         <result property="gender" column="gender"/>
-        <collection property="card" column="card"
-                    javaType="com.project.starcoffee.domain.card.Card"
+        <collection property="card" column="card" javaType="java.util.ArrayList"
+                    ofType="com.project.starcoffee.domain.card.Card"
                     select="findCardInfo"></collection>
     </resultMap>
 
     <select id="findCardInfo" resultType="com.project.starcoffee.domain.card.Card">
-        SELECT *
+        SELECT card_name, card_nickname, cardAmount
         FROM STAR_CARD
         WHERE login_id = #{id}
     </select>
