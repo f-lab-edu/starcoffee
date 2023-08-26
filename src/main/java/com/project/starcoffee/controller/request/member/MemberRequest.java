@@ -15,7 +15,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 public class MemberRequest {
-
+    @NotNull
     private UUID memberId;
 
     public MemberRequest() {

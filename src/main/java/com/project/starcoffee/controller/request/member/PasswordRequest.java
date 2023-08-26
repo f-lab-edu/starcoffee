@@ -1,8 +1,7 @@
-package com.project.starcoffee.controller.request;
+package com.project.starcoffee.controller.request.member;
 
 import com.project.starcoffee.validation.password.ValidPassword;
 import lombok.Getter;
-import lombok.NonNull;
 
 import javax.validation.constraints.NotNull;
 

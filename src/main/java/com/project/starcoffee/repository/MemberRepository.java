@@ -14,12 +14,18 @@ public interface MemberRepository {
 
     Optional<Member> findById(String loginId);
 
-    Optional<Member> findByIdAndPassword(@Param("id")String id, @Param("password")String password);
+    int checkId(String loginId);
 
-    int checkId(String id);
+    Optional<Member> findByIdAndPassword(@Param("loginId") String loginId, @Param("password") String password);
+
+    int updatePassword(@Param("loginId") String loginId, @Param("password") String password);
+
+    int updateNickName(@Param("loginId") String loginId, @Param("nickName") String nickName);
+
+    int updateEmail(@Param("loginId") String loginId, @Param("email") String email);
+
+    int updateTel(@Param("loginId") String loginId, @Param("tel") String tel);
 
     int deleteMember(String loginId);
-
-    int updatePassword(@Param("id")String id, @Param("password")String password);
 
 }

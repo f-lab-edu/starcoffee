@@ -13,7 +13,7 @@ public class SessionUtil {
      * @param session 사용자의 세션
      * @return
      */
-    public static String getLoginMemberId(HttpSession session) {
+    public static String getLoginId(HttpSession session) {
         return (String) session.getAttribute(LOGIN_MEMBER);
     }
 
@@ -22,7 +22,7 @@ public class SessionUtil {
      * @param session 사용자의 session
      * @param id 로그인한 고객의 id
      */
-    public static void setLoginMemberId(HttpSession session, String id) {
+    public static void setLoginId(HttpSession session, String id) {
         session.setAttribute(LOGIN_MEMBER, id);
     }
 

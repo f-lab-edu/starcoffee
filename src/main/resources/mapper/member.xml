@@ -33,17 +33,22 @@
         VALUES (#{memberId}, #{name}, #{loginId}, #{password}, #{tel}, #{email}, #{birth}, #{nickName}, #{gender})
     </insert>
 
-    <select id="findById" resultType="com.project.starcoffee.domain.member.Member">
+    <select id="findById" resultMap="memberInfo">
         SELECT *
         FROM MEMBERS
         WHERE login_id = #{loginId}
     </select>
 
-    <select id="findByIdAndPassword" resultType="com.project.starcoffee.domain.member.Member">
+<!--    <select id="findById" resultType="com.project.starcoffee.domain.member.Member">-->
+<!--        SELECT *-->
+<!--        FROM MEMBERS-->
+<!--        WHERE login_id = #{loginId}-->
+<!--    </select>-->
+
+    <select id="findByIdAndPassword" resultMap="memberInfo">
         SELECT *
         FROM MEMBERS
-        WHERE login_id = #{loginId}
-        AND password = #{password}
+        WHERE login_id = #{loginId} AND password = #{password}
         AND status != 'DELETED'
     </select>
 
@@ -61,9 +66,20 @@
 
     <update id="updatePassword">
         UPDATE MEMBERS
-        SET password = #{arg1},
-            updated_at = NOW()
-        WHERE login_id = #{arg0}
+        SET password = #{password}, updated_at = NOW()
+        WHERE login_id = #{loginId}
+    </update>
+
+    <update id="updateNickName">
+        UPDATE MEMBERS
+        SET nick_name = #{nickName}, updated_at = NOW()
+        WHERE login_id = #{loginId}
+    </update>
+
+    <update id="updateEmail">
+        UPDATE MEMBERS
+        SET email = #{email}, updated_at = NOW()
+        WHERE login_id = #{loginId}
     </update>
 
 </mapper>

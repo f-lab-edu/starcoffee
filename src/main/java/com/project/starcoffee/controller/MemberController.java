@@ -1,15 +1,10 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.controller.argument.LoginProcess;
-import com.project.starcoffee.controller.request.PasswordRequest;
-import com.project.starcoffee.controller.request.member.MemberLoginRequest;
-import com.project.starcoffee.controller.request.member.MemberRequest;
+import com.project.starcoffee.controller.request.member.*;
 import com.project.starcoffee.controller.response.member.LoginResponse;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.service.MemberService;
 import com.project.starcoffee.utils.SessionUtil;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,7 +39,7 @@ public class MemberController {
 
     /**
      * 로그인 진행
-     * @param loginRequest Id, Pw가 포함된 DTO
+     * @param loginRequest ID, PW가 포함된 DTO
      * @param session 세션
      * @return
      */
@@ -57,10 +52,29 @@ public class MemberController {
         Optional<Member> memberInfo = memberService.login(loginRequest);
 
         loginResponse = LoginResponse.success(memberInfo.get());
-        SessionUtil.setLoginMemberId(session, loginRequest.getLoginId());
+        SessionUtil.setLoginId(session, loginRequest.getLoginId());
         responseEntity = new ResponseEntity<>(loginResponse, HttpStatus.OK);
 
         return responseEntity;
+    }
+
+    /**
+     * 로그인 아이디를 기준으로 회원정보를 찾는다.
+     * @param session 세션
+     * @return
+     */
+    @GetMapping("/member")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Member> findById(HttpSession session) {
+        String loginId = SessionUtil.getLoginId(session);
+        Optional<Member> memberInfo = memberService.findById(loginId);
+
+        return Stream.of(memberInfo)
+                .filter(Optional::isPresent)
+                .findFirst()
+                .map(Optional::get)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
 
@@ -73,37 +87,53 @@ public class MemberController {
     @ResponseStatus(HttpStatus.OK)
     public void updateMemberPassword(@RequestBody @Valid PasswordRequest passwordRequest,
                                      HttpSession session) {
-
         String beforePassword = passwordRequest.getBeforePassword();
         String afterPassword = passwordRequest.getAfterPassword();
-
-        String memberId = SessionUtil.getLoginMemberId(session);
+        String loginId= SessionUtil.getLoginId(session);
 
         /*
         유효성 검사에 실패하면 ConstraintViolationException 이 발생하고,
         해당 예외를 적절히 처리하거나 예외 핸들러를 등록하여 처리할 수 있다.
          */
-        memberService.updatePassword(memberId, beforePassword, afterPassword);
+        memberService.updatePassword(loginId, beforePassword, afterPassword);
     }
 
     /**
-     * 로그인 아이디를 기준으로 회원정보를 찾는다.
+     * 회원의 닉네임을 변경한다.
+     * @param nickNameRequest 변경할 닉네임
      * @param session 세션
-     * @return
      */
-    @GetMapping("/member")
+    @PatchMapping("/nickname")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Member> findById(HttpSession session) {
-        String loginId = SessionUtil.getLoginMemberId(session);
-        Optional<Member> memberInfo = memberService.findById(loginId);
-
-        return Stream.of(memberInfo)
-                .filter(Optional::isPresent)
-                .findFirst()
-                .map(Optional::get)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    public void updateMemberNickName(@RequestBody NickNameRequest nickNameRequest, HttpSession session) {
+        String loginId = SessionUtil.getLoginId(session);
+        memberService.updateNickName(loginId, nickNameRequest.getAfterNickname());
     }
+
+
+    /**
+     * 회원의 이메일을 변경한다.
+     * 이메일 주소가 형식이 맞지 않으면 예외를 던진다.
+     * @param emailRequest 변경할 이메일
+     * @param session 세션
+     */
+    @PatchMapping("/email")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateMemberEmail(@RequestBody @Valid EmailRequest emailRequest, HttpSession session) {
+        String loginId = SessionUtil.getLoginId(session);
+        memberService.updateEmail(loginId, emailRequest.getAfterEmail());
+    }
+
+    /**
+     * 회원 로그아웃
+     * @param session 세션
+     */
+    @GetMapping("/logout")
+    public void logout(HttpSession session) {
+        SessionUtil.logoutMember(session);
+    }
+
+
 
     /**
      * 회원이 탈퇴를 한다.
@@ -112,7 +142,7 @@ public class MemberController {
     @DeleteMapping("/member")
     @ResponseStatus(HttpStatus.OK)
     public void deleteMemberInfo(HttpSession session) {
-        String loginId = SessionUtil.getLoginMemberId(session);
+        String loginId = SessionUtil.getLoginId(session);
         memberService.deleteMember(loginId);
     }
 
