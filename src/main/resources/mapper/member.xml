@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.starcoffee.repository.mybatis.mapper.MemberMapper">
+
+    <resultMap id="memberInfo" type="com.project.starcoffee.domain.member.Member">
+        <result property="memberId" column="member_id"/>
+        <result property="name" column="name"/>
+        <result property="loginId" column="login_id"/>
+        <result property="password" column="password"/>
+        <result property="tel" column="tel"/>
+        <result property="email" column="email"/>
+        <result property="status" column="status"/>
+        <result property="birth" column="birth"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="gender" column="gender"/>
+        <collection property="card" column="card"
+                    javaType="com.project.starcoffee.domain.card.Card"
+                    select="findCardInfo"></collection>
+    </resultMap>
+
+    <select id="findCardInfo" resultType="com.project.starcoffee.domain.card.Card">
+        SELECT *
+        FROM STAR_CARD
+        WHERE login_id = #{id}
+    </select>
+
+
+    <insert id="saveMember" parameterType="com.project.starcoffee.controller.request.member.MemberRequest">
+        INSERT INTO MEMBERS (member_id, name, login_id, password, tel, email, birth,  nick_name, gender)
+        VALUES (#{memberId}, #{name}, #{loginId}, #{password}, #{tel}, #{email}, #{birth}, #{nickName}, #{gender})
+    </insert>
+
+    <select id="findById" resultMap="memberInfo">
+        SELECT *
+        FROM MEMBERS
+        WHERE login_id = #{loginId}
+    </select>
+
+<!--    <select id="findById" resultType="com.project.starcoffee.domain.member.Member">-->
+<!--        SELECT *-->
+<!--        FROM MEMBERS-->
+<!--        WHERE login_id = #{loginId}-->
+<!--    </select>-->
+
+    <select id="findByIdAndPassword" resultMap="memberInfo">
+        SELECT *
+        FROM MEMBERS
+        WHERE login_id = #{loginId} AND password = #{password}
+        AND status != 'DELETED'
+    </select>
+
+    <select id="checkId" resultType="int">
+        SELECT count(*)
+        FROM MEMBERS
+        WHERE login_id = #{loginId}
+    </select>
+
+    <update id="deleteMember">
+        UPDATE MEMBERS
+        SET status = 'DELETED', updated_at = NOW()
+        WHERE login_id = #{loginId} AND status != 'DELETED'
+    </update>
+
+    <update id="updatePassword">
+        UPDATE MEMBERS
+        SET password = #{password}, updated_at = NOW()
+        WHERE login_id = #{loginId}
+    </update>
+
+    <update id="updateNickName">
+        UPDATE MEMBERS
+        SET nick_name = #{nickName}, updated_at = NOW()
+        WHERE login_id = #{loginId}
+    </update>
+
+    <update id="updateEmail">
+        UPDATE MEMBERS
+        SET email = #{email}, updated_at = NOW()
+        WHERE login_id = #{loginId}
+    </update>
+
+</mapper>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.starcoffee.repository.mybatis.mapper.MemberMapper">
+
+    <resultMap id="memberInfo" type="com.project.starcoffee.domain.member.Member">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="loginId" column="login_id"/>
+        <result property="password" column="password"/>
+        <result property="tel" column="tel"/>
+        <result property="email" column="email"/>
+        <result property="status" column="status"/>
+        <result property="birth" column="birth"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="gender" column="gender"/>
+        <result property="nickName" column="nick_name"/>
+        <collection property="card" column="card"
+                    javaType="com.project.starcoffee.domain.card.Card"
+                    select="findCardInfo"></collection>
+    </resultMap>
+
+    <select id="findCardInfo" resultType="com.project.starcoffee.domain.card.Card">
+        SELECT *
+        FROM CARD
+        WHERE login_id = #{loginId}
+    </select>
+
+
+    <insert id="saveMember" parameterType="com.project.starcoffee.dto.MemberDTO">
+        INSERT INTO MEMBERS (name, tel, email, gender, nick_name, login_id, password)
+        VALUES (#{name}, #{tel}, #{email}, #{gender}, #{nickName}, #{loginId}, #{password})
+    </insert>
+
+    <select id="findById" resultType="com.project.starcoffee.domain.member.Member">
+        SELECT *
+        FROM MEMBERS
+        WHERE login_id = #{id}
+    </select>
+
+    <select id="findByIdAndPassword" resultType="com.project.starcoffee.domain.member.Member">
+        SELECT *
+        FROM MEMBERS
+        WHERE login_id = #{id}
+        AND password = #{password}
+        AND status != 'DELETED'
+    </select>
+
+    <select id="checkId" resultType="int">
+        SELECT count(*)
+        FROM MEMBERS
+        where login_id = #{id}
+    </select>
+
+    <update id="deleteMember">
+        UPDATE MEMBERS
+        SET status = 'DELETED'
+        WHERE login_id = #{id} AND status != 'DELETED'
+    </update>
+
+    <update id="updatePassword">
+        UPDATE MEMBERS
+        SET password = #{password}, updated_at = NOW()
+        WHERE login_id = #{id}
+    </update>
+
+</mapper>
