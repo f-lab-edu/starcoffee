@@ -1,23 +1,21 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.controller.request.PasswordRequest;
-import com.project.starcoffee.controller.request.member.MemberLoginRequest;
+import com.project.starcoffee.controller.request.member.*;
 import com.project.starcoffee.controller.response.member.LoginResponse;
 import com.project.starcoffee.domain.member.Member;
-import com.project.starcoffee.domain.member.MemberStatus;
-import com.project.starcoffee.dto.MemberDTO;
 import com.project.starcoffee.service.MemberService;
 import com.project.starcoffee.utils.SessionUtil;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Slf4j
 @RestController
@@ -29,79 +27,123 @@ public class MemberController {
 
     /**
      * 회원가입 진행
-     * 필수입력 정보에 누락이 있으면 NullPointerException 을 처리한다.
+     * 필수입력 정보에 누락이 있으면 GrolbalExceptionHandler 에서 각각의 필드에 대해서 처리한다.
      *
-     * @param memberInfo
+     * @param memberRequest 사용자가 입력한 고객정보
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void signUp(@RequestBody @Validated MemberDTO memberInfo) {
-        if (MemberDTO.hasNullDataBeforeSignUp(memberInfo)) {
-            throw new NullPointerException("회원가입 시, 필수 데이터를 모두 입력해야합니다.");
-        }
-
-        memberService.saveMember(memberInfo);
+    public void signUp(@RequestBody @Valid MemberRequest memberRequest) {
+        memberService.saveMember(memberRequest);
     }
 
+    /**
+     * 로그인 진행
+     * @param loginRequest ID, PW가 포함된 DTO
+     * @param session 세션
+     * @return
+     */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody @NonNull MemberLoginRequest loginRequest,
+    public ResponseEntity<LoginResponse> login(@RequestBody @NotNull MemberLoginRequest loginRequest,
                                                HttpSession session) {
         ResponseEntity<LoginResponse> responseEntity = null;
-        String id = loginRequest.getLoginId();
-        String password = loginRequest.getPassword();
         LoginResponse loginResponse;
 
-        Optional<Member> memberInfo = memberService.login(id, password);
+        Optional<Member> memberInfo = memberService.login(loginRequest);
 
-        // 회원을 찾지 못했을 경우
-        if (memberInfo.isEmpty()) {
-            loginResponse = LoginResponse.FAIL;
-            responseEntity = new ResponseEntity<>(loginResponse, HttpStatus.UNAUTHORIZED);
+        loginResponse = LoginResponse.success(memberInfo.get());
+        SessionUtil.setLoginId(session, loginRequest.getLoginId());
+        responseEntity = new ResponseEntity<>(loginResponse, HttpStatus.OK);
 
-        // 회원을 찾았을 경우, 세션에 ID를 저장
-        } else if (MemberStatus.DEFAULT.equals(memberInfo.get().getStatus())) {
-            loginResponse = LoginResponse.success(memberInfo.get());
-            SessionUtil.setLoginMemberId(session, id);
-            responseEntity = new ResponseEntity<>(loginResponse, HttpStatus.OK);
-
-        // 그 외 오류
-        } else {
-            log.error("Login ERROR! {}", responseEntity);
-            throw new RuntimeException("로그인 에러입니다.");
-        }
         return responseEntity;
     }
 
-
-    @PatchMapping("/password")
-    @ResponseStatus(HttpStatus.OK)
-    public void updateMemberPassword(@RequestBody PasswordRequest passwordRequest,
-                                     HttpSession session) {
-
-        String beforePassword = passwordRequest.getBeforePassword();
-        String afterPassword = passwordRequest.getAfterPassword();
-
-        String memberId = SessionUtil.getLoginMemberId(session);
-
-        if (beforePassword == null || afterPassword == null) {
-            throw new NullPointerException("패스워드를 입력하세요.");
-        } else {
-            memberService.updatePassword(memberId, beforePassword, afterPassword);
-        }
-
-    }
-
+    /**
+     * 로그인 아이디를 기준으로 회원정보를 찾는다.
+     * @param session 세션
+     * @return
+     */
     @GetMapping("/member")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<Member> findById(HttpSession session) {
-        String loginId = SessionUtil.getLoginMemberId(session);
-        return memberService.findById(loginId);
+    public ResponseEntity<Member> findById(HttpSession session) {
+        String loginId = SessionUtil.getLoginId(session);
+        Optional<Member> memberInfo = memberService.findById(loginId);
+
+        return Stream.of(memberInfo)
+                .filter(Optional::isPresent)
+                .findFirst()
+                .map(Optional::get)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+
+    /**
+     * 로그인 된 사용자가 비밀번호를 변경하고자 할 경우
+     * @param passwordRequest 이전 비밀번호, 변경 비밀번호을 담은 DTO
+     * @param session 세션
+     */
+    @PatchMapping("/password")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateMemberPassword(@RequestBody @Valid PasswordRequest passwordRequest,
+                                     HttpSession session) {
+        String beforePassword = passwordRequest.getBeforePassword();
+        String afterPassword = passwordRequest.getAfterPassword();
+        String loginId= SessionUtil.getLoginId(session);
+
+        /*
+        유효성 검사에 실패하면 ConstraintViolationException 이 발생하고,
+        해당 예외를 적절히 처리하거나 예외 핸들러를 등록하여 처리할 수 있다.
+         */
+        memberService.updatePassword(loginId, beforePassword, afterPassword);
+    }
+
+    /**
+     * 회원의 닉네임을 변경한다.
+     * @param nickNameRequest 변경할 닉네임
+     * @param session 세션
+     */
+    @PatchMapping("/nickname")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateMemberNickName(@RequestBody NickNameRequest nickNameRequest, HttpSession session) {
+        String loginId = SessionUtil.getLoginId(session);
+        memberService.updateNickName(loginId, nickNameRequest.getAfterNickname());
+    }
+
+
+    /**
+     * 회원의 이메일을 변경한다.
+     * 이메일 주소가 형식이 맞지 않으면 예외를 던진다.
+     * @param emailRequest 변경할 이메일
+     * @param session 세션
+     */
+    @PatchMapping("/email")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateMemberEmail(@RequestBody @Valid EmailRequest emailRequest, HttpSession session) {
+        String loginId = SessionUtil.getLoginId(session);
+        memberService.updateEmail(loginId, emailRequest.getAfterEmail());
+    }
+
+    /**
+     * 회원 로그아웃
+     * @param session 세션
+     */
+    @GetMapping("/logout")
+    public void logout(HttpSession session) {
+        SessionUtil.logoutMember(session);
+    }
+
+
+
+    /**
+     * 회원이 탈퇴를 한다.
+     * @param session 세션
+     */
     @DeleteMapping("/member")
     @ResponseStatus(HttpStatus.OK)
     public void deleteMemberInfo(HttpSession session) {
-        String loginId = SessionUtil.getLoginMemberId(session);
+        String loginId = SessionUtil.getLoginId(session);
         memberService.deleteMember(loginId);
     }
+
 }

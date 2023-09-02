@@ -1,22 +1,24 @@
 package com.project.starcoffee.repository.mybatis;
 
+import com.project.starcoffee.controller.request.member.MemberRequest;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.dto.MemberDTO;
 import com.project.starcoffee.repository.MemberRepository;
 import com.project.starcoffee.repository.mybatis.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-
 @Repository
-@RequiredArgsConstructor
 public class MemberRepositoryImpl implements MemberRepository {
 
-    private final MemberMapper memberMapper;
+    @Autowired
+    private MemberMapper memberMapper;
 
     @Override
-    public int saveMember(MemberDTO memberInfo) {
+    public int saveMember(MemberRequest memberInfo) {
         return memberMapper.saveMember(memberInfo);
     }
 
@@ -26,8 +28,8 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> findByIdAndPassword(String id, String password) {
-        return memberMapper.findByIdAndPassword(id, password);
+    public Optional<Member> findByIdAndPassword(String loginId, String password) {
+        return memberMapper.findByIdAndPassword(loginId, password);
     }
 
     @Override
@@ -41,7 +43,22 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public int updatePassword(String id, String password) {
-        return memberMapper.updatePassword(id, password);
+    public int updatePassword(String loginId, String password) {
+        return memberMapper.updatePassword(loginId, password);
+    }
+
+    @Override
+    public int updateNickName(String loginId, String nickName) {
+        return memberMapper.updateNickName(loginId, nickName);
+    }
+
+    @Override
+    public int updateEmail(String loginId, String email) {
+        return memberMapper.updateEmail(loginId, email);
+    }
+
+    @Override
+    public int updateTel(String loginId, String tel) {
+        return 0;
     }
 }
