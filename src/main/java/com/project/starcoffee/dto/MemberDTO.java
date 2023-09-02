@@ -1,6 +1,12 @@
 package com.project.starcoffee.dto;
 
-import lombok.*;
+<<<<<<< HEAD
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+=======
+>>>>>>> origin/develop
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
@@ -9,11 +15,13 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+<<<<<<< HEAD
+=======
+>>>>>>> origin/develop
 public class MemberDTO {
 
-    @NonNull    // 안붙이는게 좋을까 ? @NonNull 이라도 붙이는 게 좋을까 ?
+    // 안붙이는게 좋을까 ? @NonNull 이라도 붙이는 게 좋을까 ?
+    @NonNull
     private Long id;
 
     @NotNull(message = "이름을 입력해주세요.")
