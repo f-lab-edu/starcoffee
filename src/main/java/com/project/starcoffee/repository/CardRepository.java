@@ -13,4 +13,6 @@ public interface CardRepository {
     Optional<Card> findById(String cardNumber);
 
     int updateNickName(String cardNumber, String cardNickName);
+
+    int deleteCard(String cardNumber);
 }

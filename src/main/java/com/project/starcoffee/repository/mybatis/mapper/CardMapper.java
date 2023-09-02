@@ -17,4 +17,6 @@ public interface CardMapper {
     Optional<Card> findById(String cardNumber);
 
     int updateNickName(@Param("cardNumber") String cardNumber, @Param("cardNickName") String cardNickName);
+
+    int deleteCard(String cardNumber);
 }

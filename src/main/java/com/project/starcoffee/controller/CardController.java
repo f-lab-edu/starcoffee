@@ -54,8 +54,9 @@ public class CardController {
     }
 
 
-
-
-
-
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteCard(@RequestBody CardNumberRequest cardNumber) {
+        cardService.deleteCard(cardNumber);
+    }
 }

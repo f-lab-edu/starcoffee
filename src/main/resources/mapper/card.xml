@@ -32,4 +32,10 @@
         WHERE card_number = #{cardNumber}
     </update>
 
+    <update id="deleteCard">
+        UPDATE STAR_CARD
+        SET status = 'DELETED', updated_at = NOW()
+        WHERE card_number = #{cardNumber}
+    </update>
+
 </mapper>

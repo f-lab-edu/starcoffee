@@ -1,6 +1,7 @@
 package com.project.starcoffee.service;
 
 import com.project.starcoffee.controller.request.card.CardNickNameRequest;
+import com.project.starcoffee.controller.request.card.CardNumberRequest;
 import com.project.starcoffee.controller.request.card.CardRequest;
 import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.repository.CardRepository;
@@ -30,5 +31,10 @@ public class CardService {
         String cardNumber = cardInfo.getCardNumber();
 
         cardRepository.updateNickName(cardNumber, cardNickName);
+    }
+
+    public void deleteCard(CardNumberRequest cardNumber) {
+        String card = cardNumber.getCardNumber();
+        cardRepository.deleteCard(card);
     }
 }

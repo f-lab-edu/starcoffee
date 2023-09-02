@@ -31,5 +31,10 @@ public class CardRepositoryImpl implements CardRepository {
         return cardMapper.updateNickName(cardNumber, cardNickName);
     }
 
+    @Override
+    public int deleteCard(String cardNumber) {
+        return cardMapper.deleteCard(cardNumber);
+    }
+
 
 }
