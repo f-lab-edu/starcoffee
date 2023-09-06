@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.project.starcoffee.dto.MemberDTOValidationTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-08-16T08:55:56" hostname="kuosamosui-iMac.local" time="0.162">
+  <properties/>
+  <testcase name="memberValidation()" classname="com.project.starcoffee.dto.MemberDTOValidationTest" time="0.162"/>
+  <system-out><![CDATA[17:55:56.888 [Test worker] DEBUG org.jboss.logging - Logging Provider: org.jboss.logging.Log4j2LoggerProvider
+17:55:56.889 [Test worker] INFO org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 6.2.5.Final
+17:55:56.893 [Test worker] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
+17:55:56.893 [Test worker] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
+17:55:56.894 [Test worker] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
+17:55:56.894 [Test worker] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
+17:55:56.896 [Test worker] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Cannot find javax.persistence.Persistence on classpath. Assuming non JPA 2 environment. All properties will per default be traversable.
+17:55:56.908 [Test worker] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
+17:55:56.950 [Test worker] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
+17:55:56.952 [Test worker] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator as ValidatorFactory-scoped message interpolator.
+17:55:56.953 [Test worker] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.TraverseAllTraversableResolver as ValidatorFactory-scoped traversable resolver.
+17:55:56.953 [Test worker] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
+17:55:56.953 [Test worker] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
+17:55:56.953 [Test worker] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
+17:55:57.001 [Test worker] INFO com.project.starcoffee.dto.MemberDTOValidationTest - violation = ConstraintViolationImpl{interpolatedMessage='비밀번호는 영문, 특수문자, 숫자포함 8~20자 사이로 입력가능합니다.', propertyPath=password, rootBeanClass=class com.project.starcoffee.dto.MemberDTO, messageTemplate='비밀번호는 영문, 특수문자, 숫자포함 8~20자 사이로 입력가능합니다.'}
+17:55:57.001 [Test worker] INFO com.project.starcoffee.dto.MemberDTOValidationTest - violation.message = 비밀번호는 영문, 특수문자, 숫자포함 8~20자 사이로 입력가능합니다.
+17:55:57.001 [Test worker] INFO com.project.starcoffee.dto.MemberDTOValidationTest - violation = ConstraintViolationImpl{interpolatedMessage='이름을 2~8자까지 입력가능합니다.', propertyPath=name, rootBeanClass=class com.project.starcoffee.dto.MemberDTO, messageTemplate='이름을 2~8자까지 입력가능합니다.'}
+17:55:57.002 [Test worker] INFO com.project.starcoffee.dto.MemberDTOValidationTest - violation.message = 이름을 2~8자까지 입력가능합니다.
+17:55:57.002 [Test worker] INFO com.project.starcoffee.dto.MemberDTOValidationTest - violation = ConstraintViolationImpl{interpolatedMessage='이메일 형식을 맞춰주세요.', propertyPath=email, rootBeanClass=class com.project.starcoffee.dto.MemberDTO, messageTemplate='이메일 형식을 맞춰주세요.'}
+17:55:57.002 [Test worker] INFO com.project.starcoffee.dto.MemberDTOValidationTest - violation.message = 이메일 형식을 맞춰주세요.
+17:55:57.002 [Test worker] INFO com.project.starcoffee.dto.MemberDTOValidationTest - violation = ConstraintViolationImpl{interpolatedMessage='휴대폰 번호 형식에 맞춰서 입력해주세요.', propertyPath=tel, rootBeanClass=class com.project.starcoffee.dto.MemberDTO, messageTemplate='휴대폰 번호 형식에 맞춰서 입력해주세요.'}
+17:55:57.002 [Test worker] INFO com.project.starcoffee.dto.MemberDTOValidationTest - violation.message = 휴대폰 번호 형식에 맞춰서 입력해주세요.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
