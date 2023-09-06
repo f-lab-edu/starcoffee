@@ -1,12 +1,11 @@
 package com.project.starcoffee.dto;
 
-<<<<<<< HEAD
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-=======
->>>>>>> origin/develop
+
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
@@ -15,9 +14,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-<<<<<<< HEAD
-=======
->>>>>>> origin/develop
 public class MemberDTO {
 
     // 안붙이는게 좋을까 ? @NonNull 이라도 붙이는 게 좋을까 ?
