@@ -1,6 +1,9 @@
 package com.project.starcoffee.controller.request.member;
 
+import com.fasterxml.uuid.Generators;
+import com.fasterxml.uuid.impl.TimeBasedGenerator;
 import lombok.*;
+import org.springframework.cglib.reflect.FastClass;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
@@ -16,13 +19,8 @@ import static org.springframework.format.annotation.DateTimeFormat.*;
 @Setter
 @Builder
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class MemberRequest {
-    @NotNull
-    private UUID memberId;
-
-    public MemberRequest() {
-        this.memberId = UUID.randomUUID();
-    }
 
     @NotNull(message = "이름을 입력해주세요.")
     @Size(min = 2, max = 8, message = "이름을 2~8자까지 입력가능합니다.")

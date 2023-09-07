@@ -29,8 +29,8 @@
 
 
     <insert id="saveMember" parameterType="com.project.starcoffee.controller.request.member.MemberRequest">
-        INSERT INTO MEMBERS (member_id, name, login_id, password, tel, email, birth,  nick_name, gender)
-        VALUES (#{memberId}, #{name}, #{loginId}, #{password}, #{tel}, #{email}, #{birth}, #{nickName}, #{gender})
+        INSERT INTO MEMBERS (name, login_id, password, tel, email, birth,  nick_name, gender)
+        VALUES (#{name}, #{loginId}, #{password}, #{tel}, #{email}, #{birth}, #{nickName}, #{gender})
     </insert>
 
     <select id="findById" resultMap="memberInfo">

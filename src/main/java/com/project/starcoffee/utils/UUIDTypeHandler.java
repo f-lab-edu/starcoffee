@@ -20,7 +20,7 @@ public class UUIDTypeHandler extends BaseTypeHandler<UUID> {
     public UUID getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String value = rs.getString(columnName);
         if (value != null) {
-            return UUID.fromString(value);
+            return UUID.nameUUIDFromBytes(value.getBytes());
         }
         return null;
     }
