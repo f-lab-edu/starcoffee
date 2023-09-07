@@ -10,6 +10,8 @@ import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import static org.springframework.format.annotation.DateTimeFormat.*;
+
 @Getter
 @Setter
 @Builder
@@ -43,7 +45,7 @@ public class MemberRequest {
     @Email(message = "이메일 형식을 맞춰주세요.")
     private String email;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = ISO.DATE_TIME)
     private Timestamp birth;   // 생년월일
 
     @NotNull(message = "닉네임은 필수값 입니다.")

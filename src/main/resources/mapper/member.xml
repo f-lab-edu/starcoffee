@@ -34,11 +34,12 @@
     </insert>
 
     <select id="findById" resultMap="memberInfo">
-        SELECT *
+        SELECT member_id, name, login_id, password, tel, email, status, birth, created_at, updated_at, nick_name, gender
         FROM MEMBERS
         WHERE login_id = #{loginId}
     </select>
 
+<!-- resultType 으로는 몇몇 데이터가 누락되는데 resultMap 은 정상적으로 작동한다. 왜일까 ? -->
 <!--    <select id="findById" resultType="com.project.starcoffee.domain.member.Member">-->
 <!--        SELECT *-->
 <!--        FROM MEMBERS-->
@@ -46,7 +47,7 @@
 <!--    </select>-->
 
     <select id="findByIdAndPassword" resultMap="memberInfo">
-        SELECT *
+        SELECT member_id, login_id, password
         FROM MEMBERS
         WHERE login_id = #{loginId} AND password = #{password}
         AND status != 'DELETED'
