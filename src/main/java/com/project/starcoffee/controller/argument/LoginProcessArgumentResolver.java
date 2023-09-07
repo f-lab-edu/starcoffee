@@ -19,6 +19,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Parameter;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -40,14 +41,14 @@ public class LoginProcessArgumentResolver implements HandlerMethodArgumentResolv
         String password = request.getParameter("password");
 
         String cryptoPassword = SHA256Util.encryptSHA256(password);
-        Optional<Member> memberInfo = memberRepository.findByIdAndPassword(loginId, cryptoPassword);
+        UUID memberId = memberRepository.findByIdAndPassword(loginId, cryptoPassword);
 
-        if (memberInfo.isEmpty()) {
-            log.error("not found Member ERROR! {}", memberInfo);
+        if (memberId == null) {
+            log.error("not found Member ERROR! {}", memberId);
             throw new RuntimeException("not found Member ERROR! 회원을 찾을 수 없습니다.");
         }
 
-        return memberInfo;
+        return memberId;
 
     }
 

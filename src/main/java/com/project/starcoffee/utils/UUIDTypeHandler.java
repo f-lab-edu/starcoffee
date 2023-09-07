@@ -1,13 +1,16 @@
 package com.project.starcoffee.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class UUIDTypeHandler extends BaseTypeHandler<UUID> {
@@ -19,8 +22,9 @@ public class UUIDTypeHandler extends BaseTypeHandler<UUID> {
     @Override
     public UUID getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String value = rs.getString(columnName);
+
         if (value != null) {
-            return UUID.nameUUIDFromBytes(value.getBytes());
+            return UUID.fromString(value);
         }
         return null;
     }
@@ -40,6 +44,7 @@ public class UUIDTypeHandler extends BaseTypeHandler<UUID> {
         if (value != null) {
             return UUID.fromString(value);
         }
+
         return null;
     }
 }

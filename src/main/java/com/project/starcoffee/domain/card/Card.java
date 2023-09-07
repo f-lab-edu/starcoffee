@@ -15,8 +15,6 @@ import java.util.UUID;
 public class Card {
 
     private UUID cardId;
-    /*private UUID memberId;*/
-    private String loginId;     // 로그인 아이디
     private String cardName;    // 카드 이름
     private String cardNickName;    // 카드 별칭
     private String cardNumber;  // 총 12자리(4자리씩, 하이픈 포함)

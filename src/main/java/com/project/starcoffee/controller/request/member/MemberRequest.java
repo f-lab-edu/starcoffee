@@ -1,9 +1,7 @@
 package com.project.starcoffee.controller.request.member;
 
-import com.fasterxml.uuid.Generators;
-import com.fasterxml.uuid.impl.TimeBasedGenerator;
+
 import lombok.*;
-import org.springframework.cglib.reflect.FastClass;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
@@ -11,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
-import java.util.UUID;
 
 import static org.springframework.format.annotation.DateTimeFormat.*;
 

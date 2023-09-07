@@ -33,8 +33,8 @@ public class CardController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void enroll(@RequestBody @Valid CardRequest cardRequest, HttpSession session) {
-        String loginId = SessionUtil.getLoginId(session);
-        cardRequest.setLoginId(loginId);
+//        String memberId = SessionUtil.getMemberId(session);
+//        cardRequest.setLoginId(loginId);
         cardService.saveCard(cardRequest);
     }
 

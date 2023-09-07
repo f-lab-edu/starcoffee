@@ -23,7 +23,6 @@ public class DatabaseConfig {
     @Autowired
     private ApplicationContext applicationContext;
 
-
     @Bean
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();

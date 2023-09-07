@@ -2,15 +2,14 @@ package com.project.starcoffee.repository.mybatis;
 
 import com.project.starcoffee.controller.request.member.MemberRequest;
 import com.project.starcoffee.domain.member.Member;
-import com.project.starcoffee.dto.MemberDTO;
 import com.project.starcoffee.repository.MemberRepository;
 import com.project.starcoffee.repository.mybatis.mapper.MemberMapper;
-import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
+
 @Repository
 public class MemberRepositoryImpl implements MemberRepository {
 
@@ -23,12 +22,12 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> findById(String loginId) {
-        return memberMapper.findById(loginId);
+    public Optional<Member> findById(String memberId) {
+        return memberMapper.findById(memberId);
     }
 
     @Override
-    public Optional<Member> findByIdAndPassword(String loginId, String password) {
+    public UUID findByIdAndPassword(String loginId, String password) {
         return memberMapper.findByIdAndPassword(loginId, password);
     }
 
