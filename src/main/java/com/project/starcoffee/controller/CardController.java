@@ -28,15 +28,13 @@ public class CardController {
     /**
      * 카드를 등록한다. (가맹점 시점)
      * @param cardRequest 카드 등록정보
-     * @param session
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void enroll(@RequestBody @Valid CardRequest cardRequest, HttpSession session) {
-//        String memberId = SessionUtil.getMemberId(session);
-//        cardRequest.setLoginId(loginId);
+    public void enroll(@RequestBody @Valid CardRequest cardRequest) {
         cardService.saveCard(cardRequest);
     }
+
 
     /**
      * 카드번호를 통해서 카드정보를 확인한다. (가맹점 시점)

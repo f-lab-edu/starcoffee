@@ -20,8 +20,8 @@
         VALUES (#{cardName}, #{cardNumber}, #{pinNumber})
     </insert>
 
-    <select id="findById" resultMap="cardInfo">
-        SELECT card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
+    <select id="findById" resultMap="cardInfo" resultType="java.util.UUID">
+        SELECT bin_to_uuid(card_id,1), card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
         FROM STAR_CARD
         WHERE card_number = #{cardNumber}
     </select>

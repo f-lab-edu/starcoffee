@@ -21,7 +21,6 @@
                     select="findCardInfo"></collection>
     </resultMap>
 
-
     <select id="findCardInfo" resultType="com.project.starcoffee.domain.card.Card">
         SELECT card_name, card_nickname, cardAmount
         FROM STAR_CARD
@@ -34,11 +33,6 @@
         VALUES (#{name}, #{loginId}, #{password}, #{tel}, #{email}, #{birth}, #{nickName}, #{gender})
     </insert>
 
-    <select id="findById" parameterType="string" resultMap="memberInfo">
-        SELECT name, login_id, password, tel, email, status, birth, created_at, updated_at, nick_name, gender
-        FROM MEMBERS
-        WHERE member_id = uuid_to_bin(#{memberId},1)
-    </select>
 
 <!-- resultType 으로는 몇몇 데이터가 누락되는데 resultMap 은 정상적으로 작동한다. 왜일까 ?
  <select id="findById" resultType="com.project.starcoffee.domain.member.Member">
