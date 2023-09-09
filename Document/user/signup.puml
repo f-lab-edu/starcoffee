@@ -4,7 +4,7 @@ title 회원가입
 actor "User" as user
 participant "App" as app
 participant "BackEnd" as backend
-participant "RDBMS" as db
+participant "RDBMS\n(회원TB)" as db
 
 
 user -> app : 회원정보 입력

@@ -1,0 +1,68 @@
+@startuml
+title 음료결제
+
+actor "User" as user
+participant "App" as app
+participant "BackEnd" as backend
+participant "REDIS\n(주문TB)" as redis
+database "paymentSystem" as paySystem청
+
+
+activate user
+group success flow
+app -[#blue]> backend : 주문요청(req)
+activate backend
+    group delay order
+        backend --[#red]x app : 주문요청\n(rollback)
+        note right : 장바구니 메뉴는 1주일간 보관
+    end
+activate app
+
+    group invalid order
+        backend --[#red]x backend : 주문확인
+        note right : 1회 최대 주문음료 20개
+        backend --[#red]x app : 주문요청(rollback)
+    end
+
+activate backend
+backend -[#blue]> redis : 주문정보 요청
+activate redis
+redis -[#blue]> backend : 주문정보 반환
+deactivate redis
+
+backend -[#blue]> app : 주문확인(res)
+app -[#blue]> app : 결제수단 선택
+app -[#blue]> backend : 결제요청(req)
+
+
+backend -[#blue]> paySystem : 결제요청
+activate paySystem
+    group failue pay
+        paySystem --[#red]x backend : 결제실패
+        loop
+            backend --[#green]> redis : 주문(보류)변경 요청
+            activate redis
+            redis --[#green]> backend : 주문변경 완료
+            deactivate redis
+            backend -[#blue]> paySystem : 결제요청
+            note right : 2번 반복
+        end
+        backend --[#green]> redis : 주문(취소)변경 요청
+        redis --[#green]> backend : 주문변경 완료
+        backend --[#red]x app : 주문요청\n(rollback)
+    end
+
+    group lack of balance
+            paySystem --[#red]x backend : 결제실패
+                backend --[#green]> redis : 주문(취소)변경 요청
+                activate redis
+                redis --[#green]> backend : 주문변경 완료
+                deactivate redis
+            backend --[#red]x app : 주문요청\n(rollback)
+        end
+paySystem -[#blue]> backend : 결제완료
+deactivate paySystem
+deactivate backend
+
+end
+@enduml
