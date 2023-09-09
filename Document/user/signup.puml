@@ -1,29 +1,37 @@
 @startuml
 title 회원가입
 
-participant "Customer" as customer
+actor "User" as user
+participant "App" as app
 participant "BackEnd" as backend
 participant "RDBMS" as db
 
 
-customer -[#blue]> backend : 회원가입 요청(req)
+user -> app : 회원정보 입력
+activate user
+
+app -[#blue]> backend : 회원가입 요청(req)
+activate app
 group success flow
     activate backend
     backend -[#blue]> backend : 유효성 검사확인
         group invalidate
-            backend -[#red]x customer : 유효성 검사 실패
+            backend --[#red]x app : 유효성실패 예외확인
         end
 
     backend -[#blue]> db : 로그인ID 중복체크
     activate db
         group duplicate
-            db -[#red]x backend : 로그인ID 중복
-            backend -[#red]x customer : 예외
+            db --[#red]x backend : 로그인ID 중복
+            backend --[#red]x app : 로그인중복 예외확인
         end
-
+    db -[#blue]> backend : 로그인ID 중복확인
+    backend -[#blue]> db : 회원정보 저공
     db -[#blue]> backend : 쿼리성공
     deactivate db
-    backend -[#blue]> customer : 회원가입 완료(res)
+    backend -[#blue]> app : 회원가입 완료(res)
     deactivate backend
 end
+app -> user : 회원가입 확인
+deactivate app
 @enduml
