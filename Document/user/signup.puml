@@ -1,0 +1,29 @@
+@startuml
+title 회원가입
+
+participant "Customer" as customer
+participant "BackEnd" as backend
+participant "RDBMS" as db
+
+
+customer -[#blue]> backend : 회원가입 요청(req)
+group success flow
+    activate backend
+    backend -[#blue]> backend : 유효성 검사확인
+        group invalidate
+            backend -[#red]x customer : 유효성 검사 실패
+        end
+
+    backend -[#blue]> db : 로그인ID 중복체크
+    activate db
+        group duplicate
+            db -[#red]x backend : 로그인ID 중복
+            backend -[#red]x customer : 예외
+        end
+
+    db -[#blue]> backend : 쿼리성공
+    deactivate db
+    backend -[#blue]> customer : 회원가입 완료(res)
+    deactivate backend
+end
+@enduml
