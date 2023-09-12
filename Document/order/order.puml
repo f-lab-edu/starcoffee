@@ -1,0 +1,51 @@
+@startuml
+title 음료주문
+
+actor "User" as user
+participant "App" as app
+participant "BackEnd" as backend
+participant "RDBMS\n(매장TB)" as db
+participant "REDIS\n(주문TB)" as redis
+
+
+user -> app : 주문하기
+activate user
+activate app
+app -> app : 매장선택
+group success flow
+    app -[#blue]> backend : 주문요청(req)
+    activate backend
+    backend -[#blue]> backend : 주문확인\n(유효성검사)
+
+    group invalidate
+        backend --[#red]x app : 주문재확인\n(rollback)
+        note right : 선택음료가 아이스를 제공하지 않은 경우
+    end
+
+    backend -[#blue]> backend : 주문확인\n(매장확인)
+
+    group not store
+        backend --[#red]x app : 매장 재선택\n(rollback)
+        note left : 주문 전, 매장을 선택하지 않은 경우
+    end
+
+    group out of store
+        backend -[#blue]> db : 매장정보 가져오기
+        activate db
+        backend --[#red]x app : 매장 재선택\n(rollback)
+        note left : 나와 매장의 거리가 5km 이상
+        db <-[#blue]>backend : 매장거리 확인
+        deactivate db
+
+    end
+
+    backend -[#blue]> backend : 매장선택 완료
+    backend -[#blue]> redis : 주문정보 저장
+    activate redis
+    redis -[#blue]> backend : 쿼리성공
+    deactivate redis
+    backend -[#blue]> app : 주문완료(res)
+    deactivate backend
+    deactivate app
+end
+@enduml

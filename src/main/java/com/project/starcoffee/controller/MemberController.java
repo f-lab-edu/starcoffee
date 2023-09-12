@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -49,10 +50,10 @@ public class MemberController {
         ResponseEntity<LoginResponse> responseEntity = null;
         LoginResponse loginResponse;
 
-        Optional<Member> memberInfo = memberService.login(loginRequest);
+        UUID memberId = memberService.login(loginRequest);
+        loginResponse = LoginResponse.success(memberId);
 
-        loginResponse = LoginResponse.success(memberInfo.get());
-        SessionUtil.setLoginId(session, loginRequest.getLoginId());
+        SessionUtil.setMemberId(session, memberId);
         responseEntity = new ResponseEntity<>(loginResponse, HttpStatus.OK);
 
         return responseEntity;
@@ -66,8 +67,9 @@ public class MemberController {
     @GetMapping("/member")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Member> findById(HttpSession session) {
-        String loginId = SessionUtil.getLoginId(session);
-        Optional<Member> memberInfo = memberService.findById(loginId);
+        String memberId = SessionUtil.getMemberId(session);
+        log.info(memberId.toString());
+        Optional<Member> memberInfo = memberService.findById(memberId);
 
         return Stream.of(memberInfo)
                 .filter(Optional::isPresent)
@@ -89,13 +91,14 @@ public class MemberController {
                                      HttpSession session) {
         String beforePassword = passwordRequest.getBeforePassword();
         String afterPassword = passwordRequest.getAfterPassword();
-        String loginId= SessionUtil.getLoginId(session);
+        String memberId = SessionUtil.getMemberId(session);
+
 
         /*
         유효성 검사에 실패하면 ConstraintViolationException 이 발생하고,
         해당 예외를 적절히 처리하거나 예외 핸들러를 등록하여 처리할 수 있다.
          */
-        memberService.updatePassword(loginId, beforePassword, afterPassword);
+        memberService.updatePassword(memberId, beforePassword, afterPassword);
     }
 
     /**
@@ -106,8 +109,8 @@ public class MemberController {
     @PatchMapping("/nickname")
     @ResponseStatus(HttpStatus.OK)
     public void updateMemberNickName(@RequestBody NickNameRequest nickNameRequest, HttpSession session) {
-        String loginId = SessionUtil.getLoginId(session);
-        memberService.updateNickName(loginId, nickNameRequest.getAfterNickname());
+        String memberId = SessionUtil.getMemberId(session);
+        memberService.updateNickName(memberId, nickNameRequest.getAfterNickname());
     }
 
 
@@ -120,8 +123,8 @@ public class MemberController {
     @PatchMapping("/email")
     @ResponseStatus(HttpStatus.OK)
     public void updateMemberEmail(@RequestBody @Valid EmailRequest emailRequest, HttpSession session) {
-        String loginId = SessionUtil.getLoginId(session);
-        memberService.updateEmail(loginId, emailRequest.getAfterEmail());
+        String memberId = SessionUtil.getMemberId(session);
+        memberService.updateEmail(memberId, emailRequest.getAfterEmail());
     }
 
     /**
@@ -142,8 +145,8 @@ public class MemberController {
     @DeleteMapping("/member")
     @ResponseStatus(HttpStatus.OK)
     public void deleteMemberInfo(HttpSession session) {
-        String loginId = SessionUtil.getLoginId(session);
-        memberService.deleteMember(loginId);
+        String memberId = SessionUtil.getMemberId(session);
+        memberService.deleteMember(memberId);
     }
 
 }

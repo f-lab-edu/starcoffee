@@ -4,6 +4,7 @@ package com.project.starcoffee.config;
 import com.project.starcoffee.config.login.LoginCheckInterceptor;
 import com.project.starcoffee.controller.argument.LoginProcessArgumentResolver;
 import com.project.starcoffee.repository.MemberRepository;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -25,7 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/",
                         "/members", "/members/home", "/members/login",
-                        "/error");
+                        "/cards", "/error");
     }
 
     @Override

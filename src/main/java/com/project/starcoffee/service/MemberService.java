@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -61,30 +62,30 @@ public class MemberService {
      * @param loginRequest
      * @return
      */
-    public Optional<Member> login(MemberLoginRequest loginRequest) {
+    public UUID login(MemberLoginRequest loginRequest) {
 
         String loginId = loginRequest.getLoginId();
         String password = loginRequest.getPassword();
 
         String cryptoPassword = SHA256Util.encryptSHA256(password);
-        Optional<Member> memberInfo = memberRepository.findByIdAndPassword(loginId, cryptoPassword);
+        UUID memberId = memberRepository.findByIdAndPassword(loginId, cryptoPassword);
 
-        if (memberInfo.isEmpty()) {
-            log.error("not found Member ERROR! {}", memberInfo);
+        if (memberId == null) {
+            log.error("not found Member ERROR! {}", memberId);
             throw new RuntimeException("not found Member ERROR! 회원을 찾을 수 없습니다.");
         }
 
-        return memberInfo;
+        return memberId;
     }
 
 
     /**
      * 로그인 아이디로 회원정보를 찾는다.
-     * @param loginId 로그인 아이디
+     * @param memberId 로그인 아이디
      * @return
      */
-    public Optional<Member> findById(String loginId) {
-        Optional<Member> member = memberRepository.findById(loginId);
+    public Optional<Member> findById(String memberId) {
+        Optional<Member> member = memberRepository.findById(memberId);
 
         if (!member.isPresent()) {
             log.error("not found Member ERROR! : {}", member);
@@ -97,17 +98,18 @@ public class MemberService {
 
     /**
      * 회원의 비밀번호를 변경한다.
-     * @param loginId 회원 아이디
+     * @param memberId 회원 ID
      * @param beforePw 변경 전 비밀번호
      * @param afterPw 변경 할 비밀번호
      */
     @Transactional
-    public void updatePassword(String loginId, String beforePw, String afterPw) {
-        Optional<Member> memberOptional = memberRepository.findById(loginId);
+    public void updatePassword(String memberId, String beforePw, String afterPw) {
+        Optional<Member> memberOptional = memberRepository.findById(memberId);
         Member memberInfo = memberOptional.orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
 
         // 이전 비밀번호 확인 및 비밀번호 변경
         String enAfterPassword = memberInfo.matchesAndChangePassword(beforePw, afterPw);
+        String loginId = memberOptional.get().getLoginId();
 
         int result = memberRepository.updatePassword(loginId, enAfterPassword);
         if (result != 1) {
@@ -120,11 +122,11 @@ public class MemberService {
     /**
      * 회원의 별칭을 변경할 수 있다.
      * 회원은 기존 별칭과 동일한 별칭을 사용할 경우에는 예외를 던지게 된다.
-     * @param loginId 로그인 아이디
+     * @param memberId 회원 ID
      * @param afterNickname 변경할 닉네임
      */
-    public void updateNickName(String loginId, String afterNickname) {
-        Optional<Member> memberInfo = memberRepository.findById(loginId);
+    public void updateNickName(String memberId, String afterNickname) {
+        Optional<Member> memberInfo = memberRepository.findById(memberId);
 
         Optional<String> matchNickName = memberInfo.stream()
                 .filter(m -> m.getNickName().equals(afterNickname))
@@ -136,6 +138,7 @@ public class MemberService {
             throw new RuntimeException("변경할 닉네임이 이전 닉네임과 같습니다.");
         });
 
+        String loginId = memberInfo.get().getLoginId();
         int result = memberRepository.updateNickName(loginId, afterNickname);
         if (result != 1) {
             log.error("update NickName ERROR! nickname={}", afterNickname);
@@ -146,11 +149,11 @@ public class MemberService {
     /**
      * 회원의 이메일 주소를 변경한다.
      * 회원은 기존 이메일과 동일한 이메일을 사용할 경우에는 예외를 던지게 된다.
-     * @param loginId
+     * @param memberId 회원 ID
      * @param email
      */
-    public void updateEmail(String loginId, String email) {
-        Optional<Member> memberInfo = memberRepository.findById(loginId);
+    public void updateEmail(String memberId, String email) {
+        Optional<Member> memberInfo = memberRepository.findById(memberId);
 
         // 이전 이메일과 변경 이메일이 동일한지 확인
         Optional<String> matchEmail = memberInfo.stream()
@@ -163,6 +166,7 @@ public class MemberService {
             throw new RuntimeException("변경할 이메일이 이전 이메일과 같습니다.");
         });
 
+        String loginId = memberInfo.get().getLoginId();
         int result = memberRepository.updateEmail(loginId, email);
         if (result != 1) {
             log.error("update email ERROR! email={}", email);
@@ -173,17 +177,19 @@ public class MemberService {
 
     /**
      * 회원의 Status 를 'DELETED' 로 변경한다.
-     * @param loginId 탈퇴할 아이디
+     * @param memberId 탈퇴할 회원 ID
      */
     @Transactional
-    public void deleteMember(String loginId) {
+    public void deleteMember(String memberId) {
+        Optional<Member> memberInfo = memberRepository.findById(memberId);
+        String loginId = memberInfo.get().getLoginId();
+
         int result = memberRepository.deleteMember(loginId);
         if (result != 1) {
             log.error("delete Member ERROR! id={}", loginId);
             throw new RuntimeException("delete Member ERROR! 회원을 삭제할 수 없습니다.");
         }
     }
-
 
 
 }

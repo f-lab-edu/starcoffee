@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.UUID;
+
 @Getter
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -19,10 +21,10 @@ public class LoginResponse {
 
     @NonNull
     private LoginStatus status;
-    private Member memberInfo;
+    private UUID memberId;
 
-    public static final LoginResponse success(Member memberInfo) {
-        return new LoginResponse(LoginStatus.SUCCESS, memberInfo);
+    public static final LoginResponse success(UUID memberId) {
+        return new LoginResponse(LoginStatus.SUCCESS, memberId);
     }
 
 }

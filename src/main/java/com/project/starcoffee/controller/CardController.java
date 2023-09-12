@@ -25,14 +25,22 @@ public class CardController {
     @Autowired
     private CardService cardService;
 
+    /**
+     * 카드를 등록한다. (가맹점 시점)
+     * @param cardRequest 카드 등록정보
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void enroll(@RequestBody @Valid CardRequest cardRequest, HttpSession session) {
-        String loginId = SessionUtil.getLoginId(session);
-        cardRequest.setLoginId(loginId);
+    public void enroll(@RequestBody @Valid CardRequest cardRequest) {
         cardService.saveCard(cardRequest);
     }
 
+
+    /**
+     * 카드번호를 통해서 카드정보를 확인한다. (가맹점 시점)
+     * @param cardNumber 카드번호
+     * @return
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<CardInfoResponse> findById(@RequestBody CardNumberRequest cardNumber) {
@@ -47,6 +55,10 @@ public class CardController {
     }
 
 
+    /**
+     * 카드 닉네임을 변경한다. (회원 시점)
+     * @param cardInfo 변경할 카드정보(카드번호, 닉네임)
+     */
     @PostMapping("/nickname")
     @ResponseStatus(HttpStatus.OK)
     public void updateNickName(@RequestBody @Valid CardNickNameRequest cardInfo) {
@@ -54,6 +66,10 @@ public class CardController {
     }
 
 
+    /**
+     * 등록된 카드를 말소처리한다.
+     * @param cardNumber 카드번호
+     */
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
     public void deleteCard(@RequestBody CardNumberRequest cardNumber) {

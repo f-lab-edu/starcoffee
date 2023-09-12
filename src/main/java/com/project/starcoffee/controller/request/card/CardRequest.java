@@ -1,10 +1,7 @@
 package com.project.starcoffee.controller.request.card;
 
 import com.project.starcoffee.utils.SessionUtil;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
@@ -15,17 +12,10 @@ import java.util.UUID;
 @Setter
 @Builder
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class CardRequest {
 
-    @NotNull
-    private UUID cardId;
-
     private String loginId;
-
-    public CardRequest() {
-        this.cardId = UUID.randomUUID();
-
-    }
 
     @NotNull(message = "카드 이름을 입력해주세요.")
     @Size(min = 2, max = 8, message = "이름을 2~8자까지 입력가능합니다.")

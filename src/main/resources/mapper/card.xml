@@ -16,12 +16,12 @@
     </resultMap>
 
     <insert id="saveCard" parameterType="com.project.starcoffee.controller.request.card.CardRequest">
-        INSERT INTO STAR_CARD (card_id, card_name, card_number, pin_number)
-        VALUES (#{cardId}, #{cardName}, #{cardNumber}, #{pinNumber})
+        INSERT INTO STAR_CARD (card_name, card_number, pin_number)
+        VALUES (#{cardName}, #{cardNumber}, #{pinNumber})
     </insert>
 
-    <select id="findById" resultMap="cardInfo">
-        SELECT *
+    <select id="findById" resultMap="cardInfo" resultType="java.util.UUID">
+        SELECT bin_to_uuid(card_id,1), card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
         FROM STAR_CARD
         WHERE card_number = #{cardNumber}
     </select>

@@ -1,12 +1,12 @@
 package com.project.starcoffee.domain.member;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import com.project.starcoffee.domain.card.Card;
-import com.project.starcoffee.repository.MemberRepository;
-import com.project.starcoffee.repository.mybatis.MemberRepositoryImpl;
 import com.project.starcoffee.utils.SHA256Util;
-import com.project.starcoffee.utils.SessionUtil;
-import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Timestamp;
 import java.util.List;

@@ -29,24 +29,20 @@
 
 
     <insert id="saveMember" parameterType="com.project.starcoffee.controller.request.member.MemberRequest">
-        INSERT INTO MEMBERS (member_id, name, login_id, password, tel, email, birth,  nick_name, gender)
-        VALUES (#{memberId}, #{name}, #{loginId}, #{password}, #{tel}, #{email}, #{birth}, #{nickName}, #{gender})
+        INSERT INTO MEMBERS (name, login_id, password, tel, email, birth,  nick_name, gender)
+        VALUES (#{name}, #{loginId}, #{password}, #{tel}, #{email}, #{birth}, #{nickName}, #{gender})
     </insert>
 
-    <select id="findById" resultMap="memberInfo">
-        SELECT *
+
+<!-- resultType 으로는 몇몇 데이터가 누락되는데 resultMap 은 정상적으로 작동한다. 왜일까 ?
+ <select id="findById" resultType="com.project.starcoffee.domain.member.Member">
+        SELECT member_id, name, login_id, password, tel, email, status, birth, created_at, updated_at, nick_name, gender
         FROM MEMBERS
-        WHERE login_id = #{loginId}
-    </select>
+        WHERE member_id = #{memberId}
+    </select>-->
 
-<!--    <select id="findById" resultType="com.project.starcoffee.domain.member.Member">-->
-<!--        SELECT *-->
-<!--        FROM MEMBERS-->
-<!--        WHERE login_id = #{loginId}-->
-<!--    </select>-->
-
-    <select id="findByIdAndPassword" resultMap="memberInfo">
-        SELECT *
+    <select id="findByIdAndPassword" resultType="java.util.UUID">
+        SELECT bin_to_uuid(member_id,1)
         FROM MEMBERS
         WHERE login_id = #{loginId} AND password = #{password}
         AND status != 'DELETED'

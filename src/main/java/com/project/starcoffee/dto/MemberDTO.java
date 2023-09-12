@@ -11,6 +11,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
+import static org.springframework.format.annotation.DateTimeFormat.*;
+
 @Getter
 @Setter
 @Builder
@@ -45,22 +47,7 @@ public class MemberDTO {
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$",
             message = "비밀번호는 영문, 특수문자, 숫자포함 8~20자 사이로 입력가능합니다.")
     private String password;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = ISO.DATE_TIME)
     private LocalDateTime birth;   // 생년월일
-
-
-    /**
-     * 회원가입 전 필수 데이터중 null 값이 있는지 검사한다.
-     * null 값이 존재하여 회원가입 진행이 불가능 하다면 false 를 반환한다.
-     * 검사 후 이상이 없다면 true 를 반환한다.
-     * @param memberInfo
-     * @return
-     */
-    public static boolean hasNullDataBeforeSignUp(MemberDTO memberInfo) {
-        return memberInfo.getName()==null || memberInfo.getTel()==null
-                || memberInfo.getEmail()==null || memberInfo.getGender()==null
-                || memberInfo.getNickName() == null || memberInfo.getLoginId() == null
-                || memberInfo.getPassword() == null;
-    }
 
 }

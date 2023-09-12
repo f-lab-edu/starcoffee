@@ -1,5 +1,6 @@
 package com.project.starcoffee.controller.request.member;
 
+
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -8,19 +9,15 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
-import java.util.UUID;
+
+import static org.springframework.format.annotation.DateTimeFormat.*;
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class MemberRequest {
-    @NotNull
-    private UUID memberId;
-
-    public MemberRequest() {
-        this.memberId = UUID.randomUUID();
-    }
 
     @NotNull(message = "이름을 입력해주세요.")
     @Size(min = 2, max = 8, message = "이름을 2~8자까지 입력가능합니다.")
@@ -43,7 +40,7 @@ public class MemberRequest {
     @Email(message = "이메일 형식을 맞춰주세요.")
     private String email;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = ISO.DATE_TIME)
     private Timestamp birth;   // 생년월일
 
     @NotNull(message = "닉네임은 필수값 입니다.")
