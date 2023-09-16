@@ -14,22 +14,36 @@ activate user
 
 group success flow
 
+
 backend -[#blue]> fcm : 음료제조 요청
 activate backend
+deactivate backend
 
 activate fcm
 fcm -[#blue]> store : 주문확인 요청
+deactivate fcm
 activate store
     group order cancellation
         store --[#red]x fcm : 주문취소 요청
+        activate fcm
         fcm --[#red]x backend : 주문취소
+        deactivate fcm
+        activate backend
         backend --[#green]> paySystem : 결제취소
         paySystem --[#green]> backend : 결제취소 완료
+        deactivate backend
+
         backend --[#green]> redis : 주문(취소)변경 요청
+        activate backend
         redis --[#green]> backend : 주문변경 완료
+
         backend --[#red]> app : 주문취소\n(rollback)
+        deactivate backend
     end
+
+
 store -[#blue]> fcm : 주문확인 응답
+activate fcm
 fcm -[#blue]> fcm : [주문완료] 상태변경
 
 fcm -[#blue]> app : [주문완료] 알림
@@ -41,22 +55,29 @@ deactivate app
         user --[#blue]> app : 주문상태 요청(req)
         activate app
         note right : 유저가 주문현황을 확인할 때
-        app -[#blue]> backend : 주문상태 확인
+        app -[#blue]> backend :
+        activate backend
         backend <-[#blue]> fcm : 주문상태 요청/응답 (주문완료)
         backend -[#blue]> app : 주문상태 반환
+        deactivate backend
         app --[#blue]> user : [주문완료](res)
         deactivate app
     end
 store -[#blue]> store : 음료준비중
+
 store -[#blue]> fcm : 음료준비중
+
 fcm -[#blue]> fcm : [음료준비중] 상태변경
     group user request
         user --[#blue]> app : 주문상태 요청(req)
         activate app
         note right : 유저가 주문현황을 확인할 때
         app -[#blue]> backend : 주문상태 확인
+        activate backend
         backend <-[#blue]> fcm : 주문상태 요청/응답 (음료준비중)
+
         backend -[#blue]> app : 주문상태 반환
+        deactivate backend
         app --[#blue]> user : [음료준비](res)
         deactivate app
     end
@@ -75,15 +96,17 @@ deactivate app
         activate app
         note right : 유저가 주문현황을 확인할 때
         app -[#blue]> backend : 주문상태 확인
+        activate backend
         backend <-[#blue]> fcm : 주문상태 요청/응답 (픽업대기)
+        deactivate fcm
         backend -[#blue]> app : 주문상태 반환
+        deactivate backend
         app --[#blue]> user : [픽업대기](res)
         deactivate app
-        deactivate fcm
         deactivate backend
+        deactivate user
     end
 
-deactivate user
 end
 
 @enduml

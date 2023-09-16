@@ -15,11 +15,13 @@ activate app
 group success flow
     activate backend
     backend -[#blue]> backend : 유효성 검사확인
+    note right : Bean Validation\n(Controller layer)
         group invalidate
             backend --[#red]x app : 유효성실패 예외확인
         end
 
     backend -[#blue]> db : 로그인ID 중복체크
+    note right : (Service layer)
     activate db
         group duplicate
             db --[#red]x backend : 로그인ID 중복
