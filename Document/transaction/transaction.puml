@@ -26,6 +26,8 @@ group 트랜잭션 실패 시
 end
 
 order -> store : 5. 결제완료 요청
+activate store
+deactivate store
 
 order -> saga : 6. 트랜잭션 상태추가
 activate saga
