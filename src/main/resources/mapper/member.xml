@@ -39,12 +39,19 @@
         WHERE member_id = uuid_to_bin(#{memberId},1)
     </select>
 
-    <select id="findByIdAndPassword" resultType="java.util.UUID">
-        SELECT bin_to_uuid(member_id,1)
+    <select id="findByIdAndPassword" resultMap="memberInfo">
+        SELECT bin_to_uuid(member_id,1) as member_id, name, login_id, password, tel, email, status, birth, created_at, updated_at, nick_name, gender
         FROM MEMBERS
         WHERE login_id = #{loginId} AND password = #{password}
-        AND status != 'DELETED'
+          AND status != 'DELETED'
     </select>
+
+<!--    <select id="findByIdAndPassword" resultType="java.util.UUID">-->
+<!--        SELECT bin_to_uuid(member_id,1)-->
+<!--        FROM MEMBERS-->
+<!--        WHERE login_id = #{loginId} AND password = #{password}-->
+<!--        AND status != 'DELETED'-->
+<!--    </select>-->
 
     <select id="checkId" resultType="int">
         SELECT count(*)

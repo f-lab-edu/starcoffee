@@ -10,6 +10,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 public class MemberDTOValidationTest {
@@ -19,7 +20,7 @@ public class MemberDTOValidationTest {
     @BeforeEach
     void init() {
         member = MemberDTO.builder()
-                .id(1L)
+                .id(UUID.fromString("a999d6e0-4d8b-11ee-ac76-fd3617d1d2aa"))
                 .name("김")
                 .tel("010-12-1234")
                 .email("testnaver.com")

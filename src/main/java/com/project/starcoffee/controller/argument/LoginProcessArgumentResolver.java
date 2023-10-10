@@ -41,14 +41,14 @@ public class LoginProcessArgumentResolver implements HandlerMethodArgumentResolv
         String password = request.getParameter("password");
 
         String cryptoPassword = SHA256Util.encryptSHA256(password);
-        UUID memberId = memberRepository.findByIdAndPassword(loginId, cryptoPassword);
+        Member member = memberRepository.findByIdAndPassword(loginId, cryptoPassword);
 
-        if (memberId == null) {
-            log.error("not found Member ERROR! {}", memberId);
+        if (member == null) {
+            log.error("not found Member ERROR! {}", member);
             throw new RuntimeException("not found Member ERROR! 회원을 찾을 수 없습니다.");
         }
 
-        return memberId;
+        return member;
 
     }
 

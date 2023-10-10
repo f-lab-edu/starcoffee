@@ -16,8 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -39,7 +41,7 @@ public class MemberServiceTest {
     @BeforeEach
     void init() {
         member = MemberDTO.builder()
-                .id(1L)
+                .id(UUID.fromString("a999d6e0-4d8b-11ee-ac76-fd3617d1d2aa"))
                 .name("testName")
                 .tel("010-1111-1111")
                 .email("test@test.com")
@@ -51,7 +53,6 @@ public class MemberServiceTest {
                 .build();
 
         member2 = MemberRequest.builder()
-                .id(1L)
                 .name("testName")
                 .tel("010-1111-1111")
                 .email("test@test.com")
@@ -59,13 +60,20 @@ public class MemberServiceTest {
                 .nickName("nickName")
                 .loginId("testLogin")
                 .password("password1234#")
-                .birth(LocalDateTime.now())
+                .birth(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
 
         resultMember = Optional.of(new Member());
         resultMember.ifPresent(memberInfo -> {
             memberInfo.setLoginId("testLogin");
             memberInfo.setPassword("984da22aa86418be811bc17828ebaa91cc9b058de869f223c9461fc85c734b27");
+            memberInfo.setMemberId(UUID.fromString("a999d6e0-4d8b-11ee-ac76-fd3617d1d2aa"));
+            memberInfo.setEmail("kks@naver.com");
+            memberInfo.setGender("M");
+            memberInfo.setTel("010-1111-1111");
+            memberInfo.setBirth(Timestamp.valueOf(LocalDateTime.now()));
+            memberInfo.setNickName("nickName");
+            memberInfo.setName("testName");
             memberInfo.setStatus(MemberStatus.DEFAULT);
         });
     }

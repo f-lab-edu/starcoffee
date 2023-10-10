@@ -22,9 +22,12 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping("/members")
 public class MemberController {
+    private final MemberService memberService;
 
     @Autowired
-    private MemberService memberService;
+    public MemberController(MemberService memberService) {
+        this.memberService = memberService;
+    }
 
     /**
      * 회원가입 진행
@@ -50,10 +53,9 @@ public class MemberController {
         ResponseEntity<LoginResponse> responseEntity = null;
         LoginResponse loginResponse;
 
-        UUID memberId = memberService.login(loginRequest);
-        loginResponse = LoginResponse.success(memberId);
+        Member member = memberService.login(loginRequest, session);
+        loginResponse = LoginResponse.success(member.getMemberId());
 
-        SessionUtil.setMemberId(session, memberId);
         responseEntity = new ResponseEntity<>(loginResponse, HttpStatus.OK);
 
         return responseEntity;
@@ -69,12 +71,10 @@ public class MemberController {
     public ResponseEntity<Member> findById(HttpSession session) {
         String memberId = SessionUtil.getMemberId(session);
         log.info(memberId.toString());
-        Optional<Member> memberInfo = memberService.findById(memberId);
+        Member memberInfo = memberService.findById(memberId);
 
         return Stream.of(memberInfo)
-                .filter(Optional::isPresent)
                 .findFirst()
-                .map(Optional::get)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
@@ -147,6 +147,7 @@ public class MemberController {
     public void deleteMemberInfo(HttpSession session) {
         String memberId = SessionUtil.getMemberId(session);
         memberService.deleteMember(memberId);
+        SessionUtil.logoutMember(session);
     }
 
 }

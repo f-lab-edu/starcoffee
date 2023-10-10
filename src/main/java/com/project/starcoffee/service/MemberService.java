@@ -7,20 +7,23 @@ import com.project.starcoffee.exception.DuplicateIdException;
 import com.project.starcoffee.repository.MemberRepository;
 import com.project.starcoffee.utils.SHA256Util;
 
+import com.project.starcoffee.utils.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
+import javax.servlet.http.HttpSession;
 
 @Slf4j
 @Service
 public class MemberService {
+    private final MemberRepository memberRepository;
 
     @Autowired
-    private MemberRepository memberRepository;
+    public MemberService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
 
     /**
      * 회원 가입을 진행한다.
@@ -48,7 +51,7 @@ public class MemberService {
      * 중복된 아이디가 있는지 확인한다.
      * @param memberInfo 회원정보
      */
-    public void DuplicatedId(MemberRequest memberInfo) {
+    public synchronized void DuplicatedId(MemberRequest memberInfo) {
         boolean resultId = memberRepository.checkId(memberInfo.getLoginId()) == 1;
         if (resultId) {
             throw new DuplicateIdException("중복된 아이디 입니다.");
@@ -62,20 +65,22 @@ public class MemberService {
      * @param loginRequest
      * @return
      */
-    public UUID login(MemberLoginRequest loginRequest) {
+    public Member login(MemberLoginRequest loginRequest, HttpSession session) {
 
         String loginId = loginRequest.getLoginId();
         String password = loginRequest.getPassword();
 
         String cryptoPassword = SHA256Util.encryptSHA256(password);
-        UUID memberId = memberRepository.findByIdAndPassword(loginId, cryptoPassword);
+        Member member = memberRepository.findByIdAndPassword(loginId, cryptoPassword);
 
-        if (memberId == null) {
-            log.error("not found Member ERROR! {}", memberId);
+        if (member == null) {
+            log.error("not found Member ERROR! {}", member);
             throw new RuntimeException("not found Member ERROR! 회원을 찾을 수 없습니다.");
         }
 
-        return memberId;
+        SessionUtil.setMemberId(session, member.getMemberId());
+
+        return member;
     }
 
 
@@ -84,10 +89,10 @@ public class MemberService {
      * @param memberId 로그인 아이디
      * @return
      */
-    public Optional<Member> findById(String memberId) {
-        Optional<Member> member = memberRepository.findById(memberId);
+    public Member findById(String memberId) {
+        Member member = memberRepository.findById(memberId);
 
-        if (!member.isPresent()) {
+        if (member == null) {
             log.error("not found Member ERROR! : {}", member);
             throw new RuntimeException("not found Member ERROR! 회원을 찾을 수 없습니다.\n"
                     + "Param : " +member);
@@ -104,12 +109,15 @@ public class MemberService {
      */
     @Transactional
     public void updatePassword(String memberId, String beforePw, String afterPw) {
-        Optional<Member> memberOptional = memberRepository.findById(memberId);
-        Member memberInfo = memberOptional.orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+        Member memberInfo = memberRepository.findById(memberId);
+        if (memberInfo == null) {
+            log.error("not Found Member ERROR!");
+            throw new RuntimeException("회원을 찾을 수 없습니다.");
+        }
 
         // 이전 비밀번호 확인 및 비밀번호 변경
         String enAfterPassword = memberInfo.matchesAndChangePassword(beforePw, afterPw);
-        String loginId = memberOptional.get().getLoginId();
+        String loginId = memberInfo.getLoginId();
 
         int result = memberRepository.updatePassword(loginId, enAfterPassword);
         if (result != 1) {
@@ -126,19 +134,14 @@ public class MemberService {
      * @param afterNickname 변경할 닉네임
      */
     public void updateNickName(String memberId, String afterNickname) {
-        Optional<Member> memberInfo = memberRepository.findById(memberId);
+        Member memberInfo = memberRepository.findById(memberId);
 
-        Optional<String> matchNickName = memberInfo.stream()
-                .filter(m -> m.getNickName().equals(afterNickname))
-                .map(Member::getEmail)
-                .findFirst();
-
-        matchNickName.ifPresent(n -> {
+        if (memberInfo.getNickName().equals(afterNickname)) {
             log.error("same NickName ERROR! id={}", afterNickname);
             throw new RuntimeException("변경할 닉네임이 이전 닉네임과 같습니다.");
-        });
+        }
 
-        String loginId = memberInfo.get().getLoginId();
+        String loginId = memberInfo.getLoginId();
         int result = memberRepository.updateNickName(loginId, afterNickname);
         if (result != 1) {
             log.error("update NickName ERROR! nickname={}", afterNickname);
@@ -153,20 +156,15 @@ public class MemberService {
      * @param email
      */
     public void updateEmail(String memberId, String email) {
-        Optional<Member> memberInfo = memberRepository.findById(memberId);
+        Member memberInfo = memberRepository.findById(memberId);
 
         // 이전 이메일과 변경 이메일이 동일한지 확인
-        Optional<String> matchEmail = memberInfo.stream()
-                .filter(m -> m.getEmail().equals(email))
-                .map(Member::getEmail)
-                .findFirst();
-
-        matchEmail.ifPresent(e -> {
+        if (memberInfo.getEmail().equals(email)) {
             log.error("same Email ERROR! email={}", email);
             throw new RuntimeException("변경할 이메일이 이전 이메일과 같습니다.");
-        });
+        }
 
-        String loginId = memberInfo.get().getLoginId();
+        String loginId = memberInfo.getLoginId();
         int result = memberRepository.updateEmail(loginId, email);
         if (result != 1) {
             log.error("update email ERROR! email={}", email);
@@ -181,8 +179,8 @@ public class MemberService {
      */
     @Transactional
     public void deleteMember(String memberId) {
-        Optional<Member> memberInfo = memberRepository.findById(memberId);
-        String loginId = memberInfo.get().getLoginId();
+        Member memberInfo = memberRepository.findById(memberId);
+        String loginId = memberInfo.getLoginId();
 
         int result = memberRepository.deleteMember(loginId);
         if (result != 1) {

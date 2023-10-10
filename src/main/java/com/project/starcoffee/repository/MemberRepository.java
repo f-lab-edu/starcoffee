@@ -11,11 +11,11 @@ public interface MemberRepository {
 
     int saveMember(MemberRequest memberInfo);
 
-    Optional<Member> findById(String memberId);
+    Member findById(String memberId);
 
     int checkId(String loginId);
 
-    UUID findByIdAndPassword(@Param("loginId") String loginId, @Param("password") String password);
+    Member findByIdAndPassword(@Param("loginId") String loginId, @Param("password") String password);
 
     int updatePassword(@Param("loginId") String loginId, @Param("password") String password);
 
