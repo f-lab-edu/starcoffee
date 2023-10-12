@@ -3,6 +3,7 @@ package com.project.starcoffee.config;
 
 import com.project.starcoffee.config.login.LoginCheckInterceptor;
 import com.project.starcoffee.controller.argument.LoginProcessArgumentResolver;
+import com.project.starcoffee.repository.CardRepository;
 import com.project.starcoffee.repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/",
                         "/members", "/members/home", "/members/login",
-                        "/cards", "/error");
+                        "/cards/**", "/error");
     }
 
     @Override
