@@ -1,0 +1,39 @@
+@startuml
+title 회원가입
+
+actor "User" as user
+participant "App" as app
+participant "BackEnd" as backend
+participant "RDBMS\n(회원TB)" as db
+
+
+user -> app : 회원정보 입력
+activate user
+
+app -[#blue]> backend : 회원가입 요청(req)
+activate app
+group success flow
+    activate backend
+    backend -[#blue]> backend : 유효성 검사확인
+    note right : Bean Validation\n(Controller layer)
+        group invalidate
+            backend --[#red]x app : 유효성실패 예외확인
+        end
+
+    backend -[#blue]> db : 로그인ID 중복체크
+    note right : (Service layer)
+    activate db
+        group duplicate
+            db --[#red]x backend : 로그인ID 중복
+            backend --[#red]x app : 로그인중복 예외확인
+        end
+    db -[#blue]> backend : 로그인ID 중복확인
+    backend -[#blue]> db : 회원정보 저공
+    db -[#blue]> backend : 쿼리성공
+    deactivate db
+    backend -[#blue]> app : 회원가입 완료(res)
+    deactivate backend
+end
+app -> user : 회원가입 확인
+deactivate app
+@enduml

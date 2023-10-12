@@ -1,7 +1,11 @@
 package com.project.starcoffee.utils;
 
-import javax.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
+import javax.servlet.http.HttpSession;
+import java.util.UUID;
+
+@Slf4j
 public class SessionUtil {
 
     public static final String LOGIN_MEMBER = "loginMember";
@@ -13,7 +17,7 @@ public class SessionUtil {
      * @param session 사용자의 세션
      * @return
      */
-    public static String getLoginId(HttpSession session) {
+    public static String getMemberId(HttpSession session) {
         return (String) session.getAttribute(LOGIN_MEMBER);
     }
 
@@ -22,8 +26,9 @@ public class SessionUtil {
      * @param session 사용자의 session
      * @param id 로그인한 고객의 id
      */
-    public static void setLoginId(HttpSession session, String id) {
-        session.setAttribute(LOGIN_MEMBER, id);
+    public static void setMemberId(HttpSession session, UUID id) {
+        String memberIdStr = id.toString();
+        session.setAttribute(LOGIN_MEMBER, memberIdStr);
     }
 
     /**

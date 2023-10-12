@@ -14,9 +14,13 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class CardService {
+    private final CardRepository cardRepository;
 
     @Autowired
-    private CardRepository cardRepository;
+    public CardService(CardRepository cardRepository) {
+        this.cardRepository = cardRepository;
+    }
+
 
     public void saveCard(CardRequest cardRequest) {
         cardRepository.saveCard(cardRequest);

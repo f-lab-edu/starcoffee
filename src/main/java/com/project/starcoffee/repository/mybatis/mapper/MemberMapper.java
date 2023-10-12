@@ -6,17 +6,18 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Mapper
 public interface MemberMapper {
 
     int saveMember(MemberRequest memberInfo);
 
-    Optional<Member> findById(String loginId);
+    Member findById(String memberId);
 
     int checkId(String loginId);
 
-    Optional<Member> findByIdAndPassword(@Param("loginId") String loginId, @Param("password") String password);
+    Member findByIdAndPassword(@Param("loginId") String loginId, @Param("password") String password);
 
     int updatePassword(@Param("loginId") String loginId, @Param("password") String password);
 
@@ -24,7 +25,7 @@ public interface MemberMapper {
 
     int updateEmail(@Param("loginId") String loginId, @Param("email") String email);
 
-    int updateTel(@Param("loginId") String loginId, @Param("tel") String tel);
+    // int updateTel(@Param("loginId") String loginId, @Param("tel") String tel);
 
     int deleteMember(String loginId);
 

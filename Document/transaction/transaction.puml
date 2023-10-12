@@ -1,0 +1,61 @@
+@startuml
+title 트랜잭션 관리 (Saga/Orchestration)
+
+participant "OrderService" as order
+participant "Saga Object" as saga
+participant "PayService" as pay
+participant "StoreService" as store
+
+
+order -> saga : 1. 트랜잭션 시작
+activate saga
+deactivate saga
+
+order -> pay : 2. 결제 요청
+activate pay
+deactivate pay
+
+order -> saga : 3. 트랜잭션 상태추가
+activate saga
+deactivate saga
+
+group 트랜잭션 실패 시
+    saga -[#red]> pay : 4. 보상 트랜잭션 호출
+    activate pay
+    deactivate pay
+end
+
+order -> store : 5. 결제완료 요청
+activate store
+deactivate store
+
+order -> saga : 6. 트랜잭션 상태추가
+activate saga
+deactivate saga
+
+group 트랜잭션 실패 시
+    saga -[#red]> store : 7. 보상 트랜잭션 호출
+    activate store
+    deactivate store
+end
+
+group 트랜잭션 성공 시
+    order -> saga : 8. 트랜잭션 END
+    activate saga
+    saga -> order : 9. 트랜잭션 성공
+    activate order
+    deactivate order
+    deactivate saga
+
+    saga -> order : 10. 트랜잭션 실패
+    activate order
+    deactivate order
+
+end
+
+
+
+
+
+
+@enduml
