@@ -4,7 +4,7 @@
 <mapper namespace="com.project.starcoffee.repository.mybatis.mapper.CardMapper">
 
     <resultMap id="cardInfo" type="com.project.starcoffee.domain.card.Card">
-        <result property="cardId" column="card_id"/>
+        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
         <result property="cardName" column="card_name"/>
         <result property="cardNickName" column="card_nickname"/>
         <result property="cardNumber" column="card_number"/>
@@ -21,7 +21,7 @@
     </insert>
 
     <select id="findById" resultMap="cardInfo" resultType="java.util.UUID">
-        SELECT bin_to_uuid(card_id,1), card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
+        SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
         FROM STAR_CARD
         WHERE card_number = #{cardNumber}
     </select>

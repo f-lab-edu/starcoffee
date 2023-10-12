@@ -22,8 +22,12 @@ import java.util.Optional;
 @RequestMapping("/cards")
 public class CardController {
 
+    private final CardService cardService;
+
     @Autowired
-    private CardService cardService;
+    public CardController(CardService cardService) {
+        this.cardService = cardService;
+    }
 
     /**
      * 카드를 등록한다. (가맹점 시점)

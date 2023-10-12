@@ -12,9 +12,12 @@ import java.util.UUID;
 
 @Repository
 public class MemberRepositoryImpl implements MemberRepository {
+    private final MemberMapper memberMapper;
 
     @Autowired
-    private MemberMapper memberMapper;
+    public MemberRepositoryImpl(MemberMapper memberMapper) {
+        this.memberMapper = memberMapper;
+    }
 
     @Override
     public int saveMember(MemberRequest memberInfo) {
@@ -22,12 +25,12 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> findById(String memberId) {
+    public Member findById(String memberId) {
         return memberMapper.findById(memberId);
     }
 
     @Override
-    public UUID findByIdAndPassword(String loginId, String password) {
+    public Member findByIdAndPassword(String loginId, String password) {
         return memberMapper.findByIdAndPassword(loginId, password);
     }
 

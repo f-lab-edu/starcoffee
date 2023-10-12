@@ -4,7 +4,7 @@
 <mapper namespace="com.project.starcoffee.repository.mybatis.mapper.MemberMapper">
 
     <resultMap id="memberInfo" type="com.project.starcoffee.domain.member.Member">
-        <result property="memberId" column="member_id"/>
+        <result property="memberId" column="member_id" javaType="java.util.UUID"/>
         <result property="name" column="name"/>
         <result property="loginId" column="login_id"/>
         <result property="password" column="password"/>
@@ -33,20 +33,25 @@
         VALUES (#{name}, #{loginId}, #{password}, #{tel}, #{email}, #{birth}, #{nickName}, #{gender})
     </insert>
 
-
-<!-- resultType 으로는 몇몇 데이터가 누락되는데 resultMap 은 정상적으로 작동한다. 왜일까 ?
- <select id="findById" resultType="com.project.starcoffee.domain.member.Member">
-        SELECT member_id, name, login_id, password, tel, email, status, birth, created_at, updated_at, nick_name, gender
+    <select id="findById" resultMap="memberInfo">
+        SELECT bin_to_uuid(member_id,1) as member_id, name, login_id, password, tel, email, status, birth, created_at, updated_at, nick_name, gender
         FROM MEMBERS
-        WHERE member_id = #{memberId}
-    </select>-->
+        WHERE member_id = uuid_to_bin(#{memberId},1)
+    </select>
 
-    <select id="findByIdAndPassword" resultType="java.util.UUID">
-        SELECT bin_to_uuid(member_id,1)
+    <select id="findByIdAndPassword" resultMap="memberInfo">
+        SELECT bin_to_uuid(member_id,1) as member_id, name, login_id, password, tel, email, status, birth, created_at, updated_at, nick_name, gender
         FROM MEMBERS
         WHERE login_id = #{loginId} AND password = #{password}
-        AND status != 'DELETED'
+          AND status != 'DELETED'
     </select>
+
+<!--    <select id="findByIdAndPassword" resultType="java.util.UUID">-->
+<!--        SELECT bin_to_uuid(member_id,1)-->
+<!--        FROM MEMBERS-->
+<!--        WHERE login_id = #{loginId} AND password = #{password}-->
+<!--        AND status != 'DELETED'-->
+<!--    </select>-->
 
     <select id="checkId" resultType="int">
         SELECT count(*)
