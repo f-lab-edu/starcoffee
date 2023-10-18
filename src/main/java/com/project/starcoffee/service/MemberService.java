@@ -2,6 +2,7 @@ package com.project.starcoffee.service;
 
 import com.project.starcoffee.controller.request.member.MemberLoginRequest;
 import com.project.starcoffee.controller.request.member.MemberRequest;
+import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.exception.DuplicateIdException;
 import com.project.starcoffee.repository.MemberRepository;
@@ -9,16 +10,21 @@ import com.project.starcoffee.utils.SHA256Util;
 
 import com.project.starcoffee.utils.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import java.util.UUID;
 
 @Slf4j
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
+
+    @Autowired
+    private SqlSession sqlSession;
 
     @Autowired
     public MemberService(MemberRepository memberRepository) {
@@ -190,4 +196,14 @@ public class MemberService {
     }
 
 
+    public Card enrollCard(String cardNumber, String pinNumber, HttpSession session) {
+        Card cardInfo = memberRepository.findCard(cardNumber, pinNumber);
+
+        UUID memberId = UUID.fromString(SessionUtil.getMemberId(session));
+        UUID cardId = cardInfo.getCardId();
+
+        memberRepository.enrollCard(memberId, cardId);
+
+        return cardInfo;
+    }
 }

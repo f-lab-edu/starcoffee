@@ -1,10 +1,10 @@
 package com.project.starcoffee.repository;
 
 import com.project.starcoffee.controller.request.member.MemberRequest;
+import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.member.Member;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface MemberRepository {
@@ -27,4 +27,7 @@ public interface MemberRepository {
 
     int deleteMember(String loginId);
 
+    Card findCard(@Param("cardNumber") String cardNumber, @Param("pinNumber") String pinNumber);
+
+    int enrollCard(@Param("memberId") UUID memberId, @Param("cardId") UUID cardId);
 }

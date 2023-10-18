@@ -16,17 +16,43 @@
         <result property="updatedAt" column="updated_at"/>
         <result property="nickName" column="nick_name"/>
         <result property="gender" column="gender"/>
-        <collection property="card" column="card" javaType="java.util.ArrayList"
-                    ofType="com.project.starcoffee.domain.card.Card"
-                    select="findCardInfo"></collection>
+
+        <collection property="cards" ofType="com.project.starcoffee.domain.card.Card">
+            <id property="cardId" column="card_id"/>
+            <result property="cardName" column="card_name"/>
+            <result property="cardNickName" column="card_nickName"/>
+            <result property="cardNumber" column="card_number"/>
+            <result property="status" column="status"/>
+            <result property="pinNumber" column="pin_number"/>
+            <result property="cardAmount" column="card_amount"/>
+            <result property="createdAt" column="created_at"/>
+            <result property="updatedAt" column="updated_at"/>
+        </collection>
     </resultMap>
 
-    <select id="findCardInfo" resultType="com.project.starcoffee.domain.card.Card">
-        SELECT card_name, card_nickname, cardAmount
-        FROM STAR_CARD
-        WHERE login_id = #{id}
-    </select>
+    <resultMap id="cardInfo" type="com.project.starcoffee.domain.card.Card">
+        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
+        <result property="cardName" column="card_name"/>
+        <result property="cardNickName" column="card_nickname"/>
+        <result property="cardNumber" column="card_number"/>
+        <result property="status" column="status"/>
+        <result property="pinNumber" column="pin_number"/>
+        <result property="cardAmount" column="card_amount"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
 
+    <select id="findCard" resultMap="cardInfo">
+        SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
+        FROM STAR_CARD
+        WHERE card_number = #{cardNumber} AND pin_number = #{pinNumber}
+        AND status != 'DELETED'
+    </select>
+    
+    <insert id="enrollCard">
+        INSERT INTO LOG_CARD (member_id, card_id)
+        VALUES (uuid_to_bin(#{memberId},1), uuid_to_bin(#{cardId},1))
+    </insert>
 
     <insert id="saveMember" parameterType="com.project.starcoffee.controller.request.member.MemberRequest">
         INSERT INTO MEMBERS (name, login_id, password, tel, email, birth,  nick_name, gender)
@@ -45,13 +71,6 @@
         WHERE login_id = #{loginId} AND password = #{password}
           AND status != 'DELETED'
     </select>
-
-<!--    <select id="findByIdAndPassword" resultType="java.util.UUID">-->
-<!--        SELECT bin_to_uuid(member_id,1)-->
-<!--        FROM MEMBERS-->
-<!--        WHERE login_id = #{loginId} AND password = #{password}-->
-<!--        AND status != 'DELETED'-->
-<!--    </select>-->
 
     <select id="checkId" resultType="int">
         SELECT count(*)

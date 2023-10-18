@@ -42,7 +42,7 @@ public class Member {
 
     private String gender;  // 성별
 
-    private List<Card> card;  // 스타커피 카드정보
+     private List<Card> cards;  // 스타커피 카드정보
 
 
     /**

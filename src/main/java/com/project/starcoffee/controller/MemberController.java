@@ -1,7 +1,9 @@
 package com.project.starcoffee.controller;
 
+import com.project.starcoffee.controller.request.card.CardSaveRequest;
 import com.project.starcoffee.controller.request.member.*;
 import com.project.starcoffee.controller.response.member.LoginResponse;
+import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.service.MemberService;
 import com.project.starcoffee.utils.SessionUtil;
@@ -14,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -148,6 +148,20 @@ public class MemberController {
         String memberId = SessionUtil.getMemberId(session);
         memberService.deleteMember(memberId);
         SessionUtil.logoutMember(session);
+    }
+
+    @PostMapping("/card")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Card> enrollCard(@RequestBody CardSaveRequest cardSaveRequest, HttpSession session) {
+        String cardNumber = cardSaveRequest.getCardNumber();
+        String pinNumber = cardSaveRequest.getPinNumber();
+
+        Card card = memberService.enrollCard(cardNumber, pinNumber, session);
+
+        return Stream.of(card)
+                .findFirst()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
 }

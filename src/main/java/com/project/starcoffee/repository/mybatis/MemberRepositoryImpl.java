@@ -1,6 +1,7 @@
 package com.project.starcoffee.repository.mybatis;
 
 import com.project.starcoffee.controller.request.member.MemberRequest;
+import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.repository.MemberRepository;
 import com.project.starcoffee.repository.mybatis.mapper.MemberMapper;
@@ -63,4 +64,16 @@ public class MemberRepositoryImpl implements MemberRepository {
     public int updateTel(String loginId, String tel) {
         return 0;
     }
+
+    @Override
+    public Card findCard(String cardNumber, String pinNumber) {
+        return memberMapper.findCard(cardNumber, pinNumber);
+    }
+
+    @Override
+    public int enrollCard(UUID memberId, UUID cardId) {
+        return memberMapper.enrollCard(memberId, cardId);
+    }
+
+
 }
