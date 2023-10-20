@@ -26,6 +26,12 @@
         WHERE card_number = #{cardNumber}
     </select>
 
+    <select id="findByCard" resultMap="cardInfo">
+        SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
+        FROM STAR_CARD
+        WHERE card_id = uuid_to_bin(#{cardId},1)
+    </select>
+
     <update id="updateNickName">
         UPDATE STAR_CARD
         SET card_nickname = #{cardNickName}, updated_at = NOW()

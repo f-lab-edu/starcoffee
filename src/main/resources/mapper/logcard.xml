@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.starcoffee.repository.mybatis.mapper.LogCardMapper">
+
+    <resultMap id="logCardInfo" type="com.project.starcoffee.domain.card.LogCard">
+        <result property="cardLogId" column="card_log_id" javaType="java.util.UUID"/>
+        <result property="memberId" column="member_id" javaType="java.util.UUID"/>
+        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <resultMap id="cardInfo" type="com.project.starcoffee.domain.card.Card">
+        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
+        <result property="cardName" column="card_name"/>
+        <result property="cardNickName" column="card_nickname"/>
+        <result property="cardNumber" column="card_number"/>
+        <result property="status" column="status"/>
+        <result property="pinNumber" column="pin_number"/>
+        <result property="cardAmount" column="card_amount"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findByCard" resultType="com.project.starcoffee.domain.card.LogCard">
+        SELECT bin_to_uuid(card_log_id,1) as cardLogId,
+               bin_to_uuid(member_id,1) as memberId,
+               bin_to_uuid(card_id,1) as cardId,
+               created_at,
+               status
+        FROM LOG_CARD
+        WHERE member_id = uuid_to_bin(#{memberId},1)
+    </select>
+
+    <update id="updateAmount">
+        UPDATE STAR_CARD
+            SET card_amount = #{balance}
+        WHERE card_id = uuid_to_bin(#{cardId},1)
+    </update>
+
+</mapper>

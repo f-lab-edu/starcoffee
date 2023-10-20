@@ -39,7 +39,6 @@ public class CardController {
         cardService.saveCard(cardRequest);
     }
 
-
     /**
      * 카드번호를 통해서 카드정보를 확인한다. (가맹점 시점)
      * @param cardNumber 카드번호
@@ -57,18 +56,6 @@ public class CardController {
                 }).orElseThrow(() -> new RuntimeException("카드 정보를 찾을 수 없습니다."));
         return responseEntity;
     }
-
-
-    /**
-     * 카드 닉네임을 변경한다. (회원 시점)
-     * @param cardInfo 변경할 카드정보(카드번호, 닉네임)
-     */
-    @PostMapping("/nickname")
-    @ResponseStatus(HttpStatus.OK)
-    public void updateNickName(@RequestBody @Valid CardNickNameRequest cardInfo) {
-        cardService.updateNickName(cardInfo);
-    }
-
 
     /**
      * 등록된 카드를 말소처리한다.

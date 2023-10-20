@@ -1,10 +1,13 @@
 package com.project.starcoffee.controller;
 
+import com.project.starcoffee.controller.request.card.CardNickNameRequest;
+import com.project.starcoffee.controller.request.card.CardRequest;
 import com.project.starcoffee.controller.request.card.CardSaveRequest;
 import com.project.starcoffee.controller.request.member.*;
 import com.project.starcoffee.controller.response.member.LoginResponse;
 import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.member.Member;
+import com.project.starcoffee.service.CardService;
 import com.project.starcoffee.service.MemberService;
 import com.project.starcoffee.utils.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +27,14 @@ import java.util.stream.Stream;
 public class MemberController {
     private final MemberService memberService;
 
+    private final CardService cardService;
+
     @Autowired
-    public MemberController(MemberService memberService) {
+    public MemberController(MemberService memberService, CardService cardService) {
         this.memberService = memberService;
+        this.cardService = cardService;
     }
+
 
     /**
      * 회원가입 진행
@@ -150,7 +157,14 @@ public class MemberController {
         SessionUtil.logoutMember(session);
     }
 
-    @PostMapping("/card")
+
+    /**
+     * 회원의 아이디로 카드등록을 한다.
+     * @param cardSaveRequest 카드정보
+     * @param session 세션
+     * @return
+     */
+    @PostMapping("/card/enroll")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Card> enrollCard(@RequestBody CardSaveRequest cardSaveRequest, HttpSession session) {
         String cardNumber = cardSaveRequest.getCardNumber();
@@ -163,5 +177,18 @@ public class MemberController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+
+
+    /**
+     * 등록된 카드 닉네임을 변경한다.
+     * @param cardInfo 변경할 카드정보(카드번호, 닉네임)
+     */
+    @PostMapping("/card/nickname")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateNickName(@RequestBody @Valid CardNickNameRequest cardInfo) {
+        cardService.updateNickName(cardInfo);
+    }
+
+
 
 }

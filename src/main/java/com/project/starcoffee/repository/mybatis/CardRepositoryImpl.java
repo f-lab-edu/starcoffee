@@ -13,8 +13,12 @@ import java.util.UUID;
 @Repository
 public class CardRepositoryImpl implements CardRepository {
 
+    private final CardMapper cardMapper;
+
     @Autowired
-    private CardMapper cardMapper;
+    public CardRepositoryImpl(CardMapper cardMapper) {
+        this.cardMapper = cardMapper;
+    }
 
     @Override
     public int saveCard(CardRequest cardRequest) {
@@ -24,6 +28,11 @@ public class CardRepositoryImpl implements CardRepository {
     @Override
     public Optional<Card> findById(String cardNumber) {
         return cardMapper.findById(cardNumber);
+    }
+
+    @Override
+    public Card findByCard(UUID cardId) {
+        return cardMapper.findByCard(cardId);
     }
 
     @Override
