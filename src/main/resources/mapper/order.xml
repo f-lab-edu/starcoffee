@@ -3,6 +3,14 @@
 
 <mapper namespace="com.project.starcoffee.repository.mybatis.mapper.OrderMapper">
 
+    <resultMap id="logCardInfo" type="com.project.starcoffee.domain.card.LogCard">
+        <result property="cardLogId" column="card_log_id" javaType="java.util.UUID"/>
+        <result property="memberId" column="member_id" javaType="java.util.UUID"/>
+        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
     <resultMap id="cardInfo" type="com.project.starcoffee.domain.card.Card">
         <result property="cardId" column="card_id" javaType="java.util.UUID"/>
         <result property="cardName" column="card_name"/>
