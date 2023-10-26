@@ -14,9 +14,7 @@ public interface MemberMapper {
 
     int saveMember(MemberRequest memberInfo);
 
-    Member findById(String memberId);
-
-    int checkId(String loginId);
+    Optional<Member> findById(String memberId);
 
     Member findByIdAndPassword(@Param("loginId") String loginId, @Param("password") String password);
 

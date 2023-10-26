@@ -26,8 +26,8 @@ public class CardService {
         cardRepository.saveCard(cardRequest);
     }
 
-    public Optional<Card> findById(String cardNumber) {
-        return cardRepository.findById(cardNumber);
+    public Optional<Card> findByCardNumber(String cardNumber) {
+        return cardRepository.findByCardNumber(cardNumber);
     }
 
     public void updateNickName(CardNickNameRequest cardInfo) {

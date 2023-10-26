@@ -11,27 +11,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Slf4j
 @RestController
 @RequestMapping("/pay")
 public class PayController {
-
     private final PayService payService;
-    private final LogCardService logCardService;
 
     @Autowired
-    public PayController(PayService payService, LogCardService logCardService) {
+    public PayController(PayService payService) {
         this.payService = payService;
-        this.logCardService = logCardService;
     }
 
     @GetMapping("/mycard")
     @ResponseStatus(HttpStatus.OK)
-    public Card confirmMyCard(HttpSession session) {
-        String memberId = SessionUtil.getMemberId(session);
-        Card cardInfo = logCardService.findCard(memberId);
+    public Card confirmMyCard(Card cardInfo) {
+//        String memberId = SessionUtil.getMemberId(session);
+//        Card cardInfo = logCardService.findCard(memberId);
 
         return cardInfo;
     }
@@ -39,8 +37,7 @@ public class PayController {
 
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)
-    public PayResponse doPay(@RequestBody PayRequest payRequest, HttpSession session) {
-        Card cardInfo = confirmMyCard(session);
+    public PayResponse doPay(@RequestBody PayRequest payRequest, Card cardInfo) {
         PayResponse payResponse = payService.runPay(payRequest, cardInfo);
 
         return payResponse;

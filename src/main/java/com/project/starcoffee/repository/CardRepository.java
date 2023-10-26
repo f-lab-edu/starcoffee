@@ -12,9 +12,9 @@ import java.util.UUID;
 public interface CardRepository {
     int saveCard(CardRequest cardRequest);
 
-    Optional<Card> findById(String cardNumber);
+    Optional<Card> findByCardNumber(String cardNumber);
 
-    Card findByCard(UUID cardId);
+    Optional<Card> findByCardId(UUID cardId);
 
     int updateNickName(String cardNumber, String cardNickName);
 

@@ -3,10 +3,11 @@ package com.project.starcoffee.repository.mybatis.mapper;
 import com.project.starcoffee.domain.store.Store;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Optional;
+
 @Mapper
 public interface StoreMapper {
-    long storeNotOpen(Long storeId);
-    int updateStoreOpenById(long storeId);
-    int updateStoreCloseById(long storeId);
-    Store findById(long storeId);
+    int storeNotOpen(long storeId);
+    Optional<Store> findById(long storeId);
+    int updateStoreStatus(Store store);
 }

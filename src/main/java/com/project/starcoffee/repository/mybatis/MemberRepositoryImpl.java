@@ -26,18 +26,13 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public Member findById(String memberId) {
+    public Optional<Member> findById(String memberId) {
         return memberMapper.findById(memberId);
     }
 
     @Override
     public Member findByIdAndPassword(String loginId, String password) {
         return memberMapper.findByIdAndPassword(loginId, password);
-    }
-
-    @Override
-    public int checkId(String id) {
-        return memberMapper.checkId(id);
     }
 
     @Override

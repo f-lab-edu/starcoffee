@@ -1,6 +1,6 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.domain.store.Store;
+import com.project.starcoffee.controller.response.store.StoreStatusResponse;
 import com.project.starcoffee.service.StoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +21,13 @@ public class StoreController {
     }
 
     @PatchMapping("/open/{id}")
-    public Store openStore(@PathVariable("id") long storeId) {
-        storeService.openStore(storeId);
-        return storeService.getStoreInfo(storeId);
+    public StoreStatusResponse openStore(@PathVariable("id") long storeId) {
+        return storeService.openStore(storeId);
     }
 
     @PatchMapping("/close/{id}")
-    public Store closeStore(@PathVariable("id") long storeId) {
-        storeService.closeStore(storeId);
-        return storeService.getStoreInfo(storeId);
+    public StoreStatusResponse closeStore(@PathVariable("id") long storeId) {
+        return storeService.closeStore(storeId);
     }
 
 }

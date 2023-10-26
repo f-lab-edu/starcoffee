@@ -29,8 +29,6 @@ public class OrderController {
     public void doOrder(@RequestBody OrderRequest orderRequest, HttpSession session) {
         String memberId = SessionUtil.getMemberId(session);
         orderService.runOrder(orderRequest, memberId);
+
     }
-
-
-
 }

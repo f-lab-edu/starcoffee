@@ -72,12 +72,6 @@
           AND status != 'DELETED'
     </select>
 
-    <select id="checkId" resultType="int">
-        SELECT count(*)
-        FROM MEMBERS
-        WHERE login_id = #{loginId}
-    </select>
-
     <update id="deleteMember">
         UPDATE MEMBERS
         SET status = 'DELETED', updated_at = NOW()

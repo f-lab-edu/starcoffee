@@ -6,6 +6,8 @@ import com.project.starcoffee.repository.mybatis.mapper.StoreMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class StoreRepositoryImpl implements StoreRepository {
 
@@ -17,22 +19,17 @@ public class StoreRepositoryImpl implements StoreRepository {
     }
 
     @Override
-    public long storeNotOpen(Long storeId) {
+    public int storeNotOpen(long storeId) {
         return storeMapper.storeNotOpen(storeId);
     }
 
     @Override
-    public int updateStoreOpenById(long storeId) {
-        return storeMapper.updateStoreOpenById(storeId);
-    }
-
-    @Override
-    public int updateStoreCloseById(long storeId) {
-        return storeMapper.updateStoreCloseById(storeId);
-    }
-
-    @Override
-    public Store findById(long storeId) {
+    public Optional<Store> findById(long storeId) {
         return storeMapper.findById(storeId);
+    }
+
+    @Override
+    public int updateStoreStatus(Store store) {
+        return storeMapper.updateStoreStatus(store);
     }
 }

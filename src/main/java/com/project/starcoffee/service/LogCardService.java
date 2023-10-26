@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -24,13 +25,13 @@ public class LogCardService {
         this.cardRepository = cardRepository;
     }
 
-    public Card findCard(String memberId) {
+    public Optional<Card> findCard(String memberId) {
         UUID member = UUID.fromString(memberId);
         LogCard logCard = logCardRepository.findByCard(member);
 
         UUID cardId = logCard.getCardId();
-        Card cardInfo = cardRepository.findByCard(cardId);
+        Optional<Card> cardInfoOptional = cardRepository.findByCardId(cardId);
 
-        return cardInfo;
+        return cardInfoOptional;
     }
 }

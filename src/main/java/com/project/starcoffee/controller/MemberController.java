@@ -77,7 +77,6 @@ public class MemberController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Member> findById(HttpSession session) {
         String memberId = SessionUtil.getMemberId(session);
-        log.info(memberId.toString());
         Member memberInfo = memberService.findById(memberId);
 
         return Stream.of(memberInfo)

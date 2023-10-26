@@ -1,11 +1,11 @@
 package com.project.starcoffee.config;
 
 
+import com.project.starcoffee.config.argument.CardArgumentResolver;
 import com.project.starcoffee.config.login.LoginCheckInterceptor;
-import com.project.starcoffee.controller.argument.LoginProcessArgumentResolver;
-import com.project.starcoffee.repository.CardRepository;
+import com.project.starcoffee.config.argument.LoginProcessArgumentResolver;
 import com.project.starcoffee.repository.MemberRepository;
-import lombok.AllArgsConstructor;
+import com.project.starcoffee.service.LogCardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -19,6 +19,7 @@ import java.util.List;
 public class WebConfig implements WebMvcConfigurer {
 
     private final MemberRepository memberRepository;
+    private final LogCardService logCardService;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -33,5 +34,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new LoginProcessArgumentResolver(memberRepository));
+        resolvers.add(new CardArgumentResolver(logCardService));
     }
 }

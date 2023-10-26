@@ -26,13 +26,13 @@ public class CardRepositoryImpl implements CardRepository {
     }
 
     @Override
-    public Optional<Card> findById(String cardNumber) {
-        return cardMapper.findById(cardNumber);
+    public Optional<Card> findByCardNumber(String cardNumber) {
+        return cardMapper.findByCardNumber(cardNumber);
     }
 
     @Override
-    public Card findByCard(UUID cardId) {
-        return cardMapper.findByCard(cardId);
+    public Optional<Card> findByCardId(UUID cardId) {
+        return cardMapper.findByCardId(cardId);
     }
 
     @Override

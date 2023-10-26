@@ -26,7 +26,7 @@ public class OrderService {
         long storeId = orderRequest.getStoreId();
         List<ItemDTO> items = orderRequest.getItems().stream().collect(Collectors.toList());
 
-        orderRepository.saveOrder();
+        // orderRepository.saveOrder();
 
 
     }
