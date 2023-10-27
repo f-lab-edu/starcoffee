@@ -16,7 +16,6 @@ import java.util.UUID;
 public class LogCardService {
 
     private final LogCardRepository logCardRepository;
-
     private final CardRepository cardRepository;
 
     @Autowired
@@ -25,13 +24,16 @@ public class LogCardService {
         this.cardRepository = cardRepository;
     }
 
-    public Optional<Card> findCard(String memberId) {
+    public Card findCard(String memberId) {
         UUID member = UUID.fromString(memberId);
         LogCard logCard = logCardRepository.findByCard(member);
 
         UUID cardId = logCard.getCardId();
-        Optional<Card> cardInfoOptional = cardRepository.findByCardId(cardId);
+        Optional<Card> cardInfo = cardRepository.findByCardId(cardId);
+        cardInfo.ifPresentOrElse(card -> {},
+                ()-> { throw new RuntimeException("카드를 찾을 수 없습니다."); }
+        );
 
-        return cardInfoOptional;
+        return cardInfo.get();
     }
 }

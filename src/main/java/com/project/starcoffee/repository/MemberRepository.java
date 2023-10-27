@@ -28,7 +28,9 @@ public interface MemberRepository {
 
     int deleteMember(String loginId);
 
-    Card findCard(@Param("cardNumber") String cardNumber, @Param("pinNumber") String pinNumber);
+    Optional<Card> findCard(@Param("cardNumber") String cardNumber, @Param("pinNumber") String pinNumber);
 
     int enrollCard(@Param("memberId") UUID memberId, @Param("cardId") UUID cardId);
+
+    boolean duplicatedCard(UUID cardId);
 }

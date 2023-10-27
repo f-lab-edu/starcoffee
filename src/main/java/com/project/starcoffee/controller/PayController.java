@@ -39,7 +39,6 @@ public class PayController {
     @ResponseStatus(HttpStatus.OK)
     public PayResponse doPay(@RequestBody PayRequest payRequest, Card cardInfo) {
         PayResponse payResponse = payService.runPay(payRequest, cardInfo);
-
         return payResponse;
     }
 

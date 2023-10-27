@@ -4,6 +4,7 @@ import com.project.starcoffee.controller.request.member.MemberLoginRequest;
 import com.project.starcoffee.controller.request.member.MemberRequest;
 import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.member.Member;
+import com.project.starcoffee.dto.CardDTO;
 import com.project.starcoffee.exception.DuplicateIdException;
 import com.project.starcoffee.repository.MemberRepository;
 import com.project.starcoffee.utils.SHA256Util;
@@ -187,13 +188,24 @@ public class MemberService {
 
 
     public Card enrollCard(String cardNumber, String pinNumber, HttpSession session) {
-        Card cardInfo = memberRepository.findCard(cardNumber, pinNumber);
+        Optional<Card> cardOptional = memberRepository.findCard(cardNumber, pinNumber);
+        cardOptional.orElseThrow(() -> new RuntimeException("카드를 찾을 수 없습니다."));
 
         UUID memberId = UUID.fromString(SessionUtil.getMemberId(session));
-        UUID cardId = cardInfo.getCardId();
+        UUID cardId = cardOptional.get().getCardId();
 
+        // 입력된 카드가 다른 회원에 등록되어 있는지 확인
+        if (duplicatedCard(cardId)) {
+            throw new RuntimeException("카드가 이미 등록되어 있습니다.");
+        }
+
+        // 카드를 카드이력 테이블에 등록
         memberRepository.enrollCard(memberId, cardId);
 
-        return cardInfo;
+        return cardOptional.get();
+    }
+
+    public boolean duplicatedCard(UUID cardId) {
+        return memberRepository.duplicatedCard(cardId);
     }
 }

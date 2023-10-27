@@ -36,11 +36,7 @@ public class CardArgumentResolver implements HandlerMethodArgumentResolver {
         HttpSession session = httpServletRequest.getSession();
         String memberId = SessionUtil.getMemberId(session);
 
-        Optional<Card> cardInfo = logCardService.findCard(memberId);
-
-        cardInfo.ifPresentOrElse(card -> {},
-                ()-> { throw new RuntimeException("카드를 찾을 수 없습니다."); }
-        );
+        Card cardInfo = logCardService.findCard(memberId);
 
         return cardInfo;
     }

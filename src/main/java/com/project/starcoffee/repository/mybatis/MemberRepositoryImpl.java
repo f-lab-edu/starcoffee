@@ -61,13 +61,18 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public Card findCard(String cardNumber, String pinNumber) {
+    public Optional<Card> findCard(String cardNumber, String pinNumber) {
         return memberMapper.findCard(cardNumber, pinNumber);
     }
 
     @Override
     public int enrollCard(UUID memberId, UUID cardId) {
         return memberMapper.enrollCard(memberId, cardId);
+    }
+
+    @Override
+    public boolean duplicatedCard(UUID cardId) {
+        return memberMapper.duplicatedCard(cardId);
     }
 
 

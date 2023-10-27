@@ -1,5 +1,6 @@
 package com.project.starcoffee.domain.member;
 
+import com.project.starcoffee.domain.card.LogCard;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,7 +43,7 @@ public class Member {
 
     private String gender;  // 성별
 
-     private List<Card> cards;  // 스타커피 카드정보
+     private List<LogCard> cards;  // 스타커피 카드정보
 
 
     /**

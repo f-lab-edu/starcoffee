@@ -18,7 +18,11 @@ public class LogCard {
     private UUID cardLogId;
     private UUID memberId;
     private UUID cardId;
-    private Timestamp createdAt;
     private CardStatus status;
+    private MoneyStatus moneyStatus;
+    private int cardAmount;
+    private int cardBalance;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
 }

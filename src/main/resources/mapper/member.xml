@@ -17,14 +17,14 @@
         <result property="nickName" column="nick_name"/>
         <result property="gender" column="gender"/>
 
-        <collection property="cards" ofType="com.project.starcoffee.domain.card.Card">
-            <id property="cardId" column="card_id"/>
-            <result property="cardName" column="card_name"/>
-            <result property="cardNickName" column="card_nickName"/>
-            <result property="cardNumber" column="card_number"/>
+        <collection property="cards" ofType="com.project.starcoffee.domain.card.LogCard">
+            <id property="cardLogId" column="card_log_id" javaType="java.util.UUID"/>
+            <result property="memberId" column="member_id" javaType="java.util.UUID"/>
+            <result property="cardId" column="card_id" javaType="java.util.UUID"/>
             <result property="status" column="status"/>
-            <result property="pinNumber" column="pin_number"/>
+            <result property="moneyStatus" column="money_status"/>
             <result property="cardAmount" column="card_amount"/>
+            <result property="cardBalance" column="card_balance"/>
             <result property="createdAt" column="created_at"/>
             <result property="updatedAt" column="updated_at"/>
         </collection>
@@ -42,6 +42,18 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
+    <resultMap id="logCardInfo" type="com.project.starcoffee.domain.card.LogCard">
+        <result property="cardLogId" column="card_log_id" javaType="java.util.UUID"/>
+        <result property="memberId" column="member_id" javaType="java.util.UUID"/>
+        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
+        <result property="status" column="status"/>
+        <result property="moneyStatus" column="money_status"/>
+        <result property="cardAmount" column="card_amount"/>
+        <result property="cardBalance" column="card_balance"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
     <select id="findCard" resultMap="cardInfo">
         SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
         FROM STAR_CARD
@@ -50,9 +62,20 @@
     </select>
     
     <insert id="enrollCard">
-        INSERT INTO LOG_CARD (member_id, card_id)
-        VALUES (uuid_to_bin(#{memberId},1), uuid_to_bin(#{cardId},1))
+        INSERT INTO LOG_CARD (member_id, card_id, card_balance)
+        SELECT
+            uuid_to_bin(#{memberId},1) as memberId,
+            card_id,
+            card_amount
+        FROM STAR_CARD
+        WHERE card_id = uuid_to_bin(#{cardId},1)
     </insert>
+
+    <select id="duplicatedCard" resultType="boolean">
+        SELECT count(*)
+        FROM LOG_CARD
+        WHERE card_id = uuid_to_bin(#{cardId},1)
+    </select>
 
     <insert id="saveMember" parameterType="com.project.starcoffee.controller.request.member.MemberRequest">
         INSERT INTO MEMBERS (name, login_id, password, tel, email, birth,  nick_name, gender)
