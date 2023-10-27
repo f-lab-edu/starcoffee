@@ -1,6 +1,6 @@
 package com.project.starcoffee.config.argument;
 
-import com.project.starcoffee.domain.card.Card;
+import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.service.LogCardService;
 import com.project.starcoffee.utils.SessionUtil;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -25,18 +24,19 @@ public class CardArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(Card.class);
+        return parameter.getParameterType().equals(LogCard.class);
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+
         HttpServletRequest httpServletRequest = (HttpServletRequest) webRequest.getNativeRequest();
 
         HttpSession session = httpServletRequest.getSession();
         String memberId = SessionUtil.getMemberId(session);
 
-        Card cardInfo = logCardService.findCard(memberId);
+        LogCard cardInfo = logCardService.findByCard(memberId);
 
         return cardInfo;
     }

@@ -6,6 +6,7 @@ import com.project.starcoffee.repository.mybatis.mapper.LogCardMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -18,13 +19,13 @@ public class LogCardRepositoryImpl implements LogCardRepository {
         this.logCardMapper = logCardMapper;
     }
 
-    public LogCard findByCard(UUID memberId) {
+    public Optional<LogCard> findByCard(UUID memberId) {
         return logCardMapper.findByCard(memberId);
     }
 
     @Override
-    public int updateAmount(UUID cardId, int balance) {
-        return logCardMapper.updateAmount(cardId, balance);
+    public int updateAmount(UUID cardId, int cardAmount) {
+        return logCardMapper.updateAmount(cardId, cardAmount);
     }
 
 

@@ -14,5 +14,5 @@ import java.util.UUID;
 public class PayResponse {
     private UUID memberId;
     private String storeId;
-    private long price;
+    private int orderPrice;
 }

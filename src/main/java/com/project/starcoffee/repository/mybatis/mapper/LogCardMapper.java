@@ -4,11 +4,12 @@ import com.project.starcoffee.domain.card.LogCard;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Mapper
 public interface LogCardMapper {
-    LogCard findByCard(UUID member);
+    Optional<LogCard> findByCard(UUID memberId);
 
-    int updateAmount(@Param("cardId") UUID cardId, @Param("balance") int balance);
+    int updateAmount(@Param("cardId") UUID cardId, @Param("cardAmount") int cardAmount);
 }

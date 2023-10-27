@@ -14,26 +14,21 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class LogCardService {
-
     private final LogCardRepository logCardRepository;
-    private final CardRepository cardRepository;
 
     @Autowired
-    public LogCardService(LogCardRepository logCardRepository, CardRepository cardRepository) {
+    public LogCardService(LogCardRepository logCardRepository) {
         this.logCardRepository = logCardRepository;
-        this.cardRepository = cardRepository;
     }
 
-    public Card findCard(String memberId) {
-        UUID member = UUID.fromString(memberId);
-        LogCard logCard = logCardRepository.findByCard(member);
+    public LogCard findByCard(String member) {
+        UUID memberId = UUID.fromString(member);
+        Optional<LogCard> cardInfoOptional = logCardRepository.findByCard(memberId);
 
-        UUID cardId = logCard.getCardId();
-        Optional<Card> cardInfo = cardRepository.findByCardId(cardId);
-        cardInfo.ifPresentOrElse(card -> {},
-                ()-> { throw new RuntimeException("카드를 찾을 수 없습니다."); }
+        cardInfoOptional.ifPresentOrElse(card -> {},
+                ()-> { throw new RuntimeException("회원으로 등록된 카드를 찾을 수 없습니다."); }
         );
 
-        return cardInfo.get();
+        return cardInfoOptional.get();
     }
 }

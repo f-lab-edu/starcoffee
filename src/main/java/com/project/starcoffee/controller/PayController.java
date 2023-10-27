@@ -3,6 +3,7 @@ package com.project.starcoffee.controller;
 import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.domain.card.Card;
+import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.service.LogCardService;
 import com.project.starcoffee.service.PayService;
 import com.project.starcoffee.utils.SessionUtil;
@@ -27,17 +28,14 @@ public class PayController {
 
     @GetMapping("/mycard")
     @ResponseStatus(HttpStatus.OK)
-    public Card confirmMyCard(Card cardInfo) {
-//        String memberId = SessionUtil.getMemberId(session);
-//        Card cardInfo = logCardService.findCard(memberId);
-
+    public LogCard confirmMyCard(LogCard cardInfo) {
         return cardInfo;
     }
 
 
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)
-    public PayResponse doPay(@RequestBody PayRequest payRequest, Card cardInfo) {
+    public PayResponse doPay(@RequestBody PayRequest payRequest, LogCard cardInfo) {
         PayResponse payResponse = payService.runPay(payRequest, cardInfo);
         return payResponse;
     }

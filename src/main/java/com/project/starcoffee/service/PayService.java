@@ -3,6 +3,7 @@ package com.project.starcoffee.service;
 import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.domain.card.Card;
+import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.exception.BalanceException;
 import com.project.starcoffee.repository.LogCardRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -26,17 +27,16 @@ public class PayService {
 
     // 비동기
     @Transactional
-    public PayResponse runPay(PayRequest payRequest, Card cardInfo) {
-        int orderPrice = payRequest.getFinalPrice();
-        int cardAmount = cardInfo.getCardAmount();
+    public PayResponse runPay(PayRequest payRequest, LogCard cardInfo) {
+        int cardAmount = payRequest.getFinalPrice();    // 결제 금액
+        int cardBalance = cardInfo.getCardBalance();    // 카드 잔액
         UUID cardId = cardInfo.getCardId();
 
-        if (cardAmount < orderPrice) {
+        if (cardBalance < cardAmount) {
             throw new BalanceException("잔액이 부족합니다.");
         }
 
-        int balance = cardAmount - orderPrice;
-        int result = logCardRepository.updateAmount(cardId, balance);
+        int result = logCardRepository.updateAmount(cardId, cardAmount);
 
         if (result != 1) {
             throw new RuntimeException("데이터베이스에 잔액이 업데이트되지 못했습니다.");
@@ -45,7 +45,7 @@ public class PayService {
         return PayResponse.builder()
                 .memberId(payRequest.getMemberId())
                 .storeId(payRequest.getStoreId())
-                .price(payRequest.getFinalPrice())
+                .orderPrice(cardAmount)
                 .build();
     }
 
