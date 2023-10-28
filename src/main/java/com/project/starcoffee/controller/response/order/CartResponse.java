@@ -1,4 +1,4 @@
-package com.project.starcoffee.controller.request.order;
+package com.project.starcoffee.controller.response.order;
 
 import com.project.starcoffee.dto.ItemDTO;
 import lombok.AllArgsConstructor;
@@ -7,14 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderRequest {
-    private long storeId;
-    private int itemCount;
-    private int finalPrice;
+public class CartResponse {
+    private UUID cartId;
     private List<ItemDTO> items;
 }

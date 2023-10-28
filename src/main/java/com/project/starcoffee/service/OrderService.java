@@ -1,6 +1,9 @@
 package com.project.starcoffee.service;
 
 import com.project.starcoffee.controller.request.order.OrderRequest;
+import com.project.starcoffee.dao.CartDAO;
+import com.project.starcoffee.domain.item.Item;
+import com.project.starcoffee.domain.order.OrderStatus;
 import com.project.starcoffee.dto.ItemDTO;
 import com.project.starcoffee.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,12 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class OrderService {
-
     private final OrderRepository orderRepository;
 
     @Autowired
@@ -22,12 +25,18 @@ public class OrderService {
         this.orderRepository = orderRepository;
     }
 
-    public void runOrder(OrderRequest orderRequest, String memberId) {
+    public void runOrder(OrderRequest orderRequest, String member) {
         long storeId = orderRequest.getStoreId();
-        List<ItemDTO> items = orderRequest.getItems().stream().collect(Collectors.toList());
+        UUID memberId = UUID.fromString(member);
+        List<ItemDTO> items = orderRequest.getItems();
 
-        // orderRepository.saveOrder();
+//        List<Long> itemId = orderRequest.getItems().stream()
+//                .map(ItemDTO::getItemId)
+//                .collect(Collectors.toList());
 
+        int itemCount = orderRequest.getItemCount();
+        int finalPrice = orderRequest.getFinalPrice();
 
+        orderRepository.saveOrder(memberId, items, storeId, itemCount, finalPrice);
     }
 }

@@ -2,6 +2,7 @@ package com.project.starcoffee.domain.order;
 
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Getter
@@ -10,15 +11,13 @@ import java.util.UUID;
 @Builder
 @EqualsAndHashCode
 public class Order {
-
     private UUID orderId;
     private UUID memberId;
     private long itemId;
     private long storeId;
-    private long orderPrice;
     private OrderStatus status;
-    private ItemSize itemSize;
-    private CupSize cup;
     private int itemCount;
     private long finalPrice;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 }

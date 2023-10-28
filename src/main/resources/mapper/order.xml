@@ -3,30 +3,47 @@
 
 <mapper namespace="com.project.starcoffee.repository.mybatis.mapper.OrderMapper">
 
-    <resultMap id="logCardInfo" type="com.project.starcoffee.domain.card.LogCard">
-        <result property="cardLogId" column="card_log_id" javaType="java.util.UUID"/>
+    <resultMap id="orderInfo" type="com.project.starcoffee.domain.order.Order">
+        <result property="orderId" column="order_id" javaType="java.util.UUID"/>
         <result property="memberId" column="member_id" javaType="java.util.UUID"/>
-        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
-        <result property="createdAt" column="created_at"/>
+        <result property="itemId" column="item_id"/>
+        <result property="storeId" column="store_id"/>
         <result property="status" column="status"/>
-    </resultMap>
-
-    <resultMap id="cardInfo" type="com.project.starcoffee.domain.card.Card">
-        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
-        <result property="cardName" column="card_name"/>
-        <result property="cardNickName" column="card_nickname"/>
-        <result property="cardNumber" column="card_number"/>
-        <result property="status" column="status"/>
-        <result property="pinNumber" column="pin_number"/>
-        <result property="cardAmount" column="card_amount"/>
+        <result property="itemCount" column="item_count"/>
+        <result property="finalPrice" column="final_price"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
-    <select id="findCard" resultMap="cardInfo">
-        SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
-        FROM STAR_CARD
-        WHERE card_number = #{cardNumber} AND status != 'DELETED'
+    <resultMap id="orderRequest" type="com.project.starcoffee.controller.request.order.OrderRequest">
+        <result property="storeId" column="store_id"/>
+        <result property="itemCount" column="item_count"/>
+        <result property="finalPrice" column="final_price"/>
+
+        <collection property="items" ofType="com.project.starcoffee.dto.ItemDTO">
+            <id property="itemId" column="item_id"/>
+            <result property="itemName" column="item_name"/>
+            <result property="itemPrice" column="item_price"/>
+            <result property="itemType" column="item_type"/>
+            <result property="itemSize" column="item_size"/>
+            <result property="itemCup" column="item_cup"/>
+        </collection>
+    </resultMap>
+
+    <insert id="saveOrder" parameterType="com.project.starcoffee.controller.request.order.OrderRequest">
+        INSERT INTO ORDERS (member_id, item_id, store_id, item_count, final_price)
+        VALUES (uuid_to_bin(#{memberId},1),
+        <foreach collection="items" item="item" open="(" close=")" separator="," >
+            #{item.itemId}
+        </foreach>,
+            #{storeId}, #{itemCount}, #{finalPrice})
+    </insert>
+
+    <select id="getOrderStatus" parameterType="java.util.UUID">
+        SELECT status
+        FROM ORDERS
+        WHERE order_id = uuid_to_bin(#{orderId},1)
     </select>
+
 
 </mapper>
