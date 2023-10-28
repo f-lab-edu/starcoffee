@@ -1,6 +1,7 @@
 package com.project.starcoffee.repository.mybatis;
 
 import com.project.starcoffee.controller.request.member.MemberRequest;
+import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.repository.MemberRepository;
 import com.project.starcoffee.repository.mybatis.mapper.MemberMapper;
@@ -25,18 +26,13 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public Member findById(String memberId) {
+    public Optional<Member> findById(String memberId) {
         return memberMapper.findById(memberId);
     }
 
     @Override
     public Member findByIdAndPassword(String loginId, String password) {
         return memberMapper.findByIdAndPassword(loginId, password);
-    }
-
-    @Override
-    public int checkId(String id) {
-        return memberMapper.checkId(id);
     }
 
     @Override
@@ -63,4 +59,21 @@ public class MemberRepositoryImpl implements MemberRepository {
     public int updateTel(String loginId, String tel) {
         return 0;
     }
+
+    @Override
+    public Optional<Card> findCard(String cardNumber, String pinNumber) {
+        return memberMapper.findCard(cardNumber, pinNumber);
+    }
+
+    @Override
+    public int enrollCard(UUID memberId, UUID cardId) {
+        return memberMapper.enrollCard(memberId, cardId);
+    }
+
+    @Override
+    public boolean duplicatedCard(UUID cardId) {
+        return memberMapper.duplicatedCard(cardId);
+    }
+
+
 }

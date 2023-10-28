@@ -16,17 +16,66 @@
         <result property="updatedAt" column="updated_at"/>
         <result property="nickName" column="nick_name"/>
         <result property="gender" column="gender"/>
-        <collection property="card" column="card" javaType="java.util.ArrayList"
-                    ofType="com.project.starcoffee.domain.card.Card"
-                    select="findCardInfo"></collection>
+
+        <collection property="cards" ofType="com.project.starcoffee.domain.card.LogCard">
+            <id property="cardLogId" column="card_log_id" javaType="java.util.UUID"/>
+            <result property="memberId" column="member_id" javaType="java.util.UUID"/>
+            <result property="cardId" column="card_id" javaType="java.util.UUID"/>
+            <result property="status" column="status"/>
+            <result property="moneyStatus" column="money_status"/>
+            <result property="cardAmount" column="card_amount"/>
+            <result property="cardBalance" column="card_balance"/>
+            <result property="createdAt" column="created_at"/>
+            <result property="updatedAt" column="updated_at"/>
+        </collection>
     </resultMap>
 
-    <select id="findCardInfo" resultType="com.project.starcoffee.domain.card.Card">
-        SELECT card_name, card_nickname, cardAmount
-        FROM STAR_CARD
-        WHERE login_id = #{id}
-    </select>
+    <resultMap id="cardInfo" type="com.project.starcoffee.domain.card.Card">
+        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
+        <result property="cardName" column="card_name"/>
+        <result property="cardNickName" column="card_nickname"/>
+        <result property="cardNumber" column="card_number"/>
+        <result property="status" column="status"/>
+        <result property="pinNumber" column="pin_number"/>
+        <result property="cardAmount" column="card_amount"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
 
+    <resultMap id="logCardInfo" type="com.project.starcoffee.domain.card.LogCard">
+        <result property="cardLogId" column="card_log_id" javaType="java.util.UUID"/>
+        <result property="memberId" column="member_id" javaType="java.util.UUID"/>
+        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
+        <result property="status" column="status"/>
+        <result property="moneyStatus" column="money_status"/>
+        <result property="cardAmount" column="card_amount"/>
+        <result property="cardBalance" column="card_balance"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findCard" resultMap="cardInfo">
+        SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
+        FROM STAR_CARD
+        WHERE card_number = #{cardNumber} AND pin_number = #{pinNumber}
+        AND status != 'DELETED'
+    </select>
+    
+    <insert id="enrollCard">
+        INSERT INTO LOG_CARD (member_id, card_id, card_balance)
+        SELECT
+            uuid_to_bin(#{memberId},1) as memberId,
+            card_id,
+            card_amount
+        FROM STAR_CARD
+        WHERE card_id = uuid_to_bin(#{cardId},1)
+    </insert>
+
+    <select id="duplicatedCard" resultType="boolean">
+        SELECT count(*)
+        FROM LOG_CARD
+        WHERE card_id = uuid_to_bin(#{cardId},1)
+    </select>
 
     <insert id="saveMember" parameterType="com.project.starcoffee.controller.request.member.MemberRequest">
         INSERT INTO MEMBERS (name, login_id, password, tel, email, birth,  nick_name, gender)
@@ -44,19 +93,6 @@
         FROM MEMBERS
         WHERE login_id = #{loginId} AND password = #{password}
           AND status != 'DELETED'
-    </select>
-
-<!--    <select id="findByIdAndPassword" resultType="java.util.UUID">-->
-<!--        SELECT bin_to_uuid(member_id,1)-->
-<!--        FROM MEMBERS-->
-<!--        WHERE login_id = #{loginId} AND password = #{password}-->
-<!--        AND status != 'DELETED'-->
-<!--    </select>-->
-
-    <select id="checkId" resultType="int">
-        SELECT count(*)
-        FROM MEMBERS
-        WHERE login_id = #{loginId}
     </select>
 
     <update id="deleteMember">

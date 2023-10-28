@@ -30,7 +30,7 @@ public class CardController {
     }
 
     /**
-     * 카드를 등록한다. (가맹점 시점)
+     * 카드를 등록한다. (카드본점 시점)
      * @param cardRequest 카드 등록정보
      */
     @PostMapping
@@ -39,16 +39,15 @@ public class CardController {
         cardService.saveCard(cardRequest);
     }
 
-
     /**
-     * 카드번호를 통해서 카드정보를 확인한다. (가맹점 시점)
+     * 카드번호를 통해서 카드정보를 확인한다. (카드본점 시점)
      * @param cardNumber 카드번호
      * @return
      */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<CardInfoResponse> findById(@RequestBody CardNumberRequest cardNumber) {
-        Optional<Card> cardInfo = cardService.findById(cardNumber.getCardNumber());
+    public ResponseEntity<CardInfoResponse> findByCardNumber(@RequestBody CardNumberRequest cardNumber) {
+        Optional<Card> cardInfo = cardService.findByCardNumber(cardNumber.getCardNumber());
 
         ResponseEntity<CardInfoResponse> responseEntity = cardInfo
                 .map(card -> {
@@ -58,20 +57,8 @@ public class CardController {
         return responseEntity;
     }
 
-
     /**
-     * 카드 닉네임을 변경한다. (회원 시점)
-     * @param cardInfo 변경할 카드정보(카드번호, 닉네임)
-     */
-    @PostMapping("/nickname")
-    @ResponseStatus(HttpStatus.OK)
-    public void updateNickName(@RequestBody @Valid CardNickNameRequest cardInfo) {
-        cardService.updateNickName(cardInfo);
-    }
-
-
-    /**
-     * 등록된 카드를 말소처리한다.
+     * 등록된 카드를 말소처리한다. (카드본점 시점)
      * @param cardNumber 카드번호
      */
     @DeleteMapping

@@ -2,6 +2,7 @@ package com.project.starcoffee.service;
 
 import com.project.starcoffee.controller.request.member.MemberLoginRequest;
 import com.project.starcoffee.controller.request.member.MemberRequest;
+import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.exception.DuplicateIdException;
 import com.project.starcoffee.repository.MemberRepository;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -52,10 +55,8 @@ public class MemberService {
      * @param memberInfo 회원정보
      */
     public synchronized void DuplicatedId(MemberRequest memberInfo) {
-        boolean resultId = memberRepository.checkId(memberInfo.getLoginId()) == 1;
-        if (resultId) {
-            throw new DuplicateIdException("중복된 아이디 입니다.");
-        }
+        memberRepository.findById(memberInfo.getLoginId())
+                .orElseThrow(()-> new DuplicateIdException("중복된 아이디 입니다."));
     }
 
 
@@ -90,13 +91,8 @@ public class MemberService {
      * @return
      */
     public Member findById(String memberId) {
-        Member member = memberRepository.findById(memberId);
-
-        if (member == null) {
-            log.error("not found Member ERROR! : {}", member);
-            throw new RuntimeException("not found Member ERROR! 회원을 찾을 수 없습니다.\n"
-                    + "Param : " +member);
-        }
+        Optional<Member> memberOptional = memberRepository.findById(memberId);
+        Member member = memberOptional.orElseThrow(() -> new RuntimeException("not found Member ERROR!"));
 
         return member;
     }
@@ -109,11 +105,8 @@ public class MemberService {
      */
     @Transactional
     public void updatePassword(String memberId, String beforePw, String afterPw) {
-        Member memberInfo = memberRepository.findById(memberId);
-        if (memberInfo == null) {
-            log.error("not Found Member ERROR!");
-            throw new RuntimeException("회원을 찾을 수 없습니다.");
-        }
+        Member memberInfo = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("not Found Member ERROR!"));
 
         // 이전 비밀번호 확인 및 비밀번호 변경
         String enAfterPassword = memberInfo.matchesAndChangePassword(beforePw, afterPw);
@@ -134,10 +127,10 @@ public class MemberService {
      * @param afterNickname 변경할 닉네임
      */
     public void updateNickName(String memberId, String afterNickname) {
-        Member memberInfo = memberRepository.findById(memberId);
+        Member memberInfo = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("not Found Member ERROR!"));
 
         if (memberInfo.getNickName().equals(afterNickname)) {
-            log.error("same NickName ERROR! id={}", afterNickname);
             throw new RuntimeException("변경할 닉네임이 이전 닉네임과 같습니다.");
         }
 
@@ -156,7 +149,8 @@ public class MemberService {
      * @param email
      */
     public void updateEmail(String memberId, String email) {
-        Member memberInfo = memberRepository.findById(memberId);
+        Member memberInfo = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("not Found Member ERROR!"));
 
         // 이전 이메일과 변경 이메일이 동일한지 확인
         if (memberInfo.getEmail().equals(email)) {
@@ -179,7 +173,8 @@ public class MemberService {
      */
     @Transactional
     public void deleteMember(String memberId) {
-        Member memberInfo = memberRepository.findById(memberId);
+        Member memberInfo = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("not Found Member ERROR!"));;
         String loginId = memberInfo.getLoginId();
 
         int result = memberRepository.deleteMember(loginId);
@@ -190,4 +185,25 @@ public class MemberService {
     }
 
 
+    public Card enrollCard(String cardNumber, String pinNumber, HttpSession session) {
+        Optional<Card> cardOptional = memberRepository.findCard(cardNumber, pinNumber);
+        cardOptional.orElseThrow(() -> new RuntimeException("카드를 찾을 수 없습니다."));
+
+        UUID memberId = UUID.fromString(SessionUtil.getMemberId(session));
+        UUID cardId = cardOptional.get().getCardId();
+
+        // 입력된 카드가 다른 회원에 등록되어 있는지 확인
+        if (duplicatedCard(cardId)) {
+            throw new RuntimeException("카드가 이미 등록되어 있습니다.");
+        }
+
+        // 카드를 카드이력 테이블에 등록
+        memberRepository.enrollCard(memberId, cardId);
+
+        return cardOptional.get();
+    }
+
+    public boolean duplicatedCard(UUID cardId) {
+        return memberRepository.duplicatedCard(cardId);
+    }
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.starcoffee.repository.mybatis.mapper.StoreMapper">
+
+    <resultMap id="storeInfo" type="com.project.starcoffee.domain.store.Store">
+        <result property="storeId" column="store_id"/>
+        <result property="storeName" column="store_name"/>
+        <result property="storeImage" column="store_image"/>
+        <result property="storeAddress" column="store_address"/>
+        <result property="direction" column="direction"/>
+        <result property="operationTime" column="operation_time"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <sql id="selectStore">
+        SELECT store_id, store_name, store_image,
+               store_address, direction, operation_time, status
+        FROM STORE
+    </sql>
+
+    <select id="storeNotOpen" resultType="int">
+        SELECT count(*)
+        FROM STORE
+        WHERE store_id = #{storeId} AND status != 'OPEN'
+    </select>
+
+    <select id="findById" resultMap="storeInfo">
+        <include refid="selectStore"></include>
+        WHERE store_id = #{storeId}
+    </select>
+
+    <update id="updateStoreStatus" parameterType="com.project.starcoffee.domain.store.Store">
+        UPDATE STORE
+        SET status = #{status}
+        WHERE store_id = #{storeId}
+    </update>
+
+
+</mapper>

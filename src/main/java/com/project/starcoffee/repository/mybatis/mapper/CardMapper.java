@@ -14,7 +14,9 @@ public interface CardMapper {
 
     int saveCard(CardRequest cardRequest);
 
-    Optional<Card> findById(String cardNumber);
+    Optional<Card> findByCardNumber(String cardNumber);
+
+    Optional<Card> findByCardId(UUID cardId);
 
     int updateNickName(@Param("cardNumber") String cardNumber, @Param("cardNickName") String cardNickName);
 
