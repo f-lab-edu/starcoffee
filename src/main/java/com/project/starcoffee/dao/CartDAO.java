@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,8 +30,7 @@ public class CartDAO implements CartDAORepository {
 
     @Override
     public UUID saveItem(List<ItemDTO> itemDTO) {
-        // cartId를 생성하는 더 좋은 방법이 없을까 ?
-        UUID cartId = UUID.randomUUID();
+        UUID cartId = UUID.randomUUID();    // 중복 확인
         cart.put(cartId, itemDTO);
         return cartId;
     }
@@ -46,15 +46,11 @@ public class CartDAO implements CartDAORepository {
     }
 
     @Override
-    public void autoDeleteItem(UUID cartId) {
-        List<ItemDTO> itemDTOS = cart.get(cartId);
-
-        itemDTOS.stream().filter(item ->
-                        ChronoUnit.SECONDS.between
-                                ((Temporal) item.getCreatedAt(), (Temporal) Timestamp.valueOf(LocalDateTime.now())) > expireTime)
-                        .findFirst().ifPresent(e -> {
-                    log.info("장바구니에 담긴 상품이 일주일이 경과되어 삭제처리되었습니다.");
-                    cart.remove(cartId);
-                });
+    public void autoDeleteItem() {
+        LocalDateTime now = LocalDateTime.now();
+        cart.values().forEach(itemList -> {
+            itemList.removeIf(item -> ChronoUnit.SECONDS.between((Temporal) item.getCreatedAt(), now) > expireTime);
+            log.info("장바구니에 담긴 상품이 일주일이 경과되어 삭제처리되었습니다.");
+        });
     }
 }

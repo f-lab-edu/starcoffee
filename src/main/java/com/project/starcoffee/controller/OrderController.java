@@ -2,6 +2,7 @@ package com.project.starcoffee.controller;
 
 import com.project.starcoffee.controller.request.order.OrderRequest;
 import com.project.starcoffee.controller.response.order.CartResponse;
+import com.project.starcoffee.domain.order.Order;
 import com.project.starcoffee.dto.ItemDTO;
 import com.project.starcoffee.service.OrderService;
 import com.project.starcoffee.utils.SessionUtil;
@@ -27,8 +28,7 @@ public class OrderController {
 
     @PostMapping("/new")
     @ResponseStatus(HttpStatus.OK)
-    public void doOrder(@RequestBody OrderRequest orderRequest, HttpSession session) {
-        String member = SessionUtil.getMemberId(session);
-        orderService.runOrder(orderRequest, member);
+    public List<ItemDTO> doOrder(@RequestBody List<ItemDTO> orderRequest) {
+        return orderRequest;
     }
 }

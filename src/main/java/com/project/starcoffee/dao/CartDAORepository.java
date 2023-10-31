@@ -13,7 +13,7 @@ public interface CartDAORepository
 
     void deleteItem(UUID cartId);
 
-    void autoDeleteItem(UUID cartId);
+    void autoDeleteItem();
 
 
 }

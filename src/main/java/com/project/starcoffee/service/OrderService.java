@@ -26,17 +26,19 @@ public class OrderService {
     }
 
     public void runOrder(OrderRequest orderRequest, String member) {
-        long storeId = orderRequest.getStoreId();
-        UUID memberId = UUID.fromString(member);
-        List<ItemDTO> items = orderRequest.getItems();
-
+//        long storeId = orderRequest.getStoreId();
+//        UUID memberId = UUID.fromString(member);
+//        List<ItemDTO> items = orderRequest.getItems();
+//
 //        List<Long> itemId = orderRequest.getItems().stream()
 //                .map(ItemDTO::getItemId)
 //                .collect(Collectors.toList());
+//
+//        int itemCount = orderRequest.getItemCount();
+//        int finalPrice = orderRequest.getFinalPrice();
+//
+//        orderRepository.saveOrder(memberId, items, storeId, itemCount, finalPrice);
 
-        int itemCount = orderRequest.getItemCount();
-        int finalPrice = orderRequest.getFinalPrice();
 
-        orderRepository.saveOrder(memberId, items, storeId, itemCount, finalPrice);
     }
 }

@@ -15,20 +15,20 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
-    <resultMap id="orderRequest" type="com.project.starcoffee.controller.request.order.OrderRequest">
-        <result property="storeId" column="store_id"/>
-        <result property="itemCount" column="item_count"/>
-        <result property="finalPrice" column="final_price"/>
+<!--    <resultMap id="orderRequest" type="com.project.starcoffee.controller.request.order.OrderRequest">-->
+<!--        <result property="storeId" column="store_id"/>-->
+<!--        <result property="itemCount" column="item_count"/>-->
+<!--        <result property="finalPrice" column="final_price"/>-->
 
-        <collection property="items" ofType="com.project.starcoffee.dto.ItemDTO">
-            <id property="itemId" column="item_id"/>
-            <result property="itemName" column="item_name"/>
-            <result property="itemPrice" column="item_price"/>
-            <result property="itemType" column="item_type"/>
-            <result property="itemSize" column="item_size"/>
-            <result property="itemCup" column="item_cup"/>
-        </collection>
-    </resultMap>
+<!--        <collection property="items" ofType="com.project.starcoffee.dto.ItemDTO">-->
+<!--            <id property="itemId" column="item_id"/>-->
+<!--            <result property="itemName" column="item_name"/>-->
+<!--            <result property="itemPrice" column="item_price"/>-->
+<!--            <result property="itemType" column="item_type"/>-->
+<!--            <result property="itemSize" column="item_size"/>-->
+<!--            <result property="itemCup" column="item_cup"/>-->
+<!--        </collection>-->
+<!--    </resultMap>-->
 
     <insert id="saveOrder" parameterType="com.project.starcoffee.controller.request.order.OrderRequest">
         INSERT INTO ORDERS (member_id, item_id, store_id, item_count, final_price)

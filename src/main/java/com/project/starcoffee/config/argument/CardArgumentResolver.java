@@ -36,7 +36,11 @@ public class CardArgumentResolver implements HandlerMethodArgumentResolver {
         HttpSession session = httpServletRequest.getSession();
         String memberId = SessionUtil.getMemberId(session);
 
+
+        // 카드에 대한 유효성검사
+        // Invalid
         LogCard cardInfo = logCardService.findByCard(memberId);
+
 
         return cardInfo;
     }
