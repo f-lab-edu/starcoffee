@@ -10,5 +10,6 @@ import java.util.UUID;
 public interface LogCardRepository {
     Optional<LogCard> findByCard(UUID memberId);
     int updateAmount(UUID cardId, int cardAmount);
+    int findByBalance(UUID memberId);
 
 }

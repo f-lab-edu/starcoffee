@@ -13,6 +13,9 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemDTO {
+
+    @NotNull
+    private long storeId;
     @NotNull
     private long itemId;
     @NotNull

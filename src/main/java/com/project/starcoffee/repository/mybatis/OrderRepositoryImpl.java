@@ -1,7 +1,7 @@
 package com.project.starcoffee.repository.mybatis;
 
-import com.project.starcoffee.domain.order.OrderStatus;
-import com.project.starcoffee.dto.ItemDTO;
+import com.project.starcoffee.dto.MemberCardDTO;
+import com.project.starcoffee.dto.OrderDTO;
 import com.project.starcoffee.repository.OrderRepository;
 import com.project.starcoffee.repository.mybatis.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +20,20 @@ public class OrderRepositoryImpl implements OrderRepository {
         this.orderMapper = orderMapper;
     }
 
+
     @Override
-    public int saveOrder(UUID memberId, List<ItemDTO> items, long storeId, int itemCount, int finalPrice) {
-        return orderMapper.saveOrder(memberId, items, storeId, itemCount, finalPrice);
+    public int saveOrder(UUID memberId, UUID cartId, Long storeId, int totalItemCount, int totalFinalPrice) {
+        return orderMapper.saveOrder(memberId, cartId, storeId,
+                totalItemCount, totalFinalPrice);
     }
 
+    @Override
+    public OrderDTO findByOrder(UUID cartId) {
+        return orderMapper.findByOrder(cartId);
+    }
+
+    @Override
+    public List<MemberCardDTO> findByMemberCard(UUID memberId) {
+        return orderMapper.findByMemberCard(memberId);
+    }
 }

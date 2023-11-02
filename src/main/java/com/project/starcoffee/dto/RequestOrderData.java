@@ -1,19 +1,23 @@
-package com.project.starcoffee.controller.response.order;
+package com.project.starcoffee.dto;
 
-import com.project.starcoffee.dto.ItemDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class CartResponse {
+@AllArgsConstructor
+@NoArgsConstructor
+public class RequestOrderData {
+    @NotNull
     private UUID cartId;
+    @NotNull
+    private long storeId;
+    @NotNull
     private List<ItemDTO> itemList;
 }

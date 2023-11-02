@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Data
@@ -13,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PayResponse {
     private UUID memberId;
-    private String storeId;
+    private UUID orderId;
+    private long storeId;
     private int orderPrice;
 }

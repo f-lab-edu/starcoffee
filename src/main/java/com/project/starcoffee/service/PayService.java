@@ -16,26 +16,25 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class PayService {
-    private final OrderService orderService;
     private final LogCardRepository logCardRepository;
 
     @Autowired
-    public PayService(OrderService orderService, LogCardRepository logCardRepository) {
-        this.orderService = orderService;
+    public PayService(LogCardRepository logCardRepository) {
         this.logCardRepository = logCardRepository;
     }
 
     // 비동기
     @Transactional
-    public PayResponse runPay(PayRequest payRequest, LogCard cardInfo) {
+    public PayResponse runPay(PayRequest payRequest) {
         int cardAmount = payRequest.getFinalPrice();    // 결제 금액
-        int cardBalance = cardInfo.getCardBalance();    // 카드 잔액
-        UUID cardId = cardInfo.getCardId();
+        int cardBalance = logCardRepository.findByBalance(payRequest.getCardId()); // 카드 잔액
+        UUID cardId = payRequest.getCardId();
 
-        if (cardBalance < cardAmount) {
+        if (cardBalance > cardAmount) {
             throw new BalanceException("잔액이 부족합니다.");
         }
 
+        // 회원카드 금액변경
         int result = logCardRepository.updateAmount(cardId, cardAmount);
 
         if (result != 1) {
@@ -44,6 +43,7 @@ public class PayService {
 
         return PayResponse.builder()
                 .memberId(payRequest.getMemberId())
+                .orderId(payRequest.getOrderId())
                 .storeId(payRequest.getStoreId())
                 .orderPrice(cardAmount)
                 .build();

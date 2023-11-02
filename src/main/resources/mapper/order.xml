@@ -3,47 +3,57 @@
 
 <mapper namespace="com.project.starcoffee.repository.mybatis.mapper.OrderMapper">
 
-    <resultMap id="orderInfo" type="com.project.starcoffee.domain.order.Order">
-        <result property="orderId" column="order_id" javaType="java.util.UUID"/>
-        <result property="memberId" column="member_id" javaType="java.util.UUID"/>
-        <result property="itemId" column="item_id"/>
-        <result property="storeId" column="store_id"/>
-        <result property="status" column="status"/>
-        <result property="itemCount" column="item_count"/>
-        <result property="finalPrice" column="final_price"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
+    <resultMap id="requestOrderData" type="com.project.starcoffee.dto.RequestOrderData">
+        <id property="cartId" column="cart_id" javaType="java.util.UUID" />
+
+        <collection property="itemList" ofType="com.project.starcoffee.dto.ItemDTO">
+            <result property="storeId" column="store_id" />
+            <result property="itemId" column="item_id" />
+            <result property="itemName" column="item_name" />
+            <result property="itemPrice" column="item_price" />
+            <result property="itemType" column="item_type" />
+            <result property="itemSize" column="item_size" />
+            <result property="itemCup" column="item_cup" />
+            <result property="itemCount" column="item_count" />
+            <result property="finalPrice" column="final_price" />
+            <result property="createdAt" column="created_at" />
+        </collection>
     </resultMap>
 
-<!--    <resultMap id="orderRequest" type="com.project.starcoffee.controller.request.order.OrderRequest">-->
-<!--        <result property="storeId" column="store_id"/>-->
-<!--        <result property="itemCount" column="item_count"/>-->
-<!--        <result property="finalPrice" column="final_price"/>-->
-
-<!--        <collection property="items" ofType="com.project.starcoffee.dto.ItemDTO">-->
-<!--            <id property="itemId" column="item_id"/>-->
-<!--            <result property="itemName" column="item_name"/>-->
-<!--            <result property="itemPrice" column="item_price"/>-->
-<!--            <result property="itemType" column="item_type"/>-->
-<!--            <result property="itemSize" column="item_size"/>-->
-<!--            <result property="itemCup" column="item_cup"/>-->
-<!--        </collection>-->
-<!--    </resultMap>-->
-
-    <insert id="saveOrder" parameterType="com.project.starcoffee.controller.request.order.OrderRequest">
-        INSERT INTO ORDERS (member_id, item_id, store_id, item_count, final_price)
+    <insert id="saveOrder">
+        INSERT INTO ORDERS (member_id, cart_id, store_id, item_count, final_price)
         VALUES (uuid_to_bin(#{memberId},1),
-        <foreach collection="items" item="item" open="(" close=")" separator="," >
-            #{item.itemId}
-        </foreach>,
-            #{storeId}, #{itemCount}, #{finalPrice})
+                #{cartId},
+                #{storeId},
+                #{totalItemCount},
+                #{totalFinalPrice})
     </insert>
 
-    <select id="getOrderStatus" parameterType="java.util.UUID">
-        SELECT status
+    <select id="findByOrder" resultType="com.project.starcoffee.dto.OrderDTO">
+        SELECT
+            bin_to_uuid(order_id,1) as orderId,
+            bin_to_uuid(member_id,1) as memberId,
+            cart_id as cartId,
+            store_id as storeId,
+            status as status,
+            item_count as itemCount,
+            final_price as finalPrice,
+            created_at as createdAt,
+            updated_at as updatedAt
         FROM ORDERS
-        WHERE order_id = uuid_to_bin(#{orderId},1)
+        WHERE cart_id = #{cartId}
     </select>
+
+    <select id="findByMemberCard" resultType="com.project.starcoffee.dto.MemberCardDTO">
+        SELECT
+            bin_to_uuid(card_id,1) as cardId,
+            status as status,
+            card_balance as cardBalance
+        FROM LOG_CARD
+        WHERE member_id = uuid_to_bin(#{memberId},1)
+    </select>
+
+
 
 
 </mapper>

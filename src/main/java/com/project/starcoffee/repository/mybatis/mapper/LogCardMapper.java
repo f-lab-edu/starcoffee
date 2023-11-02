@@ -10,6 +10,8 @@ import java.util.UUID;
 @Mapper
 public interface LogCardMapper {
     Optional<LogCard> findByCard(UUID memberId);
-
     int updateAmount(@Param("cardId") UUID cardId, @Param("cardAmount") int cardAmount);
+
+    int findByBalance(UUID memberId);
+
 }

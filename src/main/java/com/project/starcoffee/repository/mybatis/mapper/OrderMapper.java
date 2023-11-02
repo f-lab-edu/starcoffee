@@ -1,7 +1,7 @@
 package com.project.starcoffee.repository.mybatis.mapper;
 
-import com.project.starcoffee.domain.order.OrderStatus;
-import com.project.starcoffee.dto.ItemDTO;
+import com.project.starcoffee.dto.MemberCardDTO;
+import com.project.starcoffee.dto.OrderDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,9 +12,12 @@ import java.util.UUID;
 public interface OrderMapper {
 
     int saveOrder(@Param("memberId") UUID memberId,
-                  @Param("items") List<ItemDTO> items,
-                  @Param("storeId") long storeId,
-                  @Param("itemCount") int itemCount,
-                  @Param("finalPrice") int finalPrice);
+                  @Param("cartId") UUID cartId,
+                  @Param("storeId") Long storeId,
+                  @Param("totalItemCount") int totalItemCount,
+                  @Param("totalFinalPrice") int totalFinalPrice);
+
+    OrderDTO findByOrder(UUID cartId);
+    List<MemberCardDTO> findByMemberCard(UUID memberId);
 
 }

@@ -35,12 +35,9 @@ public class PayController {
 
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)
-    public PayResponse doPay(@RequestBody PayRequest payRequest, LogCard cardInfo) {
-        PayResponse payResponse = payService.runPay(payRequest, cardInfo);
+    public PayResponse doPay(@RequestBody PayRequest payRequest) {
+        PayResponse payResponse = payService.runPay(payRequest);
         return payResponse;
     }
-
-
-
 
 }
