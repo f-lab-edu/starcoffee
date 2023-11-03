@@ -29,8 +29,7 @@ public class CartDAO implements CartDAORepository {
     }
 
     @Override
-    public UUID saveItem(List<ItemDTO> itemDTO) {
-        UUID cartId = UUID.randomUUID();    // 중복 확인
+    public UUID saveItem(UUID cartId, List<ItemDTO> itemDTO) {
         cart.put(cartId, itemDTO);
         return cartId;
     }
@@ -43,6 +42,11 @@ public class CartDAO implements CartDAORepository {
     @Override
     public void deleteItem(UUID cartId) {
         cart.remove(cartId);
+    }
+
+    @Override
+    public boolean duplicatedId(UUID cartId) {
+        return cart.containsKey(cartId);
     }
 
     @Override

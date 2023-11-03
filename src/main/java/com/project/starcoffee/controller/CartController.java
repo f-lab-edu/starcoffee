@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +32,10 @@ public class CartController {
     @ResponseStatus(HttpStatus.OK)
     public CartResponse insertCart(@RequestBody List<ItemDTO> itemDTO) {
         UUID cartId = cartService.insertCart(itemDTO);
-        CartResponse cartResponse = new CartResponse(cartId, itemDTO);
+        CartResponse cartResponse = CartResponse.builder()
+                .cartId(cartId)
+                .itemList(itemDTO)
+                .build();
         return cartResponse;
     }
 
@@ -50,7 +54,7 @@ public class CartController {
 
     @PostMapping("/order/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<List<ItemDTO>> requestOrder(@PathVariable("id") UUID cartId) {
-        return cartService.requestOrder(cartId);
+    public Mono<List<ItemDTO>> requestOrder(@PathVariable("id") UUID cartId, HttpSession session) {
+        return cartService.requestOrder(cartId, session);
     }
 }

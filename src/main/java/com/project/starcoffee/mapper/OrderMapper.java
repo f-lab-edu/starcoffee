@@ -1,4 +1,4 @@
-package com.project.starcoffee.repository.mybatis.mapper;
+package com.project.starcoffee.mapper;
 
 import com.project.starcoffee.dto.MemberCardDTO;
 import com.project.starcoffee.dto.OrderDTO;
@@ -18,6 +18,5 @@ public interface OrderMapper {
                   @Param("totalFinalPrice") int totalFinalPrice);
 
     OrderDTO findByOrder(UUID cartId);
-    List<MemberCardDTO> findByMemberCard(UUID memberId);
 
 }

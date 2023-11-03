@@ -1,11 +1,8 @@
 package com.project.starcoffee.controller;
 
 import com.project.starcoffee.controller.request.card.CardNickNameRequest;
-import com.project.starcoffee.controller.request.card.CardRequest;
-import com.project.starcoffee.controller.request.card.CardSaveRequest;
 import com.project.starcoffee.controller.request.member.*;
 import com.project.starcoffee.controller.response.member.LoginResponse;
-import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.service.CardService;
 import com.project.starcoffee.service.MemberService;
@@ -157,25 +154,7 @@ public class MemberController {
     }
 
 
-    /**
-     * 회원의 아이디로 카드등록을 한다.
-     * @param cardSaveRequest 카드정보
-     * @param session 세션
-     * @return
-     */
-    @PostMapping("/card/enroll")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Card> enrollCard(@RequestBody CardSaveRequest cardSaveRequest, HttpSession session) {
-        String cardNumber = cardSaveRequest.getCardNumber();
-        String pinNumber = cardSaveRequest.getPinNumber();
 
-        Card card = memberService.enrollCard(cardNumber, pinNumber, session);
-
-        return Stream.of(card)
-                .findFirst()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
 
 
     /**

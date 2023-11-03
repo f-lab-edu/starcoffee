@@ -24,13 +24,5 @@ public interface MemberRepository {
 
     int updateEmail(@Param("loginId") String loginId, @Param("email") String email);
 
-    int updateTel(@Param("loginId") String loginId, @Param("tel") String tel);
-
     int deleteMember(String loginId);
-
-    Optional<Card> findCard(@Param("cardNumber") String cardNumber, @Param("pinNumber") String pinNumber);
-
-    int enrollCard(@Param("memberId") UUID memberId, @Param("cardId") UUID cardId);
-
-    boolean duplicatedCard(UUID cardId);
 }

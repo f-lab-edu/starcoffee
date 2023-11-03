@@ -17,6 +17,5 @@ public interface OrderRepository {
 
     OrderDTO findByOrder(UUID cartId);
 
-    List<MemberCardDTO> findByMemberCard(UUID memberId);
 
 }

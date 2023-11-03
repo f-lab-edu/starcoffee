@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.project.starcoffee.repository.mybatis.mapper.CardMapper">
+<mapper namespace="com.project.starcoffee.mapper.CardMapper">
 
     <resultMap id="cardInfo" type="com.project.starcoffee.domain.card.Card">
         <result property="cardId" column="card_id" javaType="java.util.UUID"/>
@@ -10,7 +10,7 @@
         <result property="cardNumber" column="card_number"/>
         <result property="status" column="status"/>
         <result property="pinNumber" column="pin_number"/>
-        <result property="cardAmount" column="card_amount"/>
+        <result property="cardBalance" column="card_amount"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
@@ -20,7 +20,7 @@
         VALUES (#{cardName}, #{cardNumber}, #{pinNumber})
     </insert>
 
-    <select id="findByCardNumber" resultMap="cardInfo" resultType="java.util.UUID">
+    <select id="findByCardNumber" resultMap="cardInfo">
         SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
         FROM STAR_CARD
         WHERE card_number = #{cardNumber}
@@ -43,5 +43,14 @@
         SET status = 'DELETED', updated_at = NOW()
         WHERE card_number = #{cardNumber}
     </update>
+
+    <select id="findCard" resultMap="cardInfo">
+        SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
+        FROM STAR_CARD
+        WHERE card_number = #{cardNumber} AND pin_number = #{pinNumber}
+          AND status != 'DELETED'
+    </select>
+
+
 
 </mapper>

@@ -1,4 +1,4 @@
-package com.project.starcoffee.repository.mybatis.mapper;
+package com.project.starcoffee.mapper;
 
 import com.project.starcoffee.controller.request.card.CardRequest;
 import com.project.starcoffee.domain.card.Card;
@@ -18,7 +18,10 @@ public interface CardMapper {
 
     Optional<Card> findByCardId(UUID cardId);
 
+    Optional<Card> findCard(@Param("cardNumber") String cardNumber, @Param("pinNumber") String pinNumber);
+
     int updateNickName(@Param("cardNumber") String cardNumber, @Param("cardNickName") String cardNickName);
 
     int deleteCard(String cardNumber);
+
 }

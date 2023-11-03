@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.project.starcoffee.repository.mybatis.mapper.OrderMapper">
+<mapper namespace="com.project.starcoffee.mapper.OrderMapper">
 
     <resultMap id="requestOrderData" type="com.project.starcoffee.dto.RequestOrderData">
         <id property="cartId" column="cart_id" javaType="java.util.UUID" />
@@ -43,17 +43,5 @@
         FROM ORDERS
         WHERE cart_id = #{cartId}
     </select>
-
-    <select id="findByMemberCard" resultType="com.project.starcoffee.dto.MemberCardDTO">
-        SELECT
-            bin_to_uuid(card_id,1) as cardId,
-            status as status,
-            card_balance as cardBalance
-        FROM LOG_CARD
-        WHERE member_id = uuid_to_bin(#{memberId},1)
-    </select>
-
-
-
 
 </mapper>

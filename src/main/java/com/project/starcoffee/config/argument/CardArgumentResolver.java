@@ -14,6 +14,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -36,12 +38,11 @@ public class CardArgumentResolver implements HandlerMethodArgumentResolver {
         HttpSession session = httpServletRequest.getSession();
         String memberId = SessionUtil.getMemberId(session);
 
-
         // 카드에 대한 유효성검사
         // Invalid
-        LogCard cardInfo = logCardService.findByCard(memberId);
+        LogCard logCardInfo = logCardService.findByCard(memberId);
 
 
-        return cardInfo;
+        return logCardInfo;
     }
 }

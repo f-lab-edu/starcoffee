@@ -3,14 +3,19 @@ package com.project.starcoffee.service;
 import com.project.starcoffee.dao.CartDAO;
 import com.project.starcoffee.dto.ItemDTO;
 import com.project.starcoffee.dto.RequestOrderData;
+import com.project.starcoffee.utils.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +37,12 @@ public class CartService {
     }
 
     public UUID insertCart(List<ItemDTO> itemDTO) {
-        UUID cartId = cartDAO.saveItem(itemDTO);
+        UUID newCartId = UUID.randomUUID();
+        if (cartDAO.duplicatedId(newCartId)) {
+            throw new RuntimeException("기존의 장바구니가 존재합니다.");
+        }
+
+        UUID cartId = cartDAO.saveItem(newCartId, itemDTO);
         return cartId;
     }
 
@@ -46,7 +56,9 @@ public class CartService {
     }
 
 
-    public Mono<List<ItemDTO>> requestOrder(UUID cartId) {
+    public Mono<List<ItemDTO>> requestOrder(UUID cartId, HttpSession session) {
+        String sessionId = session.getId();
+
         return Mono.defer(() -> {
             List<ItemDTO> itemList = cartDAO.findItem(cartId);
             int storeId = 1;
@@ -54,34 +66,12 @@ public class CartService {
             return webClient.post()
                     .uri("/order/new")
                     .contentType(MediaType.APPLICATION_JSON)
+                    .cookie("JSESSIONID", sessionId)
                     .bodyValue(new RequestOrderData(cartId, storeId, itemList))
                     .retrieve()
                     .bodyToFlux(ItemDTO.class)
                     .collectList();
         });
-//        ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-//        String sessionId = attr.getSessionId();
-//        log.info(sessionId);
-
-// 세션 정보를 WebClient의 헤더에 추가
-//        WebClient.RequestHeadersSpec<?> request = webClient.post()
-//                .uri("/order/new")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue(itemList)
-//                .headers(headers -> headers.set("Cookie", "X-SESSION-ID=" + webSession.getId()));
-
-        // API 호출
-/*        List<ItemDTO> result = webClient.post()
-                .uri("/order/new")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new RequestOrderData(cartId, itemList))
-                .retrieve()
-                .bodyToFlux(ItemDTO.class)
-                .collectList()
-                .block();
-
-        return result;*/
     }
-
 
 }

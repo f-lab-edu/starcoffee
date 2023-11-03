@@ -7,7 +7,6 @@ import com.project.starcoffee.domain.member.MemberStatus;
 import com.project.starcoffee.dto.MemberDTO;
 import com.project.starcoffee.exception.DuplicateIdException;
 import com.project.starcoffee.repository.MemberRepository;
-import com.project.starcoffee.repository.mybatis.mapper.MemberMapper;
 import com.project.starcoffee.utils.SHA256Util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,11 @@
-package com.project.starcoffee.repository.mybatis;
+package com.project.starcoffee.repository;
 
 import com.project.starcoffee.domain.card.LogCard;
-import com.project.starcoffee.repository.LogCardRepository;
-import com.project.starcoffee.repository.mybatis.mapper.LogCardMapper;
+import com.project.starcoffee.mapper.LogCardMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +32,17 @@ public class LogCardRepositoryImpl implements LogCardRepository {
     public int findByBalance(UUID memberId) {
         return logCardMapper.findByBalance(memberId);
     }
+
+    @Override
+    public int enrollCard(UUID memberId, UUID cardId, int cardBalance) {
+        return logCardMapper.enrollCard(memberId, cardId, cardBalance);
+    }
+
+    @Override
+    public boolean duplicatedCard(UUID cardId) {
+        return logCardMapper.duplicatedCard(cardId);
+    }
+
 
 
 }

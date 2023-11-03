@@ -26,17 +26,16 @@ public class PayService {
     // 비동기
     @Transactional
     public PayResponse runPay(PayRequest payRequest) {
-        int cardAmount = payRequest.getFinalPrice();    // 결제 금액
+        int finalPrice = payRequest.getFinalPrice();    // 결제 금액
         int cardBalance = logCardRepository.findByBalance(payRequest.getCardId()); // 카드 잔액
         UUID cardId = payRequest.getCardId();
 
-        if (cardBalance > cardAmount) {
+        if (cardBalance < finalPrice) {
             throw new BalanceException("잔액이 부족합니다.");
         }
 
         // 회원카드 금액변경
-        int result = logCardRepository.updateAmount(cardId, cardAmount);
-
+        int result = logCardRepository.updateAmount(cardId, finalPrice);
         if (result != 1) {
             throw new RuntimeException("데이터베이스에 잔액이 업데이트되지 못했습니다.");
         }
@@ -45,7 +44,7 @@ public class PayService {
                 .memberId(payRequest.getMemberId())
                 .orderId(payRequest.getOrderId())
                 .storeId(payRequest.getStoreId())
-                .orderPrice(cardAmount)
+                .orderPrice(finalPrice)
                 .build();
     }
 

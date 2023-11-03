@@ -3,9 +3,12 @@ package com.project.starcoffee.service;
 import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.dao.CartDAO;
+import com.project.starcoffee.domain.card.Card;
+import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.repository.OrderRepository;
 
+import com.project.starcoffee.utils.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -15,6 +18,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,10 +43,10 @@ public class OrderService {
         webClient = WebClient.create("http://localhost:8080");
     }
 
-    public void Order(RequestOrderData orderRequest) {
+    public void Order(RequestOrderData orderRequest, HttpSession session) {
         List<ItemDTO> itemList = orderRequest.getItemList();
+        UUID memberId = UUID.fromString(SessionUtil.getMemberId(session));
 
-        UUID memberId = UUID.fromString("7ddf7578-6a87-11ee-af50-ecf40330e8fa");
         UUID cartId = orderRequest.getCartId();
         Long storeId = orderRequest.getStoreId();
         int totalItemCount = itemList.stream().mapToInt(ItemDTO::getItemCount).sum();
@@ -52,7 +56,6 @@ public class OrderService {
         if (result != 1) {
             throw new RuntimeException("주문이 완료되지 못했습니다.");
         }
-
     }
 
     public List<ItemDTO> findOrderItemList(UUID cartId) {
@@ -65,12 +68,8 @@ public class OrderService {
         return OrderDTO;
     }
 
-    public List<MemberCardDTO> findByMemberCard(UUID memberId) {
-        List<MemberCardDTO> memberCards = orderRepository.findByMemberCard(memberId);
-        return memberCards;
-    }
-
-    public Mono<PayResponse> requestPay(RequestPayData requestPayData) {
+    public Mono<PayResponse> requestPay(RequestPayData requestPayData, HttpSession session) {
+        String sessionId = session.getId();
         UUID cartId = requestPayData.getCartId();
 
         // 주문정보 가져오기
@@ -80,16 +79,31 @@ public class OrderService {
         long storeId = order.getStoreId();
         int finalPrice = order.getFinalPrice();
 
-        // 회원의 카드가 맞는지 확인하기
-        List<MemberCardDTO> memberCards = findByMemberCard(memberId);
-        MemberCardDTO memberCardDTO = memberCards.stream().findFirst().get();
-        UUID cardId = memberCardDTO.getCardId();
+        // 회원카드인지 확인하기
+        Mono<LogCard> monoLogCard = webClient.get()
+                .uri(uriBuilder -> {
+                    return uriBuilder.path("/logcard")
+                            .build();
+                })
+                .cookie("JSESSIONID", sessionId)
+                .retrieve()
+                .bodyToMono(LogCard.class)
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.boundedElastic());
+
+        // 요청한 카드와 회원이 등록한 카드가 일치하는지 확인
+        LogCard memberCard = monoLogCard.block();
+        if (!memberCard.getCardId().equals(requestPayData.getCardId())) {
+            throw new RuntimeException("선택하신 카드와 회원의 카드가 일치하지 않습니다.");
+        }
 
         // PayController 로 결제 요청
         return Mono.defer(() -> {
+            UUID cardId = memberCard.getCardId();
             return webClient.post()
                     .uri("/pay/paying")
                     .contentType(MediaType.APPLICATION_JSON)
+                    .cookie("JSESSIONID", sessionId)
                     .bodyValue(new PayRequest(memberId, cardId, orderId,
                             storeId, finalPrice, Timestamp.valueOf(LocalDateTime.now())))
                     .retrieve()

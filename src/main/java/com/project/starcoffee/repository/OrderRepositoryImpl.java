@@ -1,9 +1,8 @@
-package com.project.starcoffee.repository.mybatis;
+package com.project.starcoffee.repository;
 
 import com.project.starcoffee.dto.MemberCardDTO;
 import com.project.starcoffee.dto.OrderDTO;
-import com.project.starcoffee.repository.OrderRepository;
-import com.project.starcoffee.repository.mybatis.mapper.OrderMapper;
+import com.project.starcoffee.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -32,8 +31,4 @@ public class OrderRepositoryImpl implements OrderRepository {
         return orderMapper.findByOrder(cartId);
     }
 
-    @Override
-    public List<MemberCardDTO> findByMemberCard(UUID memberId) {
-        return orderMapper.findByMemberCard(memberId);
-    }
 }

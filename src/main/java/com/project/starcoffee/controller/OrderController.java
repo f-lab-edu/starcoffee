@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,33 +27,27 @@ public class OrderController {
 
     @PostMapping("/new")
     @ResponseStatus(HttpStatus.OK)
-    public void Order(@RequestBody RequestOrderData orderRequest) {
-        orderService.Order(orderRequest);
+    public void Order(@RequestBody RequestOrderData orderRequest, HttpSession session) {
+        orderService.Order(orderRequest, session);
     }
 
-    @GetMapping("/find/itemList/{id}")
+    @GetMapping("/itemList/{id}")
     @ResponseStatus(HttpStatus.OK)
     public List<ItemDTO> findOrderItemList(@PathVariable("id") UUID cartId) {
         List<ItemDTO> itemList = orderService.findOrderItemList(cartId);
         return itemList;
     }
 
-    @GetMapping("/find/orderList/{id}")
+    @GetMapping("/orderList/{id}")
     @ResponseStatus(HttpStatus.OK)
     public OrderDTO findOrderList(@PathVariable("id") UUID cartId) {
         OrderDTO orderList = orderService.findOrder(cartId);
         return orderList;
     }
 
-    @GetMapping("/find/card/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<MemberCardDTO> findMemberCard(@PathVariable("id") UUID memberId) {
-        return orderService.findByMemberCard(memberId);
-    }
-
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<PayResponse> requestPay(@RequestBody RequestPayData requestPayData) {
-        return orderService.requestPay(requestPayData);
+    public Mono<PayResponse> requestPay(@RequestBody RequestPayData requestPayData, HttpSession session) {
+        return orderService.requestPay(requestPayData, session);
     }
 }
