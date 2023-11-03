@@ -15,7 +15,7 @@ public interface LogCardRepository {
 
     int updateAmount(UUID cardId, int cardAmount);
 
-    int findByBalance(UUID memberId);
+    int findByBalance(UUID cardId);
 
     int enrollCard(UUID memberId, UUID cardId, int cardBalance);
 

@@ -79,7 +79,7 @@ public class OrderService {
         long storeId = order.getStoreId();
         int finalPrice = order.getFinalPrice();
 
-        // 회원카드인지 확인하기
+        // 회원 카드 확인
         Mono<LogCard> monoLogCard = webClient.get()
                 .uri(uriBuilder -> {
                     return uriBuilder.path("/logcard")

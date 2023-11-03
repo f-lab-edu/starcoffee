@@ -14,7 +14,7 @@ public interface LogCardMapper {
 
     int updateAmount(@Param("cardId") UUID cardId, @Param("cardAmount") int cardAmount);
 
-    int findByBalance(UUID memberId);
+    int findByBalance(UUID cardId);
 
     int enrollCard(@Param("memberId") UUID memberId,
                    @Param("cardId") UUID cardId,

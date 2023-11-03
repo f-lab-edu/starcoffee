@@ -35,8 +35,8 @@ public class PayController {
 
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)
-    public PayResponse doPay(@RequestBody PayRequest payRequest) {
-        PayResponse payResponse = payService.runPay(payRequest);
+    public PayResponse doPay(@RequestBody PayRequest payRequest, HttpSession session) {
+        PayResponse payResponse = payService.runPay(payRequest,session);
         return payResponse;
     }
 

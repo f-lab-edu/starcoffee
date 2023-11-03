@@ -1,6 +1,7 @@
 package com.project.starcoffee.service;
 
 import com.project.starcoffee.controller.request.card.CardNumberRequest;
+import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.repository.LogCardRepository;
@@ -57,7 +58,7 @@ public class LogCardService {
                             .queryParam("cardNumber", cardNumberRequest.getCardNumber())
                             .build();
                 })
-                .header("JSESSIONID", sessionId)
+                .cookie("JSESSIONID", sessionId)
                 .retrieve()
                 .bodyToMono(Card.class)
                 .subscribeOn(Schedulers.boundedElastic())
@@ -92,6 +93,18 @@ public class LogCardService {
     }
 
 
+    public int findByBalance(String cardId) {
+        UUID cardAccount = UUID.fromString(cardId);
+        return logCardRepository.findByBalance(cardAccount);
+    }
 
+    public void withDrawAmount(BalanceRequest balanceRequest) {
+        UUID cardId = balanceRequest.getCardId();
+        int finalPrice = balanceRequest.getFinalPrice();
 
+        int result = logCardRepository.updateAmount(cardId, finalPrice);
+        if (result != 1) {
+            throw new RuntimeException("데이터베이스에 잔액이 업데이트되지 못했습니다.");
+        }
+    }
 }

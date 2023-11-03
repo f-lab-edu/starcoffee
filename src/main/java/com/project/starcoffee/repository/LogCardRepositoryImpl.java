@@ -29,8 +29,8 @@ public class LogCardRepositoryImpl implements LogCardRepository {
     }
 
     @Override
-    public int findByBalance(UUID memberId) {
-        return logCardMapper.findByBalance(memberId);
+    public int findByBalance(UUID cardId) {
+        return logCardMapper.findByBalance(cardId);
     }
 
     @Override

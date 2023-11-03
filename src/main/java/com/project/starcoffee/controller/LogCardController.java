@@ -1,6 +1,7 @@
 package com.project.starcoffee.controller;
 
 import com.project.starcoffee.controller.request.card.CardNumberRequest;
+import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.service.LogCardService;
@@ -46,11 +47,40 @@ public class LogCardController {
     }
 
 
+    /**
+     * 회원의 카드를 조회한다.
+     * (현재는 회원이 1개의 카드만 가지고 있다고 가정)
+     * @param session
+     * @return
+     */
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public LogCard findCard(HttpSession session) {
         String memberId = SessionUtil.getMemberId(session);
         return logCardService.findByCard(memberId);
+    }
+
+
+    /**
+     * 회원카드의 잔액을 조회한다.
+     * @param cardId
+     * @return
+     */
+    @GetMapping("/balance")
+    @ResponseStatus(HttpStatus.OK)
+    public int findByBalance(String cardId) {
+        return logCardService.findByBalance(cardId);
+    }
+
+
+    /**
+     * 회원의 인출로 인해서 카드 정보를 업데이트 한다.
+     * @param balanceRequest
+     */
+    @PatchMapping("/balance")
+    @ResponseStatus(HttpStatus.OK)
+    public void withDrawAmount(@RequestBody BalanceRequest balanceRequest) {
+        logCardService.withDrawAmount(balanceRequest);
     }
 
 
