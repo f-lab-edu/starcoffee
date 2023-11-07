@@ -3,26 +3,21 @@ package com.project.starcoffee.service;
 import com.project.starcoffee.dao.CartDAO;
 import com.project.starcoffee.dto.ItemDTO;
 import com.project.starcoffee.dto.RequestOrderData;
-import com.project.starcoffee.utils.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 @Service
 public class CartService {
-
     private final CartDAO cartDAO;
     private WebClient webClient;
 

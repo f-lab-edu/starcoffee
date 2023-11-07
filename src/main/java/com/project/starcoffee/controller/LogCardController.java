@@ -63,12 +63,12 @@ public class LogCardController {
 
     /**
      * 회원카드의 잔액을 조회한다.
-     * @param cardId
+     * @param cardId 회원카드 아이디
      * @return
      */
-    @GetMapping("/balance")
+    @GetMapping("/balance/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public int findByBalance(String cardId) {
+    public int findByBalance(@PathVariable("id") UUID cardId) {
         return logCardService.findByBalance(cardId);
     }
 
@@ -79,8 +79,9 @@ public class LogCardController {
      */
     @PatchMapping("/balance")
     @ResponseStatus(HttpStatus.OK)
-    public void withDrawAmount(@RequestBody BalanceRequest balanceRequest) {
-        logCardService.withDrawAmount(balanceRequest);
+    public Integer withDrawAmount(@RequestBody BalanceRequest balanceRequest) {
+        Integer result = logCardService.withDrawAmount(balanceRequest);
+        return result;
     }
 
 

@@ -93,18 +93,18 @@ public class LogCardService {
     }
 
 
-    public int findByBalance(String cardId) {
-        UUID cardAccount = UUID.fromString(cardId);
-        return logCardRepository.findByBalance(cardAccount);
+    public int findByBalance(UUID cardId) {
+        return logCardRepository.findByBalance(cardId);
     }
 
-    public void withDrawAmount(BalanceRequest balanceRequest) {
+    public Integer withDrawAmount(BalanceRequest balanceRequest) {
         UUID cardId = balanceRequest.getCardId();
-        int finalPrice = balanceRequest.getFinalPrice();
+        int cardAmount = balanceRequest.getFinalPrice();
 
-        int result = logCardRepository.updateAmount(cardId, finalPrice);
+        int result = logCardRepository.withDrawAmount(cardId, cardAmount);
         if (result != 1) {
             throw new RuntimeException("데이터베이스에 잔액이 업데이트되지 못했습니다.");
         }
+        return result;
     }
 }

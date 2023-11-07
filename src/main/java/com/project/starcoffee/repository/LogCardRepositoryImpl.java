@@ -24,12 +24,12 @@ public class LogCardRepositoryImpl implements LogCardRepository {
     }
 
     @Override
-    public int updateAmount(UUID cardId, int cardAmount) {
-        return logCardMapper.updateAmount(cardId, cardAmount);
+    public Integer withDrawAmount(UUID cardId, int cardAmount) {
+        return logCardMapper.withDrawAmount(cardId, cardAmount);
     }
 
     @Override
-    public int findByBalance(UUID cardId) {
+    public Integer findByBalance(UUID cardId) {
         return logCardMapper.findByBalance(cardId);
     }
 
