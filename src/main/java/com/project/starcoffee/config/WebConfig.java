@@ -1,6 +1,5 @@
 package com.project.starcoffee.config;
 
-
 import com.project.starcoffee.config.argument.CardArgumentResolver;
 import com.project.starcoffee.config.login.LoginCheckInterceptor;
 import com.project.starcoffee.config.argument.LoginProcessArgumentResolver;

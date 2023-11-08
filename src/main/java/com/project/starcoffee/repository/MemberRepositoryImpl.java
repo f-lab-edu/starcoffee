@@ -1,15 +1,12 @@
-package com.project.starcoffee.repository.mybatis;
+package com.project.starcoffee.repository;
 
 import com.project.starcoffee.controller.request.member.MemberRequest;
-import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.member.Member;
-import com.project.starcoffee.repository.MemberRepository;
-import com.project.starcoffee.repository.mybatis.mapper.MemberMapper;
+import com.project.starcoffee.mapper.MemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public class MemberRepositoryImpl implements MemberRepository {
@@ -41,6 +38,11 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
+    public int updateNumber(String loginId, String phoneNumber) {
+        return memberMapper.updateNumber(loginId, phoneNumber);
+    }
+
+    @Override
     public int updatePassword(String loginId, String password) {
         return memberMapper.updatePassword(loginId, password);
     }
@@ -54,26 +56,5 @@ public class MemberRepositoryImpl implements MemberRepository {
     public int updateEmail(String loginId, String email) {
         return memberMapper.updateEmail(loginId, email);
     }
-
-    @Override
-    public int updateTel(String loginId, String tel) {
-        return 0;
-    }
-
-    @Override
-    public Optional<Card> findCard(String cardNumber, String pinNumber) {
-        return memberMapper.findCard(cardNumber, pinNumber);
-    }
-
-    @Override
-    public int enrollCard(UUID memberId, UUID cardId) {
-        return memberMapper.enrollCard(memberId, cardId);
-    }
-
-    @Override
-    public boolean duplicatedCard(UUID cardId) {
-        return memberMapper.duplicatedCard(cardId);
-    }
-
 
 }

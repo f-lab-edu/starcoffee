@@ -1,4 +1,4 @@
-package com.project.starcoffee.repository.mybatis.mapper;
+package com.project.starcoffee.mapper;
 
 import com.project.starcoffee.domain.store.Store;
 import org.apache.ibatis.annotations.Mapper;

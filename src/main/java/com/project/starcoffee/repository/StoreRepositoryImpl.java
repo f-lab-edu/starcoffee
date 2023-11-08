@@ -1,8 +1,7 @@
-package com.project.starcoffee.repository.mybatis;
+package com.project.starcoffee.repository;
 
 import com.project.starcoffee.domain.store.Store;
-import com.project.starcoffee.repository.StoreRepository;
-import com.project.starcoffee.repository.mybatis.mapper.StoreMapper;
+import com.project.starcoffee.mapper.StoreMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

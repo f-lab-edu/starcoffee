@@ -16,7 +16,11 @@ public interface CardRepository {
 
     Optional<Card> findByCardId(UUID cardId);
 
+    Optional<Card> findCard(String cardNumber, String pinNumber);
+
     int updateNickName(String cardNumber, String cardNickName);
 
     int deleteCard(String cardNumber);
+
+
 }

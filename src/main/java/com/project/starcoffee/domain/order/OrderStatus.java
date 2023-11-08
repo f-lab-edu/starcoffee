@@ -1,5 +1,5 @@
 package com.project.starcoffee.domain.order;
 
 public enum OrderStatus {
-    PRE_ORDER, COMPLETE_ORDER, CANCEL_ORDER, PENDING_ORDER
-}
+    ORDER_REQUEST, ORDER_APPROVAL, ORDER_COMPLETE, BEFORE_PAYMENT
+    }

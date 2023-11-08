@@ -1,32 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.project.starcoffee.repository.mybatis.mapper.OrderMapper">
+<mapper namespace="com.project.starcoffee.mapper.OrderMapper">
 
-    <resultMap id="logCardInfo" type="com.project.starcoffee.domain.card.LogCard">
-        <result property="cardLogId" column="card_log_id" javaType="java.util.UUID"/>
-        <result property="memberId" column="member_id" javaType="java.util.UUID"/>
-        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="status" column="status"/>
+    <resultMap id="requestOrderData" type="com.project.starcoffee.dto.RequestOrderData">
+        <id property="cartId" column="cart_id" javaType="java.util.UUID" />
+
+        <collection property="itemList" ofType="com.project.starcoffee.dto.ItemDTO">
+            <result property="storeId" column="store_id" />
+            <result property="itemId" column="item_id" />
+            <result property="itemName" column="item_name" />
+            <result property="itemPrice" column="item_price" />
+            <result property="itemType" column="item_type" />
+            <result property="itemSize" column="item_size" />
+            <result property="itemCup" column="item_cup" />
+            <result property="itemCount" column="item_count" />
+            <result property="finalPrice" column="final_price" />
+            <result property="createdAt" column="created_at" />
+        </collection>
     </resultMap>
 
-    <resultMap id="cardInfo" type="com.project.starcoffee.domain.card.Card">
-        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
-        <result property="cardName" column="card_name"/>
-        <result property="cardNickName" column="card_nickname"/>
-        <result property="cardNumber" column="card_number"/>
-        <result property="status" column="status"/>
-        <result property="pinNumber" column="pin_number"/>
-        <result property="cardAmount" column="card_amount"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-    </resultMap>
+    <insert id="saveOrder">
+        INSERT INTO ORDERS (member_id, cart_id, store_id, item_count, final_price)
+        VALUES (uuid_to_bin(#{memberId},1),
+                #{cartId},
+                #{storeId},
+                #{totalItemCount},
+                #{totalFinalPrice})
+    </insert>
 
-    <select id="findCard" resultMap="cardInfo">
-        SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
-        FROM STAR_CARD
-        WHERE card_number = #{cardNumber} AND status != 'DELETED'
+    <select id="findByOrder" resultType="com.project.starcoffee.dto.OrderDTO">
+        SELECT
+            bin_to_uuid(order_id,1) as orderId,
+            bin_to_uuid(member_id,1) as memberId,
+            cart_id as cartId,
+            store_id as storeId,
+            status as status,
+            item_count as itemCount,
+            final_price as finalPrice,
+            created_at as createdAt,
+            updated_at as updatedAt
+        FROM ORDERS
+        WHERE cart_id = #{cartId}
     </select>
 
 </mapper>

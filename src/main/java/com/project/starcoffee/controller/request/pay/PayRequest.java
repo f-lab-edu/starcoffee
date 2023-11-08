@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -17,11 +19,17 @@ import static org.springframework.format.annotation.DateTimeFormat.*;
 @AllArgsConstructor
 @Builder
 public class PayRequest {
+    @NotNull
     private UUID memberId;
-    private String storeId;
+    @NotNull
+    private UUID cardId;
+    @NotNull
     private UUID orderId;
+    @NotNull
+    private long storeId;
+    @NotNull
     private int finalPrice;
     @DateTimeFormat(iso = ISO.DATE_TIME)
-    private ZonedDateTime created_at;
+    private Timestamp created_at;
 
 }
