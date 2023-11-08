@@ -6,6 +6,7 @@ import com.project.starcoffee.dto.RequestOrderData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class CartService {
     private final CartDAO cartDAO;
     private WebClient webClient;
+    private static final long SCHEDULE_DELETE_CART_SECOND = 86400;
 
     @Autowired
     public CartService(CartDAO cartDAO) {
@@ -48,6 +50,15 @@ public class CartService {
 
     public void deleteItem(UUID cartId) {
         cartDAO.deleteItem(cartId);
+    }
+
+    /**
+     * 일주일동안 주문하지 않은 장바구니는 24시간 뒤에 자동으로 삭제된다.
+     */
+    @Scheduled(fixedRate = SCHEDULE_DELETE_CART_SECOND)
+    public void deleteBySchedule() {
+        log.info("일주일 동안 담긴 상품은 자동 으로 삭제 처리");
+        cartDAO.autoDeleteItem();
     }
 
 

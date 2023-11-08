@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -53,7 +54,12 @@ public class CartDAO implements CartDAORepository {
     public void autoDeleteItem() {
         LocalDateTime now = LocalDateTime.now();
         cart.values().forEach(itemList -> {
-            itemList.removeIf(item -> ChronoUnit.SECONDS.between((Temporal) item.getCreatedAt(), now) > expireTime);
+            itemList.removeIf(item ->
+            {
+                LocalDateTime createdAt = item.getCreatedAt().toLocalDateTime();
+                Duration duration = Duration.between(createdAt, now);
+                return duration.getSeconds() > expireTime;
+            });
             log.info("장바구니에 담긴 상품이 일주일이 경과되어 삭제처리되었습니다.");
         });
     }

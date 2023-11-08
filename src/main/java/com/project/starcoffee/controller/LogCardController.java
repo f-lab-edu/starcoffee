@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -40,8 +41,7 @@ public class LogCardController {
     public ResponseEntity<Card> enrollCard(@RequestBody CardNumberRequest cardNumberRequest, HttpSession session) {
         Card card = logCardService.enrollCard(cardNumberRequest, session);
 
-        return Stream.of(card)
-                .findFirst()
+        return Optional.ofNullable(card)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
