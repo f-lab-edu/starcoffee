@@ -10,7 +10,7 @@
         <result property="cardNumber" column="card_number"/>
         <result property="status" column="status"/>
         <result property="pinNumber" column="pin_number"/>
-        <result property="cardBalance" column="card_amount"/>
+        <result property="cardBalance" column="card_balance"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
@@ -21,13 +21,13 @@
     </insert>
 
     <select id="findByCardNumber" resultMap="cardInfo">
-        SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
+        SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_balance, created_at, updated_at
         FROM STAR_CARD
         WHERE card_number = #{cardNumber}
     </select>
 
     <select id="findByCardId" resultMap="cardInfo">
-        SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_amount, created_at, updated_at
+        SELECT bin_to_uuid(card_id,1) as card_id, card_name, card_nickname, card_number, status, pin_number, card_balance, created_at, updated_at
         FROM STAR_CARD
         WHERE card_id = uuid_to_bin(#{cardId},1)
     </select>

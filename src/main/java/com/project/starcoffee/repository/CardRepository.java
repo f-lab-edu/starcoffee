@@ -16,7 +16,7 @@ public interface CardRepository {
 
     Optional<Card> findByCardId(UUID cardId);
 
-    Optional<Card> findCard(@Param("cardNumber") String cardNumber, @Param("pinNumber") String pinNumber);
+    Optional<Card> findCard(String cardNumber, String pinNumber);
 
     int updateNickName(String cardNumber, String cardNickName);
 

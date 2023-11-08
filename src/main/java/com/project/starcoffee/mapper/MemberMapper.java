@@ -22,6 +22,8 @@ public interface MemberMapper {
 
     int updateEmail(@Param("loginId") String loginId, @Param("email") String email);
 
+    int updateNumber(@Param("loginId") String loginId, @Param("phoneNumber") String phoneNumber);
+
     int deleteMember(String loginId);
 
 }

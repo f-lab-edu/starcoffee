@@ -30,30 +30,6 @@
         </collection>
     </resultMap>
 
-    <resultMap id="cardInfo" type="com.project.starcoffee.domain.card.Card">
-        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
-        <result property="cardName" column="card_name"/>
-        <result property="cardNickName" column="card_nickname"/>
-        <result property="cardNumber" column="card_number"/>
-        <result property="status" column="status"/>
-        <result property="pinNumber" column="pin_number"/>
-        <result property="cardBalance" column="card_balance"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-    </resultMap>
-
-    <resultMap id="logCardInfo" type="com.project.starcoffee.domain.card.LogCard">
-        <result property="cardLogId" column="card_log_id" javaType="java.util.UUID"/>
-        <result property="memberId" column="member_id" javaType="java.util.UUID"/>
-        <result property="cardId" column="card_id" javaType="java.util.UUID"/>
-        <result property="status" column="status"/>
-        <result property="moneyStatus" column="money_status"/>
-        <result property="cardAmount" column="card_amount"/>
-        <result property="cardBalance" column="card_balance"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-    </resultMap>
-
     <insert id="saveMember" parameterType="com.project.starcoffee.controller.request.member.MemberRequest">
         INSERT INTO MEMBERS (name, login_id, password, tel, email, birth,  nick_name, gender)
         VALUES (#{name}, #{loginId}, #{password}, #{tel}, #{email}, #{birth}, #{nickName}, #{gender})
@@ -72,12 +48,6 @@
           AND status != 'DELETED'
     </select>
 
-    <update id="deleteMember">
-        UPDATE MEMBERS
-        SET status = 'DELETED', updated_at = NOW()
-        WHERE login_id = #{loginId} AND status != 'DELETED'
-    </update>
-
     <update id="updatePassword">
         UPDATE MEMBERS
         SET password = #{password}, updated_at = NOW()
@@ -94,6 +64,18 @@
         UPDATE MEMBERS
         SET email = #{email}, updated_at = NOW()
         WHERE login_id = #{loginId}
+    </update>
+
+    <update id="updateNumber">
+        UPDATE MEMBERS
+        SET tel = #{phoneNumber}, updated_at = NOW()
+        WHERE login_id = #{loginId}
+    </update>
+
+    <update id="deleteMember">
+        UPDATE MEMBERS
+        SET status = 'DELETED', updated_at = NOW()
+        WHERE login_id = #{loginId} AND status != 'DELETED'
     </update>
 
 </mapper>

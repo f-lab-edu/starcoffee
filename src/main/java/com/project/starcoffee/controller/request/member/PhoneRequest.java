@@ -1,14 +1,13 @@
 package com.project.starcoffee.controller.request.member;
 
+import com.project.starcoffee.validation.phone.ValidPhone;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 @Getter
-public class NickNameRequest {
+@ValidPhone
+public class PhoneRequest {
     @NotNull
-    @Size(min = 2, max = 10)
-    private String afterNickname;
-
+    private String afterPhoneNumber;
 }

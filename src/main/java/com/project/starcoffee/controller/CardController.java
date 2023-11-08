@@ -1,5 +1,6 @@
 package com.project.starcoffee.controller;
 
+import com.project.starcoffee.controller.request.card.CardNickNameRequest;
 import com.project.starcoffee.controller.request.card.CardNumberRequest;
 import com.project.starcoffee.controller.request.card.CardRequest;
 import com.project.starcoffee.controller.response.card.CardInfoResponse;
@@ -59,10 +60,25 @@ public class CardController {
     }
 
 
+    /**
+     * 카드번호로 카드를 조회한다.
+     * @param cardNumber 카드번호
+     * @return
+     */
     @GetMapping("/find")
     @ResponseStatus(HttpStatus.OK)
     public Card findCardByNumber(String cardNumber) {
         return cardService.findByCardNumber(cardNumber);
+    }
+
+    /**
+     * 등록된 카드 닉네임을 변경한다.
+     * @param cardInfo 변경할 카드정보(카드번호, 닉네임)
+     */
+    @PostMapping("/card/nickname")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateNickName(@RequestBody @Valid CardNickNameRequest cardInfo) {
+        cardService.updateNickName(cardInfo);
     }
 
 

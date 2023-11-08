@@ -38,6 +38,11 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
+    public int updateNumber(String loginId, String phoneNumber) {
+        return memberMapper.updateNumber(loginId, phoneNumber);
+    }
+
+    @Override
     public int updatePassword(String loginId, String password) {
         return memberMapper.updatePassword(loginId, password);
     }

@@ -32,7 +32,6 @@ public class CardService {
         Optional<Card> cardInfo = cardRepository.findByCardNumber(cardNumber);
         cardInfo.ifPresentOrElse(card -> {},
                 () -> new RuntimeException("카드 정보를 찾을 수 없습니다."));
-
         return cardInfo.get();
     }
 

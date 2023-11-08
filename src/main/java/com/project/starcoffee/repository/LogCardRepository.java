@@ -11,13 +11,14 @@ import java.util.UUID;
 
 @Repository
 public interface LogCardRepository {
+
+    int enrollCard(UUID memberId, UUID cardId, int cardBalance);
+
     Optional<LogCard> findByCard(UUID memberId);
 
     Integer withDrawAmount(UUID cardId, int cardAmount);
 
     Integer findByBalance(UUID cardId);
-
-    int enrollCard(UUID memberId, UUID cardId, int cardBalance);
 
     boolean duplicatedCard(UUID cardId);
 

@@ -10,15 +10,14 @@ import java.util.UUID;
 
 @Mapper
 public interface LogCardMapper {
+    int enrollCard(@Param("memberId") UUID memberId,
+                   @Param("cardId") UUID cardId,
+                   @Param("cardBalance") int cardBalance);
     Optional<LogCard> findByCard(UUID memberId);
 
     Integer withDrawAmount(@Param("cardId") UUID cardId, @Param("cardAmount") int cardAmount);
 
     Integer findByBalance(UUID cardId);
-
-    int enrollCard(@Param("memberId") UUID memberId,
-                   @Param("cardId") UUID cardId,
-                   @Param("cardBalance") int cardBalance);
 
     boolean duplicatedCard(UUID cardId);
 
