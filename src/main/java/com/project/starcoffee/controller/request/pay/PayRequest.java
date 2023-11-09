@@ -28,7 +28,7 @@ public class PayRequest {
     @NotNull
     private long storeId;
     @NotNull
-    private int finalPrice;
+    private long finalPrice;
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Timestamp created_at;
 

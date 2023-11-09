@@ -16,7 +16,7 @@ public interface LogCardRepository {
 
     Optional<LogCard> findByCard(UUID memberId);
 
-    Integer withDrawAmount(UUID cardId, int cardAmount);
+    Integer withDrawAmount(UUID cardId, long cardAmount);
 
     Integer findByBalance(UUID cardId);
 

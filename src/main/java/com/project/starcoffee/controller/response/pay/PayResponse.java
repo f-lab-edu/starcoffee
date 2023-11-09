@@ -16,5 +16,5 @@ public class PayResponse {
     private UUID memberId;
     private UUID orderId;
     private long storeId;
-    private int orderPrice;
+    private long orderPrice;
 }

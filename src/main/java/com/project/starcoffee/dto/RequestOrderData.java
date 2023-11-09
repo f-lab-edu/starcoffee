@@ -15,8 +15,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class RequestOrderData {
     @NotNull
-    private UUID cartId;
-    @NotNull
     private long storeId;
     @NotNull
     private List<ItemDTO> itemList;

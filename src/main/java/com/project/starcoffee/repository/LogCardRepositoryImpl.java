@@ -24,7 +24,7 @@ public class LogCardRepositoryImpl implements LogCardRepository {
     }
 
     @Override
-    public Integer withDrawAmount(UUID cardId, int cardAmount) {
+    public Integer withDrawAmount(UUID cardId, long cardAmount) {
         return logCardMapper.withDrawAmount(cardId, cardAmount);
     }
 

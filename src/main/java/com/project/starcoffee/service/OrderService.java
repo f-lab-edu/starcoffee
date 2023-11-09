@@ -5,7 +5,9 @@ import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.dao.CartDAO;
 import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.card.LogCard;
+import com.project.starcoffee.domain.order.OrderStatus;
 import com.project.starcoffee.dto.*;
+import com.project.starcoffee.dto.OrderDTO.OrderDTOBuilder;
 import com.project.starcoffee.repository.OrderRepository;
 
 import com.project.starcoffee.utils.SessionUtil;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -21,50 +24,60 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final CartDAO cartDAO;
-    private WebClient webClient;
+    private final WebClient webClient;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, CartDAO cartDAO) {
+    public OrderService(OrderRepository orderRepository, WebClient webClient) {
         this.orderRepository = orderRepository;
-        this.cartDAO = cartDAO;
+        this.webClient = webClient;
     }
 
-    @PostConstruct
-    public void initWebClient() {
-        webClient = WebClient.create("http://localhost:8080");
-    }
-
+    @Transactional
     public void Order(RequestOrderData orderRequest, HttpSession session) {
         List<ItemDTO> itemList = orderRequest.getItemList();
         UUID memberId = UUID.fromString(SessionUtil.getMemberId(session));
-
-        UUID cartId = orderRequest.getCartId();
         Long storeId = orderRequest.getStoreId();
-        int totalItemCount = itemList.stream().mapToInt(ItemDTO::getItemCount).sum();
-        int totalFinalPrice = itemList.stream().mapToInt(ItemDTO::getFinalPrice).sum();
 
-        int result = orderRepository.saveOrder(memberId, cartId, storeId, totalItemCount, totalFinalPrice);
+        OrderDTO newOrder = OrderDTO.builder()
+                .memberId(memberId)
+                .storeId(storeId)
+                .itemCount(itemList.stream().mapToInt(ItemDTO::getItemCount).sum())
+                .finalPrice(itemList.stream().mapToInt(ItemDTO::getFinalPrice).sum())
+                .build();
+
+        int result = orderRepository.insertOrder(newOrder);
         if (result != 1) {
             throw new RuntimeException("주문이 완료되지 못했습니다.");
         }
+
+        UUID orderId = newOrder.getOrderId();
+        List<OrderItemDTO> orderItems = itemList.stream()
+                .map(item -> OrderItemDTO.builder()
+                        .orderId(orderId)
+                        .itemId(item.getItemId())
+                        .itemName(item.getItemName())
+                        .itemPrice(item.getItemPrice())
+                        .itemType(item.getItemType())
+                        .itemSize(item.getItemSize())
+                        .cupSize(item.getCupSize())
+                        .build()
+                ).collect(Collectors.toList());
+
+        orderRepository.insertOrderItems(orderItems);
     }
 
-    public List<ItemDTO> findOrderItemList(UUID cartId) {
-        List<ItemDTO> items = cartDAO.findItem(cartId);
-        return items;
-    }
-
-    public OrderDTO findOrder(UUID cartId) {
-        OrderDTO OrderDTO = orderRepository.findByOrder(cartId);
+    public OrderDTO findByOrder(UUID orderId) {
+        OrderDTO OrderDTO = orderRepository.findByOrder(orderId);
         return OrderDTO;
     }
 
@@ -73,11 +86,11 @@ public class OrderService {
         UUID cartId = requestPayData.getCartId();
 
         // 주문정보 가져오기
-        OrderDTO order = findOrder(cartId);
+        OrderDTO order = findByOrder(cartId);
         UUID memberId = order.getMemberId();
         UUID orderId = order.getOrderId();
         long storeId = order.getStoreId();
-        int finalPrice = order.getFinalPrice();
+        long finalPrice = order.getFinalPrice();
 
         // 회원 카드 확인
         Mono<LogCard> monoLogCard = webClient.get()

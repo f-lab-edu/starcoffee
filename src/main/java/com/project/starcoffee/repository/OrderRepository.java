@@ -1,7 +1,7 @@
 package com.project.starcoffee.repository;
 
-import com.project.starcoffee.dto.MemberCardDTO;
 import com.project.starcoffee.dto.OrderDTO;
+import com.project.starcoffee.dto.OrderItemDTO;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -9,13 +9,10 @@ import java.util.UUID;
 
 @Repository
 public interface OrderRepository {
-    int saveOrder(UUID memberId,
-                  UUID cartId,
-                  Long storeId,
-                  int totalItemCount,
-                  int totalFinalPrice);
+    int insertOrder(OrderDTO newOrder);
 
-    OrderDTO findByOrder(UUID cartId);
+    int insertOrderItems(List<OrderItemDTO> orderItems);
 
+    OrderDTO findByOrder(UUID orderId);
 
 }

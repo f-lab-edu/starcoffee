@@ -16,5 +16,5 @@ public class BalanceRequest {
     @NotNull
     private UUID cardId;
     @NotNull
-    private int finalPrice;
+    private long finalPrice;
 }

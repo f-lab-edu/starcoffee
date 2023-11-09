@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -15,12 +16,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDTO {
-    @NotNull
+
     private UUID orderId;
     @NotNull
     private UUID memberId;
-    @NotNull
-    private UUID cartId;
     @NotNull
     private long storeId;
     @NotNull
@@ -28,11 +27,10 @@ public class OrderDTO {
     @NotNull
     private int itemCount;
     @NotNull
-    private int finalPrice;
+    private long finalPrice;
     @NotNull
     private Timestamp createdAt;
-
     private Timestamp updatedAt;
-
+    private List<OrderItemDTO> orderItemList;
 
 }

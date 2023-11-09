@@ -20,17 +20,13 @@ import java.util.UUID;
 @Service
 public class CartService {
     private final CartDAO cartDAO;
-    private WebClient webClient;
+    private final WebClient webClient;
     private static final long SCHEDULE_DELETE_CART_SECOND = 86400;
 
     @Autowired
-    public CartService(CartDAO cartDAO) {
+    public CartService(CartDAO cartDAO, WebClient webClient) {
         this.cartDAO = cartDAO;
-    }
-
-    @PostConstruct
-    public void initWebClient() {
-        webClient = WebClient.create("http://localhost:8080");
+        this.webClient = webClient;
     }
 
     public UUID insertCart(List<ItemDTO> itemDTO) {
@@ -67,13 +63,14 @@ public class CartService {
 
         return Mono.defer(() -> {
             List<ItemDTO> itemList = cartDAO.findItem(cartId);
-            int storeId = 1;
+            Long storeId = itemList.stream().findFirst().map(ItemDTO::getStoreId)
+                    .orElseThrow(() -> new RuntimeException("가게정보가 없습니다."));
 
             return webClient.post()
                     .uri("/order/new")
                     .contentType(MediaType.APPLICATION_JSON)
                     .cookie("JSESSIONID", sessionId)
-                    .bodyValue(new RequestOrderData(cartId, storeId, itemList))
+                    .bodyValue(new RequestOrderData(storeId, itemList))
                     .retrieve()
                     .bodyToFlux(ItemDTO.class)
                     .collectList();

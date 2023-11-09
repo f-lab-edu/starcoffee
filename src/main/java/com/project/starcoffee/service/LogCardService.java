@@ -25,17 +25,14 @@ import java.util.stream.Collectors;
 @Service
 public class LogCardService {
     private final LogCardRepository logCardRepository;
-    private WebClient webClient;
+    private final WebClient webClient;
 
     @Autowired
-    public LogCardService(LogCardRepository logCardRepository) {
+    public LogCardService(LogCardRepository logCardRepository, WebClient webClient) {
         this.logCardRepository = logCardRepository;
+        this.webClient = webClient;
     }
 
-    @PostConstruct
-    public void initWebClient() {
-        webClient = WebClient.create("http://localhost:8080");
-    }
 
     public LogCard findByCard(String member) {
         UUID memberId = UUID.fromString(member);
@@ -99,7 +96,7 @@ public class LogCardService {
 
     public Integer withDrawAmount(BalanceRequest balanceRequest) {
         UUID cardId = balanceRequest.getCardId();
-        int cardAmount = balanceRequest.getFinalPrice();
+        long cardAmount = balanceRequest.getFinalPrice();
 
         int result = logCardRepository.withDrawAmount(cardId, cardAmount);
         if (result != 1) {

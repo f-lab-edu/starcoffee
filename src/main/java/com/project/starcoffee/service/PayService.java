@@ -3,10 +3,8 @@ package com.project.starcoffee.service;
 import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.pay.PayResponse;
-import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.exception.BalanceException;
-import com.project.starcoffee.repository.LogCardRepository;
 import com.project.starcoffee.repository.PayRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,23 +23,19 @@ import java.util.UUID;
 @Service
 public class PayService {
     private final PayRepository payRepository;
-    private WebClient webClient;
+    private final WebClient webClient;
 
     @Autowired
-    public PayService(PayRepository payRepository) {
+    public PayService(PayRepository payRepository, WebClient webClient) {
         this.payRepository = payRepository;
-    }
-
-    @PostConstruct
-    public void initWebClient() {
-        webClient = WebClient.create("http://localhost:8080");
+        this.webClient = webClient;
     }
 
     // 비동기
     @Transactional
     public PayResponse runPay(PayRequest payRequest, HttpSession session) {
         String sessionId = session.getId();
-        int finalPrice = payRequest.getFinalPrice();    // 결제 금액
+        long finalPrice = payRequest.getFinalPrice();    // 결제 금액
         UUID cardId = payRequest.getCardId();           // 카드 ID
 
         // 회원 카드 확인
