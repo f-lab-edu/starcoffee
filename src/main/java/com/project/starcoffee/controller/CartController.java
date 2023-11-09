@@ -1,6 +1,7 @@
 package com.project.starcoffee.controller;
 
 import com.project.starcoffee.controller.response.order.CartResponse;
+import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.dto.ItemDTO;
 import com.project.starcoffee.service.CartService;
 import lombok.AllArgsConstructor;
@@ -54,7 +55,7 @@ public class CartController {
 
     @PostMapping("/order/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<List<ItemDTO>> requestOrder(@PathVariable("id") UUID cartId, HttpSession session) {
+    public Mono<List<OrderResponse>> requestOrder(@PathVariable("id") UUID cartId, HttpSession session) {
         return cartService.requestOrder(cartId, session);
     }
 }

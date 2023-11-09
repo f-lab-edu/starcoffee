@@ -1,6 +1,7 @@
 package com.project.starcoffee.service;
 
 import com.project.starcoffee.controller.request.pay.PayRequest;
+import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.dao.CartDAO;
 import com.project.starcoffee.domain.card.Card;
@@ -43,23 +44,24 @@ public class OrderService {
     }
 
     @Transactional
-    public void Order(RequestOrderData orderRequest, HttpSession session) {
+    public OrderResponse Order(RequestOrderData orderRequest, HttpSession session) {
         List<ItemDTO> itemList = orderRequest.getItemList();
         UUID memberId = UUID.fromString(SessionUtil.getMemberId(session));
         Long storeId = orderRequest.getStoreId();
 
+        // 주문 테이블에 주문 정보 저장
         OrderDTO newOrder = OrderDTO.builder()
                 .memberId(memberId)
                 .storeId(storeId)
                 .itemCount(itemList.stream().mapToInt(ItemDTO::getItemCount).sum())
                 .finalPrice(itemList.stream().mapToInt(ItemDTO::getFinalPrice).sum())
                 .build();
-
         int result = orderRepository.insertOrder(newOrder);
         if (result != 1) {
             throw new RuntimeException("주문이 완료되지 못했습니다.");
         }
 
+        // 주문 아이템 테이블에 세부 주문 정보 저장
         UUID orderId = newOrder.getOrderId();
         List<OrderItemDTO> orderItems = itemList.stream()
                 .map(item -> OrderItemDTO.builder()
@@ -72,8 +74,16 @@ public class OrderService {
                         .cupSize(item.getCupSize())
                         .build()
                 ).collect(Collectors.toList());
-
         orderRepository.insertOrderItems(orderItems);
+
+        return OrderResponse.builder()
+                .orderId(orderId)
+                .memberId(newOrder.getMemberId())
+                .storeId(newOrder.getStoreId())
+                .itemCount(newOrder.getItemCount())
+                .finalPrice(newOrder.getFinalPrice())
+                .orderItems(orderItems)
+                .build();
     }
 
     public OrderDTO findByOrder(UUID orderId) {
@@ -83,12 +93,11 @@ public class OrderService {
 
     public Mono<PayResponse> requestPay(RequestPayData requestPayData, HttpSession session) {
         String sessionId = session.getId();
-        UUID cartId = requestPayData.getCartId();
+        UUID orderId = requestPayData.getOrderId();
 
         // 주문정보 가져오기
-        OrderDTO order = findByOrder(cartId);
+        OrderDTO order = findByOrder(orderId);
         UUID memberId = order.getMemberId();
-        UUID orderId = order.getOrderId();
         long storeId = order.getStoreId();
         long finalPrice = order.getFinalPrice();
 

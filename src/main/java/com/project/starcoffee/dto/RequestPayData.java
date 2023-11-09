@@ -14,9 +14,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestPayData {
-
-    @NotNull
-    private UUID cartId;
     @NotNull
     private UUID orderId;
     @NotNull

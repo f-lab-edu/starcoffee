@@ -31,7 +31,9 @@
                 #{itemCount},
                 #{finalPrice})
         <selectKey keyProperty="orderId" resultType="java.util.UUID" order="AFTER">
-            SELECT bin_to_uuid(order_id,1) FROM ORDERS
+            SELECT bin_to_uuid(order_id,1)
+            FROM ORDERS
+            WHERE created_at = (SELECT MAX(created_at) FROM ORDERS)
         </selectKey>
     </insert>
 

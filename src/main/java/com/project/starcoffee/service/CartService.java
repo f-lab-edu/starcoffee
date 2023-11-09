@@ -1,5 +1,6 @@
 package com.project.starcoffee.service;
 
+import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.dao.CartDAO;
 import com.project.starcoffee.dto.ItemDTO;
 import com.project.starcoffee.dto.RequestOrderData;
@@ -58,7 +59,7 @@ public class CartService {
     }
 
 
-    public Mono<List<ItemDTO>> requestOrder(UUID cartId, HttpSession session) {
+    public Mono<List<OrderResponse>> requestOrder(UUID cartId, HttpSession session) {
         String sessionId = session.getId();
 
         return Mono.defer(() -> {
@@ -72,7 +73,7 @@ public class CartService {
                     .cookie("JSESSIONID", sessionId)
                     .bodyValue(new RequestOrderData(storeId, itemList))
                     .retrieve()
-                    .bodyToFlux(ItemDTO.class)
+                    .bodyToFlux(OrderResponse.class)
                     .collectList();
         });
     }

@@ -1,5 +1,6 @@
 package com.project.starcoffee.controller;
 
+import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.service.OrderService;
@@ -31,8 +32,8 @@ public class OrderController {
      */
     @PostMapping("/new")
     @ResponseStatus(HttpStatus.OK)
-    public void Order(@RequestBody RequestOrderData orderRequest, HttpSession session) {
-        orderService.Order(orderRequest, session);
+    public OrderResponse Order(@RequestBody RequestOrderData orderRequest, HttpSession session) {
+        return orderService.Order(orderRequest, session);
     }
 
     /**
