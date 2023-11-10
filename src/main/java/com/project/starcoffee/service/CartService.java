@@ -22,7 +22,8 @@ import java.util.UUID;
 public class CartService {
     private final CartDAO cartDAO;
     private final WebClient webClient;
-    private static final long SCHEDULE_DELETE_CART_SECOND = 86400;
+
+    private static final long SCHEDULE_DELETE_CART_SECOND = 86400000; // 24시간 뒤 실행
 
     @Autowired
     public CartService(CartDAO cartDAO, WebClient webClient) {
@@ -54,7 +55,6 @@ public class CartService {
      */
     @Scheduled(fixedRate = SCHEDULE_DELETE_CART_SECOND)
     public void deleteBySchedule() {
-        log.info("일주일 동안 담긴 상품은 자동 으로 삭제 처리");
         cartDAO.autoDeleteItem();
     }
 
