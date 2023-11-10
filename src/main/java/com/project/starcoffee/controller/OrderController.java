@@ -51,7 +51,7 @@ public class OrderController {
 
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<PayResponse> requestPay(@RequestBody RequestPayData requestPayData, HttpSession session) {
-        return orderService.requestPay(requestPayData, session);
+    public Mono<PayResponse> requestPay(@RequestBody RequestPayData requestPayData) {
+        return orderService.requestPay(requestPayData);
     }
 }

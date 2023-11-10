@@ -26,17 +26,10 @@ public class PayController {
         this.payService = payService;
     }
 
-    @GetMapping("/mycard")
-    @ResponseStatus(HttpStatus.OK)
-    public LogCard confirmMyCard(LogCard cardInfo) {
-        return cardInfo;
-    }
-
-
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)
-    public PayResponse doPay(@RequestBody PayRequest payRequest, HttpSession session) {
-        PayResponse payResponse = payService.runPay(payRequest,session);
+    public PayResponse doPay(@RequestBody PayRequest payRequest) {
+        PayResponse payResponse = payService.runPay(payRequest);
         return payResponse;
     }
 

@@ -49,15 +49,20 @@ public class LogCardController {
 
     /**
      * 회원의 카드를 조회한다.
-     * (현재는 회원이 1개의 카드만 가지고 있다고 가정)
      * @param session
      * @return
      */
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public LogCard findCard(HttpSession session) {
+    public List<LogCard> findCard(HttpSession session) {
         String memberId = SessionUtil.getMemberId(session);
-        return logCardService.findByCard(memberId);
+        return logCardService.findByMemberId(memberId);
+    }
+
+    @GetMapping("/cardId")
+    @ResponseStatus(HttpStatus.OK)
+    public LogCard findByCardId(@RequestParam UUID cardId) {
+        return logCardService.findByCardId(cardId);
     }
 
 

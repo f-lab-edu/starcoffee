@@ -59,8 +59,7 @@ public class CartService {
     }
 
 
-    public Mono<List<OrderResponse>> requestOrder(UUID cartId, HttpSession session) {
-        String sessionId = session.getId();
+    public Mono<List<OrderResponse>> requestOrder(UUID cartId) {
 
         return Mono.defer(() -> {
             List<ItemDTO> itemList = cartDAO.findItem(cartId);
@@ -70,7 +69,6 @@ public class CartService {
             return webClient.post()
                     .uri("/order/new")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .cookie("JSESSIONID", sessionId)
                     .bodyValue(new RequestOrderData(storeId, itemList))
                     .retrieve()
                     .bodyToFlux(OrderResponse.class)

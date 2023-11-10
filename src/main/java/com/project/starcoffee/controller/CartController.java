@@ -55,7 +55,7 @@ public class CartController {
 
     @PostMapping("/order/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<List<OrderResponse>> requestOrder(@PathVariable("id") UUID cartId, HttpSession session) {
-        return cartService.requestOrder(cartId, session);
+    public Mono<List<OrderResponse>> requestOrder(@PathVariable("id") UUID cartId) {
+        return cartService.requestOrder(cartId);
     }
 }

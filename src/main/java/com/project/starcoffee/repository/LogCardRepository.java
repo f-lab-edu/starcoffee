@@ -14,7 +14,9 @@ public interface LogCardRepository {
 
     int enrollCard(UUID memberId, UUID cardId, int cardBalance);
 
-    Optional<LogCard> findByCard(UUID memberId);
+    List<LogCard> findByMemberId(UUID memberId);
+
+    Optional<LogCard> findByCardId(UUID cardId);
 
     Integer withDrawAmount(UUID cardId, long cardAmount);
 

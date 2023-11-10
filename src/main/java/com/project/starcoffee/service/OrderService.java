@@ -4,7 +4,6 @@ import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.domain.card.LogCard;
-import com.project.starcoffee.domain.order.OrderStatus;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.repository.OrderRepository;
 
@@ -86,9 +85,9 @@ public class OrderService {
         return orderOptional.orElseThrow(() -> new RuntimeException("주문 리스트가 없습니다."));
     }
 
-    public Mono<PayResponse> requestPay(RequestPayData requestPayData, HttpSession session) {
-        String sessionId = session.getId();
+    public Mono<PayResponse> requestPay(RequestPayData requestPayData) {
         UUID orderId = requestPayData.getOrderId();
+        UUID requestCardId = requestPayData.getCardId();
 
         // 주문정보 가져오기
         OrderDTO order = findByOrder(orderId);
@@ -99,14 +98,12 @@ public class OrderService {
         // 회원 카드 확인
         Mono<LogCard> monoLogCard = webClient.get()
                 .uri(uriBuilder -> {
-                    return uriBuilder.path("/logcard")
+                    return uriBuilder.path("/logcard/cardId")
+                            .queryParam("cardId",requestCardId)
                             .build();
                 })
-                .cookie("JSESSIONID", sessionId)
                 .retrieve()
-                .bodyToMono(LogCard.class)
-                .subscribeOn(Schedulers.boundedElastic())
-                .publishOn(Schedulers.boundedElastic());
+                .bodyToMono(LogCard.class);
 
         // 요청한 카드와 회원이 등록한 카드가 일치하는지 확인
         LogCard memberCard = monoLogCard.block();
@@ -120,13 +117,10 @@ public class OrderService {
             return webClient.post()
                     .uri("/pay/paying")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .cookie("JSESSIONID", sessionId)
                     .bodyValue(new PayRequest(memberId, cardId, orderId,
                             storeId, finalPrice, Timestamp.valueOf(LocalDateTime.now())))
                     .retrieve()
-                    .bodyToMono(PayResponse.class)
-                    .subscribeOn(Schedulers.boundedElastic())
-                    .publishOn(Schedulers.boundedElastic());
+                    .bodyToMono(PayResponse.class);
         });
     }
 }

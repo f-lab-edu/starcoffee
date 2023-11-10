@@ -34,8 +34,7 @@ public class PayService {
 
     // 비동기
     @Transactional
-    public PayResponse runPay(PayRequest payRequest, HttpSession session) {
-        String sessionId = session.getId();
+    public PayResponse runPay(PayRequest payRequest) {
         long finalPrice = payRequest.getFinalPrice();    // 결제 금액
         UUID cardId = payRequest.getCardId();           // 카드 ID
 
@@ -43,14 +42,12 @@ public class PayService {
         // 회원카드잔액 과 결제금액의 차이 확인
         Mono<LogCard> monoLogCard = webClient.get()
                 .uri(uriBuilder -> {
-                    return uriBuilder.path("/logcard")
+                    return uriBuilder.path("/logcard/cardId")
+                            .queryParam("cardId", cardId)
                             .build();
                 })
-                .cookie("JSESSIONID", sessionId)
                 .retrieve()
-                .bodyToMono(LogCard.class)
-                .subscribeOn(Schedulers.boundedElastic())
-                .publishOn(Schedulers.boundedElastic());
+                .bodyToMono(LogCard.class);
 
         LogCard memberCard = monoLogCard.block();
         if (memberCard.getCardBalance() < finalPrice) {
@@ -74,7 +71,6 @@ public class PayService {
         Mono<Integer> resultLogCard = webClient.patch()
                 .uri("/logcard/balance")
                 .contentType(MediaType.APPLICATION_JSON)
-                .cookie("JSESSIONID", sessionId)
                 .bodyValue(new BalanceRequest(cardId, finalPrice))
                 .retrieve()
                 .bodyToMono(Integer.class);
