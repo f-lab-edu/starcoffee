@@ -38,9 +38,9 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse Order(RequestOrderData orderRequest, HttpSession session) {
+    public OrderResponse Order(RequestOrderData orderRequest, String strMemberId) {
         List<ItemDTO> itemList = orderRequest.getItemList();
-        UUID memberId = UUID.fromString(SessionUtil.getMemberId(session));
+        UUID memberId = UUID.fromString(strMemberId);
         Long storeId = orderRequest.getStoreId();
 
         // 주문 테이블에 주문 정보 저장

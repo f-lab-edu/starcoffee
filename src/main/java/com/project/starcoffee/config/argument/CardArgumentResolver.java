@@ -26,7 +26,8 @@ public class CardArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(LogCard.class);
+        return parameter.getParameterType().equals(LogCard.class) ||
+                parameter.getParameterType().equals(List.class);
     }
 
     @Override

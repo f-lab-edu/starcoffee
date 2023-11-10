@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -25,6 +26,13 @@ public class PayController {
     public PayController(PayService payService) {
         this.payService = payService;
     }
+
+    @GetMapping("/mycard")
+    @ResponseStatus(HttpStatus.OK)
+    public List<LogCard> confirmMyCard(List<LogCard> cardList) {
+        return cardList;
+    }
+
 
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)

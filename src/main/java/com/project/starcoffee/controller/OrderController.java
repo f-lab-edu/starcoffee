@@ -1,5 +1,6 @@
 package com.project.starcoffee.controller;
 
+import com.project.starcoffee.config.aop.SessionMemberId;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.dto.*;
@@ -28,12 +29,13 @@ public class OrderController {
     /**
      * 장바구니에서 주문요청을 하면 주문테이블에 주문을 저장한다.
      * @param orderRequest 장바구니 정보
-     * @param session 세션
+     * @param strMemberId aop -> 회원 아이디
      */
     @PostMapping("/new")
+    @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
-    public OrderResponse Order(@RequestBody RequestOrderData orderRequest, HttpSession session) {
-        return orderService.Order(orderRequest, session);
+    public OrderResponse Order(@RequestBody RequestOrderData orderRequest, String strMemberId) {
+        return orderService.Order(orderRequest, strMemberId);
     }
 
     /**

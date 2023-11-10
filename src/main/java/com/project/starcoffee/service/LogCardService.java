@@ -34,8 +34,8 @@ public class LogCardService {
     }
 
 
-    public List<LogCard> findByMemberId(String member) {
-        UUID memberId = UUID.fromString(member);
+    public List<LogCard> findByMemberId(String strMemberId) {
+        UUID memberId = UUID.fromString(strMemberId);
         List<LogCard> cardList = logCardRepository.findByMemberId(memberId);
 
         if (cardList.isEmpty()) {
@@ -85,13 +85,13 @@ public class LogCardService {
         return cardMono;
     }
 
-    public Card enrollCard(CardNumberRequest cardNumberRequest, HttpSession session) {
+    public Card enrollCard(CardNumberRequest cardNumberRequest, String strMemberId) {
         Mono<Card> cardMono = requestFindCard(cardNumberRequest);
 
         Mono<Card> cardMonoResult = cardMono.flatMap(card -> {
             UUID cardId = card.getCardId();
             int cardBalance = card.getCardBalance();
-            UUID memberId = UUID.fromString(SessionUtil.getMemberId(session));
+            UUID memberId = UUID.fromString(strMemberId);
 
             // 카드를 카드이력 테이블에 등록
             logCardRepository.enrollCard(memberId, cardId, cardBalance);
