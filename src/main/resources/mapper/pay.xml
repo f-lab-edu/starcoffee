@@ -3,4 +3,9 @@
 
 <mapper namespace="com.project.starcoffee.mapper.PayMapper">
 
+    <insert id="insertPay" parameterType="com.project.starcoffee.dto.RequestPaySaveData">
+        INSERT INTO PAYMENT (order_id, pay_price, status)
+        VALUES (uuid_to_bin(#{orderId},1), #{finalPrice}, #{status})
+    </insert>
+
 </mapper>

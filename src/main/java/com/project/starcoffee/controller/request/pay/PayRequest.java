@@ -1,6 +1,7 @@
 package com.project.starcoffee.controller.request.pay;
 
 
+import com.project.starcoffee.domain.pay.PayType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -5,6 +5,7 @@ import com.project.starcoffee.dto.OrderItemDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Mapper
@@ -14,6 +15,6 @@ public interface OrderMapper {
 
     int insertOrderItems(List<OrderItemDTO> orderItems);
 
-    OrderDTO findByOrder(UUID orderId);
+    Optional<OrderDTO> findByOrder(UUID orderId);
 
 }

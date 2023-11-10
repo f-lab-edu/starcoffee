@@ -3,12 +3,9 @@ package com.project.starcoffee.service;
 import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
-import com.project.starcoffee.dao.CartDAO;
-import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.domain.order.OrderStatus;
 import com.project.starcoffee.dto.*;
-import com.project.starcoffee.dto.OrderDTO.OrderDTOBuilder;
 import com.project.starcoffee.repository.OrderRepository;
 
 import com.project.starcoffee.utils.SessionUtil;
@@ -21,11 +18,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -87,8 +82,8 @@ public class OrderService {
     }
 
     public OrderDTO findByOrder(UUID orderId) {
-        OrderDTO OrderDTO = orderRepository.findByOrder(orderId);
-        return OrderDTO;
+        Optional<OrderDTO> orderOptional = orderRepository.findByOrder(orderId);
+        return orderOptional.orElseThrow(() -> new RuntimeException("주문 리스트가 없습니다."));
     }
 
     public Mono<PayResponse> requestPay(RequestPayData requestPayData, HttpSession session) {
