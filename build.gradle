@@ -36,9 +36,19 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
+	// webClient
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+	// webClient-test
+	testImplementation 'com.squareup.okhttp3:okhttp'
+	testImplementation 'com.squareup.okhttp3:mockwebserver'
+	testImplementation 'io.projectreactor:reactor-test'
+
+	// AOP
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.9.Final:osx-aarch_64'
+
 }
 
 tasks.named('test') {
