@@ -36,4 +36,9 @@ public class OrderRepositoryImpl implements OrderRepository {
         return orderMapper.findByOrder(orderId);
     }
 
+    @Override
+    public int cancelOrder(UUID orderId, UUID memberId) {
+        return orderMapper.cancelOrder(orderId, memberId);
+    }
+
 }

@@ -41,9 +41,19 @@ public class MemberDTOValidationTest {
         Set<ConstraintViolation<MemberDTO>> validations = validator.validate(member);
 
         for (ConstraintViolation<MemberDTO> violation : validations) {
-            log.info("violation = " + violation);
-            log.info("violation.message = " +violation.getMessage());
+            // template 방식
+            String str = "violation = " + violation;
+
+            if (log.isInfoEnabled()) {
+                log.info("violation = " + violation);
+                log.info("violation.message = " +violation.getMessage());
+
+                // placeholder
+                log.info("violation = {}", violation);
+                log.info("violation.message = {}", violation.getMessage());
+            }
         }
+
     }
 
 }

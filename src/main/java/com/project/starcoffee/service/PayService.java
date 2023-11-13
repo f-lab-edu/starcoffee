@@ -1,7 +1,9 @@
 package com.project.starcoffee.service;
 
 import com.project.starcoffee.controller.request.pay.BalanceRequest;
+import com.project.starcoffee.controller.request.pay.CancelRequest;
 import com.project.starcoffee.controller.request.pay.PayRequest;
+import com.project.starcoffee.controller.response.pay.CancelResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.dto.RequestPaySaveData;
@@ -18,6 +20,8 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import javax.servlet.http.HttpSession;
+import java.sql.Timestamp;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -81,6 +85,30 @@ public class PayService {
                 .orderId(payRequest.getOrderId())
                 .storeId(payRequest.getStoreId())
                 .orderPrice(finalPrice)
+                .build();
+    }
+
+    @Transactional
+    public CancelResponse runCancel(CancelRequest cancelRequest) {
+        UUID orderId = cancelRequest.getOrderId();
+        // 결제 테이블에서 결제금액 확인
+        long cancelPay = payRepository.findPay(orderId);
+
+        CancelRequest requestPay = CancelRequest.builder()
+                .orderId(orderId)
+                .cancelPay(cancelPay)
+                .build();
+
+        // 결제 테이블에서 환불정보 INSERT
+        int result = payRepository.cancelPay(requestPay);
+        if (result != 1) {
+            throw new RuntimeException("결제취소가 완료되지 못했습니다.");
+        }
+
+        return CancelResponse.builder()
+                .paymentId(requestPay.getPaymentId())
+                .orderId(orderId)
+                .cancelPrice(-cancelPay)
                 .build();
     }
 

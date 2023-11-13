@@ -61,4 +61,11 @@
         WHERE order_id = uuid_to_bin(#{orderId},1)
     </select>
 
+    <update id="cancelOrder">
+        UPDATE ORDERS
+            SET status = 'ORDER_CANCEL',
+                updated_at = NOW()
+        WHERE order_id = uuid_to_bin(#{orderId},1) AND member_id = uuid_to_bin(#{memberId},1)
+    </update>
+
 </mapper>

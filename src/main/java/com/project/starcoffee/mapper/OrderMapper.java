@@ -3,6 +3,7 @@ package com.project.starcoffee.mapper;
 import com.project.starcoffee.dto.OrderDTO;
 import com.project.starcoffee.dto.OrderItemDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,5 +17,7 @@ public interface OrderMapper {
     int insertOrderItems(List<OrderItemDTO> orderItems);
 
     Optional<OrderDTO> findByOrder(UUID orderId);
+
+    int cancelOrder(@Param("orderId") UUID orderId, @Param("memberId") UUID memberId);
 
 }

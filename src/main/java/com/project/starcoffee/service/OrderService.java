@@ -50,6 +50,7 @@ public class OrderService {
                 .itemCount(itemList.stream().mapToInt(ItemDTO::getItemCount).sum())
                 .finalPrice(itemList.stream().mapToInt(ItemDTO::getFinalPrice).sum())
                 .build();
+
         int result = orderRepository.insertOrder(newOrder);
         if (result != 1) {
             throw new RuntimeException("주문이 완료되지 못했습니다.");
@@ -85,6 +86,7 @@ public class OrderService {
         return orderOptional.orElseThrow(() -> new RuntimeException("주문 리스트가 없습니다."));
     }
 
+    @Transactional
     public Mono<PayResponse> requestPay(RequestPayData requestPayData) {
         UUID orderId = requestPayData.getOrderId();
         UUID requestCardId = requestPayData.getCardId();
@@ -122,5 +124,14 @@ public class OrderService {
                     .retrieve()
                     .bodyToMono(PayResponse.class);
         });
+    }
+
+    @Transactional
+    public void requestCancel(UUID orderId, String strMemberId) {
+        UUID memberId = UUID.fromString(strMemberId);
+        int result = orderRepository.cancelOrder(orderId, memberId);
+        if (result != 1) {
+            throw new RuntimeException("주문취소가 실패했습니다.");
+        }
     }
 }

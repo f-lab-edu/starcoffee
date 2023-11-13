@@ -1,6 +1,9 @@
 package com.project.starcoffee.controller;
 
+import com.project.starcoffee.config.aop.SessionMemberId;
+import com.project.starcoffee.controller.request.pay.CancelRequest;
 import com.project.starcoffee.controller.request.pay.PayRequest;
+import com.project.starcoffee.controller.response.pay.CancelResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.card.LogCard;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -39,6 +43,13 @@ public class PayController {
     public PayResponse doPay(@RequestBody PayRequest payRequest) {
         PayResponse payResponse = payService.runPay(payRequest);
         return payResponse;
+    }
+
+    @PostMapping("/cancelling")
+    @ResponseStatus(HttpStatus.OK)
+    public CancelResponse doCancel(@RequestBody CancelRequest cancelRequest) {
+        CancelResponse cancelResponse = payService.runCancel(cancelRequest);
+        return cancelResponse;
     }
 
 }

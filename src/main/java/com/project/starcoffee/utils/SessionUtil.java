@@ -18,6 +18,8 @@ public class SessionUtil {
      * @return
      */
     public static String getMemberId(HttpSession session) {
+        // Optional 활용하기
+        // 온전한 값 리턴할 수 있도록 변경
         return (String) session.getAttribute(LOGIN_MEMBER);
     }
 

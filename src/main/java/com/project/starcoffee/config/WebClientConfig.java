@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 @Configuration
 public class WebClientConfig {
 
+    // 세션 유틸에서도 비슷한 형태로 진행할 수 있지 않을까 ?
     @Bean
     public WebClient webClient(HttpSession session) {
         return WebClient.builder().baseUrl("http://localhost:8080")
@@ -21,6 +22,7 @@ public class WebClientConfig {
                 .filter(addSessionId(session))
                 .build();
     }
+
 
     private ExchangeFilterFunction addSessionId(HttpSession session) {
         return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
