@@ -1,6 +1,6 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.config.aop.SessionMemberId;
+import com.project.starcoffee.aop.SessionMemberId;
 import com.project.starcoffee.controller.request.member.*;
 import com.project.starcoffee.controller.response.member.LoginResponse;
 import com.project.starcoffee.domain.member.Member;

@@ -1,23 +1,20 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.config.aop.SessionMemberId;
+import com.project.starcoffee.aop.SessionMemberId;
 import com.project.starcoffee.controller.request.card.CardNumberRequest;
 import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.service.LogCardService;
-import com.project.starcoffee.utils.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Slf4j
 @RestController

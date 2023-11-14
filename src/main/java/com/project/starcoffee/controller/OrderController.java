@@ -1,8 +1,7 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.config.aop.SessionMemberId;
+import com.project.starcoffee.aop.SessionMemberId;
 import com.project.starcoffee.controller.response.order.OrderResponse;
-import com.project.starcoffee.controller.response.pay.CancelResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.service.OrderService;
@@ -12,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpSession;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
