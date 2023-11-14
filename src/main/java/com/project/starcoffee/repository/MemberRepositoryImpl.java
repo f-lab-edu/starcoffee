@@ -1,14 +1,12 @@
-package com.project.starcoffee.repository.mybatis;
+package com.project.starcoffee.repository;
 
 import com.project.starcoffee.controller.request.member.MemberRequest;
 import com.project.starcoffee.domain.member.Member;
-import com.project.starcoffee.repository.MemberRepository;
-import com.project.starcoffee.repository.mybatis.mapper.MemberMapper;
+import com.project.starcoffee.mapper.MemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public class MemberRepositoryImpl implements MemberRepository {
@@ -25,7 +23,7 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public Member findById(String memberId) {
+    public Optional<Member> findById(String memberId) {
         return memberMapper.findById(memberId);
     }
 
@@ -35,13 +33,13 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public int checkId(String id) {
-        return memberMapper.checkId(id);
+    public int deleteMember(String loginId) {
+        return memberMapper.deleteMember(loginId);
     }
 
     @Override
-    public int deleteMember(String loginId) {
-        return memberMapper.deleteMember(loginId);
+    public int updateNumber(String loginId, String phoneNumber) {
+        return memberMapper.updateNumber(loginId, phoneNumber);
     }
 
     @Override
@@ -59,8 +57,4 @@ public class MemberRepositoryImpl implements MemberRepository {
         return memberMapper.updateEmail(loginId, email);
     }
 
-    @Override
-    public int updateTel(String loginId, String tel) {
-        return 0;
-    }
 }

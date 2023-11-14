@@ -1,9 +1,8 @@
-package com.project.starcoffee.repository.mybatis;
+package com.project.starcoffee.repository;
 
 import com.project.starcoffee.controller.request.card.CardRequest;
 import com.project.starcoffee.domain.card.Card;
-import com.project.starcoffee.repository.CardRepository;
-import com.project.starcoffee.repository.mybatis.mapper.CardMapper;
+import com.project.starcoffee.mapper.CardMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,8 +12,12 @@ import java.util.UUID;
 @Repository
 public class CardRepositoryImpl implements CardRepository {
 
+    private final CardMapper cardMapper;
+
     @Autowired
-    private CardMapper cardMapper;
+    public CardRepositoryImpl(CardMapper cardMapper) {
+        this.cardMapper = cardMapper;
+    }
 
     @Override
     public int saveCard(CardRequest cardRequest) {
@@ -22,8 +25,18 @@ public class CardRepositoryImpl implements CardRepository {
     }
 
     @Override
-    public Optional<Card> findById(String cardNumber) {
-        return cardMapper.findById(cardNumber);
+    public Optional<Card> findByCardNumber(String cardNumber) {
+        return cardMapper.findByCardNumber(cardNumber);
+    }
+
+    @Override
+    public Optional<Card> findByCardId(UUID cardId) {
+        return cardMapper.findByCardId(cardId);
+    }
+
+    @Override
+    public Optional<Card> findCard(String cardNumber, String pinNumber) {
+        return cardMapper.findCard(cardNumber, pinNumber);
     }
 
     @Override
@@ -35,6 +48,8 @@ public class CardRepositoryImpl implements CardRepository {
     public int deleteCard(String cardNumber) {
         return cardMapper.deleteCard(cardNumber);
     }
+
+
 
 
 }

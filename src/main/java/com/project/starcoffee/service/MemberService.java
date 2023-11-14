@@ -2,6 +2,8 @@ package com.project.starcoffee.service;
 
 import com.project.starcoffee.controller.request.member.MemberLoginRequest;
 import com.project.starcoffee.controller.request.member.MemberRequest;
+import com.project.starcoffee.controller.request.member.PhoneRequest;
+import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.exception.DuplicateIdException;
 import com.project.starcoffee.repository.MemberRepository;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -52,17 +56,15 @@ public class MemberService {
      * @param memberInfo 회원정보
      */
     public synchronized void DuplicatedId(MemberRequest memberInfo) {
-        boolean resultId = memberRepository.checkId(memberInfo.getLoginId()) == 1;
-        if (resultId) {
-            throw new DuplicateIdException("중복된 아이디 입니다.");
-        }
+        memberRepository.findById(memberInfo.getLoginId())
+                .orElseThrow(()-> new DuplicateIdException("중복된 아이디 입니다."));
     }
 
 
     /**
      * 로그인을 한다.
      *
-     * @param loginRequest
+     * @param loginRequest 로그인 요청정보
      * @return
      */
     public Member login(MemberLoginRequest loginRequest, HttpSession session) {
@@ -90,13 +92,8 @@ public class MemberService {
      * @return
      */
     public Member findById(String memberId) {
-        Member member = memberRepository.findById(memberId);
-
-        if (member == null) {
-            log.error("not found Member ERROR! : {}", member);
-            throw new RuntimeException("not found Member ERROR! 회원을 찾을 수 없습니다.\n"
-                    + "Param : " +member);
-        }
+        Optional<Member> memberOptional = memberRepository.findById(memberId);
+        Member member = memberOptional.orElseThrow(() -> new RuntimeException("not found Member ERROR!"));
 
         return member;
     }
@@ -109,11 +106,8 @@ public class MemberService {
      */
     @Transactional
     public void updatePassword(String memberId, String beforePw, String afterPw) {
-        Member memberInfo = memberRepository.findById(memberId);
-        if (memberInfo == null) {
-            log.error("not Found Member ERROR!");
-            throw new RuntimeException("회원을 찾을 수 없습니다.");
-        }
+        Member memberInfo = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("not Found Member ERROR!"));
 
         // 이전 비밀번호 확인 및 비밀번호 변경
         String enAfterPassword = memberInfo.matchesAndChangePassword(beforePw, afterPw);
@@ -133,11 +127,12 @@ public class MemberService {
      * @param memberId 회원 ID
      * @param afterNickname 변경할 닉네임
      */
+    @Transactional
     public void updateNickName(String memberId, String afterNickname) {
-        Member memberInfo = memberRepository.findById(memberId);
+        Member memberInfo = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("not Found Member ERROR!"));
 
         if (memberInfo.getNickName().equals(afterNickname)) {
-            log.error("same NickName ERROR! id={}", afterNickname);
             throw new RuntimeException("변경할 닉네임이 이전 닉네임과 같습니다.");
         }
 
@@ -153,10 +148,12 @@ public class MemberService {
      * 회원의 이메일 주소를 변경한다.
      * 회원은 기존 이메일과 동일한 이메일을 사용할 경우에는 예외를 던지게 된다.
      * @param memberId 회원 ID
-     * @param email
+     * @param email 변경할 이메일 주소
      */
+    @Transactional
     public void updateEmail(String memberId, String email) {
-        Member memberInfo = memberRepository.findById(memberId);
+        Member memberInfo = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("not Found Member ERROR!"));
 
         // 이전 이메일과 변경 이메일이 동일한지 확인
         if (memberInfo.getEmail().equals(email)) {
@@ -170,7 +167,31 @@ public class MemberService {
             log.error("update email ERROR! email={}", email);
             throw new RuntimeException("이메일을 변경 할 수 없습니다.");
         }
+    }
 
+    /**
+     * 회원의 휴대폰번호를 변경한다.
+     * @param memberId 회원 ID
+     * @param phoneRequest 변경할 휴대폰번호
+     */
+    @Transactional
+    public void updatePhone(String memberId, PhoneRequest phoneRequest) {
+        String phoneNumber = phoneRequest.getAfterPhoneNumber();
+        Member memberInfo = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("not Found MEMBER ERROR!"));
+
+        // 이전 휴대폰 번호와 변경 휴대폰번호가 동일한지 확인
+        if (memberInfo.getTel().equals(phoneNumber)) {
+            log.error("same PhoneNumber ERROR! phoneNumber={}", phoneNumber);
+            throw new RuntimeException("변경할 휴대폰번호가 이전 휴대폰 번호와 같습니다.");
+        }
+
+        String loginId = memberInfo.getLoginId();
+        int result = memberRepository.updateNumber(loginId, phoneNumber);
+        if (result != 1) {
+            log.error("update PhoneNumber ERROR! PhoneNumber={}", phoneNumber);
+            throw new RuntimeException("휴대폰번호를 변경 할 수 없습니다.");
+        }
     }
 
     /**
@@ -179,7 +200,8 @@ public class MemberService {
      */
     @Transactional
     public void deleteMember(String memberId) {
-        Member memberInfo = memberRepository.findById(memberId);
+        Member memberInfo = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("not Found Member ERROR!"));;
         String loginId = memberInfo.getLoginId();
 
         int result = memberRepository.deleteMember(loginId);

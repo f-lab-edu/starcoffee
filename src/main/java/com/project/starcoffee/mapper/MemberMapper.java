@@ -1,4 +1,4 @@
-package com.project.starcoffee.repository.mybatis.mapper;
+package com.project.starcoffee.mapper;
 
 import com.project.starcoffee.controller.request.member.MemberRequest;
 import com.project.starcoffee.domain.member.Member;
@@ -6,16 +6,13 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Mapper
 public interface MemberMapper {
 
     int saveMember(MemberRequest memberInfo);
 
-    Member findById(String memberId);
-
-    int checkId(String loginId);
+    Optional<Member> findById(String memberId);
 
     Member findByIdAndPassword(@Param("loginId") String loginId, @Param("password") String password);
 
@@ -25,7 +22,7 @@ public interface MemberMapper {
 
     int updateEmail(@Param("loginId") String loginId, @Param("email") String email);
 
-    // int updateTel(@Param("loginId") String loginId, @Param("tel") String tel);
+    int updateNumber(@Param("loginId") String loginId, @Param("phoneNumber") String phoneNumber);
 
     int deleteMember(String loginId);
 

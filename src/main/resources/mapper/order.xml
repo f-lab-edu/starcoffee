@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.starcoffee.mapper.OrderMapper">
+
+    <resultMap id="newOrderInfo" type="com.project.starcoffee.dto.OrderDTO">
+        <result property="orderId" column="order_id" javaType="java.util.UUID"/>
+        <result property="memberId" column="member_id" javaType="java.util.UUID"/>
+        <result property="storeId" column="store_id"/>
+        <result property="status" column="status"/>
+        <result property="itemCount" column="item_count"/>
+        <result property="finalPrice" column="final_price"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+
+        <collection property="orderItemList" ofType="com.project.starcoffee.dto.OrderItemDTO">
+            <id property="itemId" column="item_id"/>
+            <result property="itemName" column="item_name"/>
+            <result property="itemPrice" column="item_price"/>
+            <result property="itemType" column="item_type"/>
+            <result property="itemSize" column="item_size"/>
+            <result property="cupSize" column="cup_size"/>
+        </collection>
+    </resultMap>
+
+
+    <insert id="insertOrder" parameterType="com.project.starcoffee.dto.OrderDTO">
+        INSERT INTO ORDERS (member_id, store_id, item_count, final_price)
+        VALUES (uuid_to_bin(#{memberId},1),
+                #{storeId},
+                #{itemCount},
+                #{finalPrice})
+        <selectKey keyProperty="orderId" resultType="java.util.UUID" order="AFTER">
+            SELECT bin_to_uuid(order_id,1)
+            FROM ORDERS
+            WHERE created_at = (SELECT MAX(created_at) FROM ORDERS)
+        </selectKey>
+    </insert>
+
+    <insert id="insertOrderItems" parameterType="java.util.List">
+        INSERT INTO ORDERS_ITEM
+            (order_id, item_id, item_name, item_price, item_type, item_size, cup_size)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+             (uuid_to_bin(#{item.orderId},1), #{item.itemId}, #{item.itemName},
+            #{item.itemPrice}, #{item.itemType}, #{item.itemSize}, #{item.cupSize})
+        </foreach>
+    </insert>
+
+    <select id="findByOrder" resultType="com.project.starcoffee.dto.OrderDTO">
+        SELECT
+            bin_to_uuid(order_id,1) as orderId,
+            bin_to_uuid(member_id,1) as memberId,
+            store_id as storeId,
+            status as status,
+            item_count as itemCount,
+            final_price as finalPrice,
+            created_at as createdAt,
+            updated_at as updatedAt
+        FROM ORDERS
+        WHERE order_id = uuid_to_bin(#{orderId},1)
+    </select>
+
+    <update id="cancelOrder">
+        UPDATE ORDERS
+            SET status = 'ORDER_CANCEL',
+                updated_at = NOW()
+        WHERE order_id = uuid_to_bin(#{orderId},1) AND member_id = uuid_to_bin(#{memberId},1)
+    </update>
+
+</mapper>

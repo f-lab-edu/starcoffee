@@ -8,7 +8,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 public class EmailValidator implements ConstraintValidator<ValidEmail, EmailRequest> {
-    private static final String PASSWORD_PATTERN  = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+    private static final String EMAIL_PATTERN  = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
     @Override
     public void initialize(ValidEmail constraintAnnotation) {
@@ -16,7 +16,7 @@ public class EmailValidator implements ConstraintValidator<ValidEmail, EmailRequ
 
     @Override
     public boolean isValid(EmailRequest email, ConstraintValidatorContext context) {
-        return Pattern.matches(PASSWORD_PATTERN, email.getAfterEmail());
+        return Pattern.matches(EMAIL_PATTERN, email.getAfterEmail());
     }
 
 }

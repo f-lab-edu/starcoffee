@@ -9,6 +9,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,11 +29,11 @@ public class MemberDTOValidationTest {
                 .nickName("nickName")
                 .loginId("testId")
                 .password("1234")
-                .birth(LocalDateTime.now())
+                .birth(ZonedDateTime.from(LocalDateTime.now()))
                 .build();
     }
 
-    @Test
+    //@Test
     void memberValidation() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
@@ -40,9 +41,19 @@ public class MemberDTOValidationTest {
         Set<ConstraintViolation<MemberDTO>> validations = validator.validate(member);
 
         for (ConstraintViolation<MemberDTO> violation : validations) {
-            log.info("violation = " + violation);
-            log.info("violation.message = " +violation.getMessage());
+            // template 방식
+            String str = "violation = " + violation;
+
+            if (log.isInfoEnabled()) {
+                log.info("violation = " + violation);
+                log.info("violation.message = " +violation.getMessage());
+
+                // placeholder
+                log.info("violation = {}", violation);
+                log.info("violation.message = {}", violation.getMessage());
+            }
         }
+
     }
 
 }

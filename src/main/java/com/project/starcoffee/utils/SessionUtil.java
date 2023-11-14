@@ -1,8 +1,11 @@
 package com.project.starcoffee.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import javax.servlet.http.HttpSession;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -18,7 +21,11 @@ public class SessionUtil {
      * @return
      */
     public static String getMemberId(HttpSession session) {
-        return (String) session.getAttribute(LOGIN_MEMBER);
+        Optional<String> optionalMemberId = Optional.ofNullable((String) session.getAttribute(LOGIN_MEMBER));
+        optionalMemberId.orElseThrow(() ->
+                new RuntimeException("고객의 아이디 세션을 찾을 수 없습니다."));
+
+        return optionalMemberId.get();
     }
 
     /**

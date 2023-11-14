@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.sql.DataSource;
 
 @Configuration
-@MapperScan(basePackages = "com.project.starcoffee.repository.mybatis.mapper")
+@MapperScan(basePackages = "com.project.starcoffee.mapper")
 public class DatabaseConfig {
 
     @Autowired

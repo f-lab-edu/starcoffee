@@ -26,6 +26,8 @@
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-validation:2.7.14" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-web:2.7.14" level="project" />
     <orderEntry type="library" name="Gradle: org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-webflux:2.7.14" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-aop:2.7.14" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-jdbc:2.7.14" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.data:spring-data-jdbc:2.4.14" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter:2.7.14" level="project" />
@@ -40,12 +42,16 @@
     <orderEntry type="library" name="Gradle: org.mybatis.spring.boot:mybatis-spring-boot-autoconfigure:2.3.1" level="project" />
     <orderEntry type="library" name="Gradle: org.mybatis:mybatis:3.5.13" level="project" />
     <orderEntry type="library" name="Gradle: org.mybatis:mybatis-spring:2.1.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework:spring-webflux:5.3.29" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-reactor-netty:2.7.14" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework:spring-aop:5.3.29" level="project" />
+    <orderEntry type="library" name="Gradle: org.aspectj:aspectjweaver:1.9.7" level="project" />
     <orderEntry type="library" name="Gradle: com.zaxxer:HikariCP:4.0.3" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-jdbc:5.3.29" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.data:spring-data-relational:2.4.14" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework:spring-context:5.3.29" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.data:spring-data-commons:2.7.14" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-tx:5.3.29" level="project" />
-    <orderEntry type="library" name="Gradle: org.springframework:spring-context:5.3.29" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-beans:5.3.29" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-core:5.3.29" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.36" level="project" />
@@ -57,7 +63,6 @@
     <orderEntry type="library" name="Gradle: org.springframework.data:spring-data-keyvalue:2.7.14" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-context-support:5.3.29" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-oxm:5.3.29" level="project" />
-    <orderEntry type="library" name="Gradle: org.springframework:spring-aop:5.3.29" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-handler:4.1.94.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-transport:4.1.94.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-common:4.1.94.Final" level="project" />
@@ -72,6 +77,7 @@
     <orderEntry type="library" name="Gradle: org.apache.tomcat.embed:tomcat-embed-websocket:9.0.78" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.tomcat.embed:tomcat-embed-core:9.0.78" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-expression:5.3.29" level="project" />
+    <orderEntry type="library" name="Gradle: io.projectreactor.netty:reactor-netty-http:1.0.34" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-jcl:5.3.29" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.2.12" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-to-slf4j:2.17.2" level="project" />
@@ -83,8 +89,18 @@
     <orderEntry type="library" name="Gradle: org.reactivestreams:reactive-streams:1.0.4" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.13.5" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.13.5" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-http2:4.1.94.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.projectreactor.netty:reactor-netty-core:1.0.34" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-http:4.1.94.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-resolver-dns:4.1.94.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-transport-native-epoll:linux-x86_64:4.1.94.Final" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-core:1.2.12" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-api:2.17.2" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-handler-proxy:4.1.94.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-dns:4.1.94.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-transport-classes-epoll:4.1.94.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-socks:4.1.94.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-resolver-dns-native-macos:4.1.9.Final" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.mysql:mysql-connector-j:8.0.33" level="project" />
   </component>
 </module>
