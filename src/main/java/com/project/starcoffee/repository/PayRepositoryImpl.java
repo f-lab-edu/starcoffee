@@ -25,7 +25,7 @@ public class PayRepositoryImpl implements PayRepository {
     }
 
     @Override
-    public long findPay(UUID orderId) {
+    public Long findPay(UUID orderId) {
         return payMapper.findPay(orderId);
     }
 

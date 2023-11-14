@@ -66,10 +66,10 @@ public class OrderController {
         return orderService.requestPay(requestPayData);
     }
 
-    @PostMapping("/cancelling/{id}")
+    @PostMapping("/cancelling")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
-    public void requestCancel(@PathVariable("id") UUID orderId, String strMemberId) {
+    public void requestCancel(@RequestParam UUID orderId, String strMemberId) {
         orderService.requestCancel(orderId, strMemberId);
     }
 }

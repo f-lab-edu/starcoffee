@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface PayRepository {
     int insertPay(RequestPaySaveData paySaveRequest);
 
-    long findPay(UUID orderId);
+    Long findPay(UUID orderId);
 
     int cancelPay(CancelRequest cancelRequest);
 

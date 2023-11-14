@@ -92,7 +92,12 @@ public class PayService {
     public CancelResponse runCancel(CancelRequest cancelRequest) {
         UUID orderId = cancelRequest.getOrderId();
         // 결제 테이블에서 결제금액 확인
-        long cancelPay = payRepository.findPay(orderId);
+        Long cancelPay = payRepository.findPay(orderId);
+
+        // 주문건이 없는 경우나, 환불요청을 이미 했을 경우를 확인
+        if (cancelPay == null) {
+            throw new RuntimeException("이미 환불되었거나 주문요청을 찾을 수 없습니다.");
+        }
 
         CancelRequest requestPay = CancelRequest.builder()
                 .orderId(orderId)
@@ -104,6 +109,17 @@ public class PayService {
         if (result != 1) {
             throw new RuntimeException("결제취소가 완료되지 못했습니다.");
         }
+
+        // 주문 서비스에 주문취소 요청
+        Mono<Void> cancelOrder = webClient.post()
+                .uri(uriBuilder -> {
+                    return uriBuilder.path("/order/cancelling")
+                            .queryParam("orderId", orderId)
+                            .build();
+                })
+                .retrieve()
+                .bodyToMono(void.class);
+        cancelOrder.block();
 
         return CancelResponse.builder()
                 .paymentId(requestPay.getPaymentId())
