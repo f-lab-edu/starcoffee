@@ -1,22 +1,23 @@
 package com.project.starcoffee.mapper;
 
-import com.project.starcoffee.dto.MemberCardDTO;
 import com.project.starcoffee.dto.OrderDTO;
+import com.project.starcoffee.dto.OrderItemDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Mapper
 public interface OrderMapper {
 
-    int saveOrder(@Param("memberId") UUID memberId,
-                  @Param("cartId") UUID cartId,
-                  @Param("storeId") Long storeId,
-                  @Param("totalItemCount") int totalItemCount,
-                  @Param("totalFinalPrice") int totalFinalPrice);
+    int insertOrder(OrderDTO newOrder);
 
-    OrderDTO findByOrder(UUID cartId);
+    int insertOrderItems(List<OrderItemDTO> orderItems);
+
+    Optional<OrderDTO> findByOrder(UUID orderId);
+
+    int cancelOrder(@Param("orderId") UUID orderId, @Param("memberId") UUID memberId);
 
 }

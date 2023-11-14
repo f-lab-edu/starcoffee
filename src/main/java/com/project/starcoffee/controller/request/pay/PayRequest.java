@@ -1,6 +1,7 @@
 package com.project.starcoffee.controller.request.pay;
 
 
+import com.project.starcoffee.domain.pay.PayType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,7 +29,7 @@ public class PayRequest {
     @NotNull
     private long storeId;
     @NotNull
-    private int finalPrice;
+    private long finalPrice;
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Timestamp created_at;
 

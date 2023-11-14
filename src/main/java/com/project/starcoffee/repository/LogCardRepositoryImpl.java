@@ -19,12 +19,17 @@ public class LogCardRepositoryImpl implements LogCardRepository {
         this.logCardMapper = logCardMapper;
     }
 
-    public Optional<LogCard> findByCard(UUID memberId) {
-        return logCardMapper.findByCard(memberId);
+    public List<LogCard> findByMemberId(UUID memberId) {
+        return logCardMapper.findByMemberId(memberId);
     }
 
     @Override
-    public Integer withDrawAmount(UUID cardId, int cardAmount) {
+    public Optional<LogCard> findByCardId(UUID cardId) {
+        return logCardMapper.findByCardId(cardId);
+    }
+
+    @Override
+    public Integer withDrawAmount(UUID cardId, long cardAmount) {
         return logCardMapper.withDrawAmount(cardId, cardAmount);
     }
 

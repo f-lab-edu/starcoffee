@@ -13,9 +13,11 @@ public interface LogCardMapper {
     int enrollCard(@Param("memberId") UUID memberId,
                    @Param("cardId") UUID cardId,
                    @Param("cardBalance") int cardBalance);
-    Optional<LogCard> findByCard(UUID memberId);
+    List<LogCard> findByMemberId(UUID memberId);
 
-    Integer withDrawAmount(@Param("cardId") UUID cardId, @Param("cardAmount") int cardAmount);
+    Optional<LogCard> findByCardId(UUID cardId);
+
+    Integer withDrawAmount(@Param("cardId") UUID cardId, @Param("cardAmount") long cardAmount);
 
     Integer findByBalance(UUID cardId);
 

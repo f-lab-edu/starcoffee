@@ -3,4 +3,26 @@
 
 <mapper namespace="com.project.starcoffee.mapper.PayMapper">
 
+    <insert id="insertPay" parameterType="com.project.starcoffee.dto.RequestPaySaveData">
+        INSERT INTO PAYMENT (order_id, pay_price, status)
+        VALUES (uuid_to_bin(#{orderId},1), #{finalPrice}, #{status})
+    </insert>
+
+    <select id="findPay" parameterType="java.util.UUID">
+        SELECT pay_price
+        FROM PAYMENT
+        WHERE order_id = uuid_to_bin(#{orderId},1) AND status != 'REFUND'
+    </select>
+
+    <insert id="cancelPay" parameterType="com.project.starcoffee.controller.request.pay.CancelRequest">
+        INSERT INTO PAYMENT (order_id, pay_price, status)
+        VALUES (uuid_to_bin(#{orderId},1), -#{cancelPay}, 'REFUND')
+
+        <selectKey keyProperty="paymentId" resultType="java.util.UUID" order="AFTER">
+            SELECT bin_to_uuid(payment_id,1)
+            FROM PAYMENT
+            WHERE created_at = (SELECT MAX(created_at) FROM PAYMENT)
+        </selectKey>
+    </insert>
+
 </mapper>

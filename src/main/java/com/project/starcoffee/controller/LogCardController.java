@@ -1,5 +1,6 @@
 package com.project.starcoffee.controller;
 
+import com.project.starcoffee.config.aop.SessionMemberId;
 import com.project.starcoffee.controller.request.card.CardNumberRequest;
 import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.domain.card.Card;
@@ -32,14 +33,15 @@ public class LogCardController {
 
     /**
      * 회원의 아이디로 카드등록을 한다.
-     * @param cardNumberRequest 카드정보
-     * @param session 세션
+     * @param cardNumberRequest 카드등록 정보
+     * @param strMemberId aop -> 회원 아이디
      * @return
      */
     @PostMapping()
+    @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Card> enrollCard(@RequestBody CardNumberRequest cardNumberRequest, HttpSession session) {
-        Card card = logCardService.enrollCard(cardNumberRequest, session);
+    public ResponseEntity<Card> enrollCard(@RequestBody CardNumberRequest cardNumberRequest, String strMemberId) {
+        Card card = logCardService.enrollCard(cardNumberRequest, strMemberId);
 
         return Optional.ofNullable(card)
                 .map(ResponseEntity::ok)
@@ -49,15 +51,20 @@ public class LogCardController {
 
     /**
      * 회원의 카드를 조회한다.
-     * (현재는 회원이 1개의 카드만 가지고 있다고 가정)
-     * @param session
+     * @param strMemberId aop -> 회원 아이디
      * @return
      */
     @GetMapping()
+    @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
-    public LogCard findCard(HttpSession session) {
-        String memberId = SessionUtil.getMemberId(session);
-        return logCardService.findByCard(memberId);
+    public List<LogCard> findByMemberId(String strMemberId) {
+        return logCardService.findByMemberId(strMemberId);
+    }
+
+    @GetMapping("/cardId")
+    @ResponseStatus(HttpStatus.OK)
+    public LogCard findByCardId(@RequestParam UUID cardId) {
+        return logCardService.findByCardId(cardId);
     }
 
 
@@ -83,8 +90,5 @@ public class LogCardController {
         Integer result = logCardService.withDrawAmount(balanceRequest);
         return result;
     }
-
-
-
 
 }

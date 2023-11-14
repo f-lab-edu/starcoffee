@@ -26,7 +26,8 @@ public class CardArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(LogCard.class);
+        return parameter.getParameterType().equals(LogCard.class) ||
+                parameter.getParameterType().equals(List.class);
     }
 
     @Override
@@ -40,9 +41,9 @@ public class CardArgumentResolver implements HandlerMethodArgumentResolver {
 
         // 카드에 대한 유효성검사
         // Invalid
-        LogCard logCardInfo = logCardService.findByCard(memberId);
+        List<LogCard> cardList = logCardService.findByMemberId(memberId);
 
 
-        return logCardInfo;
+        return cardList;
     }
 }

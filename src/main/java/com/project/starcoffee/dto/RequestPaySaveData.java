@@ -1,20 +1,18 @@
-package com.project.starcoffee.controller.response.pay;
+package com.project.starcoffee.dto;
 
+import com.project.starcoffee.domain.pay.PayStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
 import java.util.UUID;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PayResponse {
-    private UUID memberId;
+public class RequestPaySaveData {
     private UUID orderId;
-    private long storeId;
-    private long orderPrice;
+    private long finalPrice;
+    private PayStatus status;
 }

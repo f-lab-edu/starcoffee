@@ -3,21 +3,24 @@ package com.project.starcoffee.dto;
 import com.project.starcoffee.domain.item.ItemType;
 import com.project.starcoffee.domain.order.CupSize;
 import com.project.starcoffee.domain.order.ItemSize;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemDTO {
+public class OrderItemDTO {
 
+    private UUID orderId;
     @NotNull
-    private long storeId;
-    @NotNull
-    private long itemId;
+    private Long itemId;
     @NotNull
     private String itemName;
     @NotNull
@@ -28,11 +31,5 @@ public class ItemDTO {
     private ItemSize itemSize;
     @NotNull
     private CupSize cupSize;
-    @NotNull
-    private int itemCount;
-    @NotNull
-    private int finalPrice;
-    @NotNull
-    private Timestamp createdAt;
 
 }

@@ -1,18 +1,15 @@
 package com.project.starcoffee.domain.card;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LogCard {
 
     private UUID cardLogId;

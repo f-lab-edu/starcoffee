@@ -1,4 +1,4 @@
-package com.project.starcoffee.controller.response.pay;
+package com.project.starcoffee.controller.request.pay;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,9 +12,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PayResponse {
-    private UUID memberId;
+public class CancelRequest {
+    private UUID paymentId;
     private UUID orderId;
-    private long storeId;
-    private long orderPrice;
+    private long cancelPay;
 }

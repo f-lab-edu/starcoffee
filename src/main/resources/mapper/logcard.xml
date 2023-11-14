@@ -28,7 +28,7 @@
                 #{cardBalance})
     </insert>
 
-    <select id="findByCard" resultType="com.project.starcoffee.domain.card.LogCard">
+    <select id="findByMemberId" resultType="com.project.starcoffee.domain.card.LogCard">
         SELECT bin_to_uuid(card_log_id,1) as cardLogId,
                bin_to_uuid(member_id,1) as memberId,
                bin_to_uuid(card_id,1) as cardId,
@@ -40,6 +40,20 @@
                updated_at as updatedAt
         FROM LOG_CARD
         WHERE member_id = uuid_to_bin(#{memberId},1)
+    </select>
+
+    <select id="findByCardId" resultType="com.project.starcoffee.domain.card.LogCard">
+        SELECT bin_to_uuid(card_log_id,1) as cardLogId,
+               bin_to_uuid(member_id,1) as memberId,
+               bin_to_uuid(card_id,1) as cardId,
+               status as status,
+               money_status as moneyStatus,
+               card_amount as cardAmount,
+               card_balance as cardBalance,
+               created_at as createdAt,
+               updated_at as updatedAt
+        FROM LOG_CARD
+        WHERE card_id = uuid_to_bin(#{cardId},1)
     </select>
 
     <update id="withDrawAmount">

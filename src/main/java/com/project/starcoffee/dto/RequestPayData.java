@@ -1,5 +1,6 @@
 package com.project.starcoffee.dto;
 
+import com.project.starcoffee.domain.pay.PayType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,9 +15,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestPayData {
-
-    @NotNull
-    private UUID cartId;
     @NotNull
     private UUID orderId;
     @NotNull

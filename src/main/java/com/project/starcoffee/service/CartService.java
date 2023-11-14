@@ -1,5 +1,6 @@
 package com.project.starcoffee.service;
 
+import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.dao.CartDAO;
 import com.project.starcoffee.dto.ItemDTO;
 import com.project.starcoffee.dto.RequestOrderData;
@@ -20,17 +21,14 @@ import java.util.UUID;
 @Service
 public class CartService {
     private final CartDAO cartDAO;
-    private WebClient webClient;
-    private static final long SCHEDULE_DELETE_CART_SECOND = 86400;
+    private final WebClient webClient;
+
+    private static final long SCHEDULE_DELETE_CART_SECOND = 86400000; // 24시간 뒤 실행
 
     @Autowired
-    public CartService(CartDAO cartDAO) {
+    public CartService(CartDAO cartDAO, WebClient webClient) {
         this.cartDAO = cartDAO;
-    }
-
-    @PostConstruct
-    public void initWebClient() {
-        webClient = WebClient.create("http://localhost:8080");
+        this.webClient = webClient;
     }
 
     public UUID insertCart(List<ItemDTO> itemDTO) {
@@ -57,25 +55,23 @@ public class CartService {
      */
     @Scheduled(fixedRate = SCHEDULE_DELETE_CART_SECOND)
     public void deleteBySchedule() {
-        log.info("일주일 동안 담긴 상품은 자동 으로 삭제 처리");
         cartDAO.autoDeleteItem();
     }
 
 
-    public Mono<List<ItemDTO>> requestOrder(UUID cartId, HttpSession session) {
-        String sessionId = session.getId();
+    public Mono<List<OrderResponse>> requestOrder(UUID cartId) {
 
         return Mono.defer(() -> {
             List<ItemDTO> itemList = cartDAO.findItem(cartId);
-            int storeId = 1;
+            Long storeId = itemList.stream().findFirst().map(ItemDTO::getStoreId)
+                    .orElseThrow(() -> new RuntimeException("가게정보가 없습니다."));
 
             return webClient.post()
                     .uri("/order/new")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .cookie("JSESSIONID", sessionId)
-                    .bodyValue(new RequestOrderData(cartId, storeId, itemList))
+                    .bodyValue(new RequestOrderData(storeId, itemList))
                     .retrieve()
-                    .bodyToFlux(ItemDTO.class)
+                    .bodyToFlux(OrderResponse.class)
                     .collectList();
         });
     }
