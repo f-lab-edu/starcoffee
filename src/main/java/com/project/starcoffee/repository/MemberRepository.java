@@ -14,7 +14,9 @@ public interface MemberRepository {
 
     int saveMember(MemberRequest memberInfo);
 
-    Optional<Member> findById(String memberId);
+    Optional<String> findById(String loginId);
+
+    Optional<Member> findByMember(String memberId);
 
     Member findByIdAndPassword(String loginId, String password);
 

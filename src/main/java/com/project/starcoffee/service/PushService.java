@@ -33,6 +33,46 @@ public class PushService {
     }
 
     /**
+     * 회원 토큰정보를 저장한다.
+     *
+     * @param token 토큰 정보
+     * @param memberId 고객의 고유 아이디
+     */
+    public void addMemberToken(String token, String memberId) {
+        fcmDAO.addMemberToken(token, memberId);
+    }
+
+    /**
+     * 가게 토큰 정보를 저장한다.
+     * @param token 토큰 정보
+     * @param StoreId 가게의 고유 아이디
+     */
+    public void addStoreToken(String token, long StoreId) {
+        fcmDAO.addStoreToken(token, StoreId);
+    }
+
+    /**
+     * 고객 토큰정보를 조회한다.
+     * @param memberId 고객의 고유 아이디
+     * @return
+     */
+    public List<String> getMemberTokens(String memberId) {
+        return fcmDAO.getMemberTokens(memberId);
+    }
+
+
+    /**
+     * 사장님 토큰 정보를 조회한다.
+     *
+     * @param storeId 사장님의 고유 아이디
+     * @return
+     */
+    public List<String> getStoreTokens(long storeId) {
+        return fcmDAO.getStoreTokens(storeId);
+    }
+
+
+    /**
      * 1명의 사용자에게 푸시 메세지를 전송한다.
      *
      * @param messageInfo 전송할 푸시 정보
@@ -56,8 +96,13 @@ public class PushService {
     }
 
 
+    /**
+     * 가게에 푸시 메세지를 전송한다.
+     * @param messageInfo
+     * @param storeId
+     */
     @Async("asyncTask")
-    public void sendByStore(PushMessage messageInfo, String storeId) {
+    public void sendByStore(PushMessage messageInfo, long storeId) {
         List<String> tokens = fcmDAO.getStoreTokens(storeId);
 
         List<Message> messages = tokens.stream().map(token -> Message.builder()
@@ -77,7 +122,7 @@ public class PushService {
         }
     }
 
-    public void addStoreErrorPush(String storeId, List<Message> messages) {
+    public void addStoreErrorPush(long storeId, List<Message> messages) {
         fcmDAO.addStoreErrorPush(storeId,messages);
     }
 

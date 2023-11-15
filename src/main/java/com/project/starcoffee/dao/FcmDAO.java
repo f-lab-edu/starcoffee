@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -40,15 +41,16 @@ public class FcmDAO implements FcmDAORepository {
      * @param token 토큰 정보
      * @param memberId 고객의 고유 아이디
      */
-    @SessionMemberId
     public void addMemberToken(String token, String memberId) {
         String key = RedisKeyFactory.generateFcmMemberKey(memberId);
+
 
         // 낙관적 락 (Optimistic Lock)
         redisTemplate.watch(key);
 
         try {
             if (getMemberTokens(memberId).contains(token)) {
+                log.info("이미 토큰이 존재합니다.");
                 return;
             }
 
@@ -57,7 +59,7 @@ public class FcmDAO implements FcmDAORepository {
             // 키의 만료시간 설정 -> 설정한 시간이 지나면 Redis 는 해당 키에 대한 데이터를 자동으로 삭제
             redisTemplate.expire(key, memberTokenExpireSecond, TimeUnit.SECONDS);
 
-            redisTemplate.exec();   // 트랜잭션 처리
+            redisTemplate.exec();   // 트랜잭션 실행
         } catch (Exception e) {
             log.error("Redis Add Member Token Error! Key : {}", key);
             log.error("Error Info : {}", e.getMessage());
@@ -66,12 +68,19 @@ public class FcmDAO implements FcmDAORepository {
         }
     }
 
-    public void addStoreToken(String token, String storeId) {
+    /**
+     * 가게가 발급받은 토큰을 저장한다.
+     *
+     * @param token 토큰정보
+     * @param storeId 가게의 고유 아이디
+     */
+    public void addStoreToken(String token, long storeId) {
         String key = RedisKeyFactory.generateFcmStoreKey(storeId);
         redisTemplate.watch(key);
 
         try {
             if (getStoreTokens(storeId).contains(key)) {
+                log.info("이미 토큰이 존재합니다.");
                 return;
             }
             redisTemplate.multi();
@@ -95,10 +104,11 @@ public class FcmDAO implements FcmDAORepository {
      * @return
      */
     public List<String> getMemberTokens(String memberId) {
-        return redisTemplate.opsForList().range(RedisKeyFactory.generateFcmMemberKey(memberId), 0, -1)
+        List<String> resultList = redisTemplate.opsForList().range(RedisKeyFactory.generateFcmMemberKey(memberId), 0, -1)
                 .stream()
                 .map(e -> objectMapper.convertValue(e, String.class))
                 .collect(Collectors.toList());
+        return resultList;
     }
 
 
@@ -108,24 +118,19 @@ public class FcmDAO implements FcmDAORepository {
      * @param storeId 가게의 고유 아이디
      * @return
      */
-    public List<String> getStoreTokens(String storeId) {
-        List<String> tokenList = redisTemplate.opsForList().range(RedisKeyFactory.generateFcmStoreKey(storeId), 0, -1)
+    public List<String> getStoreTokens(long storeId) {
+        List<String> resultList = redisTemplate.opsForList().range(RedisKeyFactory.generateFcmStoreKey(storeId), 0, -1)
                 .stream()
                 .map(e -> objectMapper.convertValue(e, String.class))
                 .collect(Collectors.toList());
-
-        if (tokenList.isEmpty()) {
-            throw new RuntimeException("해당 가게의 토큰이 존재하지 않습니다.");
-        }
-
-        return tokenList;
+        return resultList;
     }
 
     public void addMemberErrorPush(String memberId, List<Message> messages) {
         redisTemplate.opsForList().rightPush(RedisKeyFactory.generateFcmMemberErrorKey(memberId), messages);
     }
 
-    public void addStoreErrorPush(String storeId, List<Message> messages) {
+    public void addStoreErrorPush(long storeId, List<Message> messages) {
         redisTemplate.opsForList().rightPush(RedisKeyFactory.generateFcmStoreErrorKey(storeId), messages);
     }
 

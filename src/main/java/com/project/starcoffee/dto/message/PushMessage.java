@@ -1,6 +1,5 @@
 package com.project.starcoffee.dto.message;
 
-import lombok.Data;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;

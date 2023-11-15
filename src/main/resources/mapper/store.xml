@@ -19,6 +19,11 @@
         FROM STORE
     </sql>
 
+    <insert id="saveStore" parameterType="com.project.starcoffee.controller.request.store.StoreRequest" useGeneratedKeys="true" keyProperty="storeId">
+        INSERT INTO STORE(store_name, store_image, store_address, direction, operation_time)
+        VALUES (#{storeName}, #{storeImage}, #{storeAddress}, #{direction}, #{operationTime})
+    </insert>
+
     <select id="storeNotOpen" resultType="int">
         SELECT count(*)
         FROM STORE

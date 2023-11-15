@@ -8,6 +8,7 @@ import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.dto.RequestPaySaveData;
 import com.project.starcoffee.domain.pay.PayStatus;
+import com.project.starcoffee.dto.message.PushMessage;
 import com.project.starcoffee.exception.BalanceException;
 import com.project.starcoffee.repository.PayRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +30,13 @@ import java.util.UUID;
 public class PayService {
     private final PayRepository payRepository;
     private final WebClient webClient;
+    private final PushService pushService;
 
     @Autowired
-    public PayService(PayRepository payRepository, WebClient webClient) {
+    public PayService(PayRepository payRepository, WebClient webClient, PushService pushService) {
         this.payRepository = payRepository;
         this.webClient = webClient;
+        this.pushService = pushService;
     }
 
     // 비동기
@@ -41,6 +44,7 @@ public class PayService {
     public PayResponse runPay(PayRequest payRequest) {
         long finalPrice = payRequest.getFinalPrice();    // 결제 금액
         UUID cardId = payRequest.getCardId();           // 카드 ID
+        long storeId = payRequest.getStoreId();         // 가게 ID
 
 
         // 회원카드잔액 과 결제금액의 차이 확인
@@ -79,6 +83,11 @@ public class PayService {
                 .retrieve()
                 .bodyToMono(Integer.class);
         resultLogCard.block();
+
+        // 가게에 푸시 알림
+        PushMessage payCompleteMsg = PushMessage.STORE_PAYMENT_COMPLETE;
+        pushService.sendByStore(payCompleteMsg, storeId);
+
 
         return PayResponse.builder()
                 .memberId(payRequest.getMemberId())

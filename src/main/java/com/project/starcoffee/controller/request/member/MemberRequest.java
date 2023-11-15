@@ -9,15 +9,17 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import static org.springframework.format.annotation.DateTimeFormat.*;
 
-@Getter
-@Setter
+@Data
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class MemberRequest {
+
+    private UUID memberId;
 
     @NotNull(message = "이름을 입력해주세요.")
     @Size(min = 2, max = 8, message = "이름을 2~8자까지 입력가능합니다.")

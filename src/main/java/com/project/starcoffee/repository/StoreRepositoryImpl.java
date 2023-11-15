@@ -1,5 +1,6 @@
 package com.project.starcoffee.repository;
 
+import com.project.starcoffee.controller.request.store.StoreRequest;
 import com.project.starcoffee.domain.store.Store;
 import com.project.starcoffee.mapper.StoreMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,11 @@ public class StoreRepositoryImpl implements StoreRepository {
     @Autowired
     public StoreRepositoryImpl(StoreMapper storeMapper) {
         this.storeMapper = storeMapper;
+    }
+
+    @Override
+    public int saveStore(StoreRequest storeRequest) {
+        return storeMapper.saveStore(storeRequest);
     }
 
     @Override

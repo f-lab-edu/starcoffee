@@ -28,6 +28,7 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+
     /**
      * 회원가입 진행
      * 필수입력 정보에 누락이 있으면 GrolbalExceptionHandler 에서 각각의 필드에 대해서 처리한다.
@@ -63,15 +64,16 @@ public class MemberController {
 
 
     /**
-     * 로그인 아이디를 기준으로 회원정보를 찾는다.
+     * 회원ID를 기준으로 회원정보를 찾는다.
+     *
      * @param memberId aop -> 회원 아이디
      * @return
      */
     @GetMapping("/member")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Member> findById(String memberId) {
-        Member memberInfo = memberService.findById(memberId);
+    public ResponseEntity<Member> findByMember(String memberId) {
+        Member memberInfo = memberService.findByMember(memberId);
 
         return Stream.of(memberInfo)
                 .findFirst()
@@ -83,7 +85,7 @@ public class MemberController {
      * 로그인 된 사용자가 비밀번호를 변경하고자 할 경우
      *
      * @param passwordRequest 이전 비밀번호, 변경 비밀번호을 담은 DTO
-     * @param memberId aop -> 회원 아이디
+     * @param memberId        aop -> 회원 아이디
      */
     @PatchMapping("/password")
     @SessionMemberId
@@ -101,8 +103,9 @@ public class MemberController {
 
     /**
      * 회원의 닉네임을 변경한다.
+     *
      * @param nickNameRequest 변경할 닉네임
-     * @param memberId aop -> 회원 아이디
+     * @param memberId        aop -> 회원 아이디
      */
     @PatchMapping("/nickname")
     @SessionMemberId
@@ -116,7 +119,7 @@ public class MemberController {
      * 이메일 주소가 형식이 맞지 않으면 예외를 던진다.
      *
      * @param emailRequest 변경할 이메일
-     * @param memberId aop -> 회원 아이디
+     * @param memberId     aop -> 회원 아이디
      */
     @PatchMapping("/email")
     @SessionMemberId
@@ -127,8 +130,9 @@ public class MemberController {
 
     /**
      * 회원의 휴대폰번호를 변경한다.
+     *
      * @param phoneRequest 변경할 휴대폰번호
-     * @param memberId aop -> 회원 아이디
+     * @param memberId     aop -> 회원 아이디
      */
     @PatchMapping("/phoneNumber")
     @SessionMemberId
@@ -160,4 +164,5 @@ public class MemberController {
         memberService.deleteMember(memberId);
         SessionUtil.logoutMember(session);
     }
+
 }

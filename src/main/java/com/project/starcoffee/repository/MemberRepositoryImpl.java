@@ -23,8 +23,13 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> findById(String memberId) {
-        return memberMapper.findById(memberId);
+    public Optional<String> findById(String loginId) {
+        return memberMapper.findById(loginId);
+    }
+
+    @Override
+    public Optional<Member> findByMember(String memberId) {
+        return memberMapper.findByMember(memberId);
     }
 
     @Override

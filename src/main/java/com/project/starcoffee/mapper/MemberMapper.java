@@ -12,7 +12,9 @@ public interface MemberMapper {
 
     int saveMember(MemberRequest memberInfo);
 
-    Optional<Member> findById(String memberId);
+    Optional<String> findById(String loginId);
+
+    Optional<Member> findByMember(String memberId);
 
     Member findByIdAndPassword(@Param("loginId") String loginId, @Param("password") String password);
 
