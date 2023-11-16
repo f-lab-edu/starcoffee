@@ -37,4 +37,9 @@ public class StoreRepositoryImpl implements StoreRepository {
     public int updateStoreStatus(Store store) {
         return storeMapper.updateStoreStatus(store);
     }
+
+    @Override
+    public String confirmStoreStatus(long storeId) {
+        return storeMapper.confirmStoreStatus(storeId);
+    }
 }

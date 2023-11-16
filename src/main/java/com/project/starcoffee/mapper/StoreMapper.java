@@ -11,5 +11,6 @@ public interface StoreMapper {
     int saveStore(StoreRequest storeRequest);
     int storeNotOpen(long storeId);
     Optional<Store> findById(long storeId);
+    String confirmStoreStatus(long storeId);
     int updateStoreStatus(Store store);
 }

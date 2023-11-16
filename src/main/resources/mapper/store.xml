@@ -35,6 +35,12 @@
         WHERE store_id = #{storeId}
     </select>
 
+    <select id="confirmStoreStatus" resultType="java.lang.String">
+        SELECT status
+        FROM STORE
+        WHERE store_id = #{storeId}
+    </select>
+
     <update id="updateStoreStatus" parameterType="com.project.starcoffee.domain.store.Store">
         UPDATE STORE
         SET status = #{status}

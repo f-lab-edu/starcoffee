@@ -32,4 +32,9 @@ public class StoreController {
         return storeService.closeStore(storeId);
     }
 
+    @GetMapping("/status")
+    public String StoreStatus(@RequestParam long storeId) {
+        return storeService.getStoreStatus(storeId);
+    }
+
 }

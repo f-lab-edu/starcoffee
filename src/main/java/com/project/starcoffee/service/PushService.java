@@ -1,9 +1,6 @@
 package com.project.starcoffee.service;
 
-import com.google.firebase.messaging.BatchResponse;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.*;
 import com.project.starcoffee.dao.FcmDAO;
 import com.project.starcoffee.dto.message.PushMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -36,17 +33,17 @@ public class PushService {
      * @param token 토큰 정보
      * @param memberId 고객의 고유 아이디
      */
-    public void addMemberToken(String token, String memberId) {
-        fcmDAO.addMemberToken(token, memberId);
+    public void addMemberToken(String memberId, String token) {
+        fcmDAO.addMemberToken(memberId, token);
     }
 
     /**
      * 가게 토큰 정보를 저장한다.
      * @param token 토큰 정보
-     * @param StoreId 가게의 고유 아이디
+     * @param storeId 가게의 고유 아이디
      */
-    public void addStoreToken(String token, long StoreId) {
-        fcmDAO.addStoreToken(token, StoreId);
+    public void addStoreToken(long storeId, String token) {
+        fcmDAO.addStoreToken(storeId, token);
     }
 
     /**
@@ -69,7 +66,6 @@ public class PushService {
         return fcmDAO.getStoreTokens(storeId);
     }
 
-
     /**
      * 고객 아이디로 로그인한 기기에 메세지를 보낸다.
      *
@@ -80,14 +76,15 @@ public class PushService {
 
         List<Message> messages = tokens.stream()
                 .map(token -> Message.builder()
-                        .putData("title", messageInfo.getTitle())
-                        .putData("message", messageInfo.getMessage())
-                        .putData("time", String.valueOf(Timestamp.valueOf(LocalDateTime.now())))
                         .setToken(token)
-                        .build()).collect(Collectors.toList());
+                        .setWebpushConfig(WebpushConfig.builder().putHeader("ttl", "300")
+                                .setNotification(new WebpushNotification(messageInfo.getTitle(),
+                                        messageInfo.getMessage())
+                                ).build()).build()).collect(Collectors.toList());
 
         BatchResponse response;
         try {
+            send(messages);
             response = FirebaseMessaging.getInstance().sendEach(messages);
             log.info("Member Sent message : " + response);
         } catch (FirebaseMessagingException e) {
@@ -124,10 +121,13 @@ public class PushService {
         }
     }
 
+    public void send(List<Message> message) throws FirebaseMessagingException {
+        FirebaseMessaging.getInstance().sendEach(message);
+    }
+
     public void deleteMemberToken(String memberId) {
         fcmDAO.deleteToken(memberId);
     }
-
     public void addMemberErrorPush(String memberId, List<Message> messages){
         fcmDAO.addMemberErrorPush(memberId, messages);
     }

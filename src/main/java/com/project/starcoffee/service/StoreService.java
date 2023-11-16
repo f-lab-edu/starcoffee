@@ -27,7 +27,7 @@ public class StoreService {
         this.pushService = pushService;
     }
 
-    @Transactional
+
     public void saveStore(StoreRequest storeRequest) {
         int result = storeRepository.saveStore(storeRequest);
         if (result != 1) {
@@ -37,13 +37,17 @@ public class StoreService {
         // 가게의 토큰정보 저장
         long storeId = storeRequest.getStoreId();
         String token = TokenGenerator.generateToken();
-        pushService.addStoreToken(token, storeId);
+        pushService.addStoreToken(storeId, token);
     }
 
     public Store getStoreInfo(long storeId) {
         Optional<Store> storeOptional = storeRepository.findById(storeId);
         storeOptional.orElseThrow(() -> new RuntimeException("가게 정보를 찾을 수 없습니다."));
         return storeOptional.get();
+    }
+
+    public String getStoreStatus(long storeId) {
+        return storeRepository.confirmStoreStatus(storeId);
     }
 
     private boolean isClose(long storeId) {

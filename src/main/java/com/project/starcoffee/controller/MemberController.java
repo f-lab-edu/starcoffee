@@ -29,6 +29,8 @@ public class MemberController {
     }
 
 
+
+
     /**
      * 회원가입 진행
      * 필수입력 정보에 누락이 있으면 GrolbalExceptionHandler 에서 각각의 필드에 대해서 처리한다.

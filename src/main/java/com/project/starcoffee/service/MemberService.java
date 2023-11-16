@@ -38,7 +38,6 @@ public class MemberService {
         * Validation 적용하여 비밀번호(영문/특수문자/숫자 포함 8~20자리), 휴대폰번호, 이메일 주소 형식이 올바르게 기입되어야 한다.
         * 이름, 로그인아이디, 비밀번호, 휴대폰번호, 이메일주소, 닉네임 값은 필수 값이다. (생년월일, 성별은 Null을 허용)
      */
-    @Transactional
     public void saveMember(MemberRequest memberRequest) {
         // 로그인 ID 중복 체크
         DuplicatedId(memberRequest.getLoginId());
@@ -92,7 +91,7 @@ public class MemberService {
         String token = TokenGenerator.generateToken();
         String memberId = member.getMemberId().toString();
 
-        pushService.addMemberToken(token, memberId);
+         pushService.addMemberToken(token, memberId);
 
         return member;
     }

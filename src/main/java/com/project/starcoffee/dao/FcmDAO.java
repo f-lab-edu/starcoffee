@@ -81,8 +81,9 @@ public class FcmDAO implements FcmDAORepository {
      * @param token 토큰정보
      * @param storeId 가게의 고유 아이디
      */
-    public void addStoreToken(String token, long storeId) {
+    public void addStoreToken(long storeId, String token) {
         String key = RedisKeyFactory.generateFcmStoreKey(storeId);
+        log.info(key);
 
         if (getStoreTokens(storeId).contains(key)) {
             log.info("이미 토큰이 존재합니다.");
@@ -121,9 +122,9 @@ public class FcmDAO implements FcmDAORepository {
                 .map(e -> objectMapper.convertValue(e, String.class))
                 .collect(Collectors.toList());
 
-        if (resultList.isEmpty()) {
-            throw new RuntimeException("해당 멤버의 토큰이 존재하지 않습니다.");
-        }
+//        if (resultList.isEmpty()) {
+//            throw new RuntimeException("해당 멤버의 토큰이 존재하지 않습니다.");
+//        }
 
         return resultList;
     }
@@ -141,9 +142,9 @@ public class FcmDAO implements FcmDAORepository {
                 .map(e -> objectMapper.convertValue(e, String.class))
                 .collect(Collectors.toList());
 
-        if (resultList.isEmpty()) {
-            throw new RuntimeException("해당 가게의 토큰이 존재하지 않습니다.");
-        }
+//        if (resultList.isEmpty()) {
+//            throw new RuntimeException("해당 가게의 토큰이 존재하지 않습니다.");
+//        }
 
         return resultList;
     }

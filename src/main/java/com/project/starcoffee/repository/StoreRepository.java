@@ -13,5 +13,5 @@ public interface StoreRepository {
     int storeNotOpen(long storeId);
     Optional<Store> findById(long storeId);
     int updateStoreStatus(Store store);
-
+    String confirmStoreStatus(long storeId);
 }

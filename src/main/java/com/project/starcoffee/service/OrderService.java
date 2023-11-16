@@ -4,6 +4,7 @@ import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.domain.card.LogCard;
+import com.project.starcoffee.domain.store.StoreStatus;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.repository.OrderRepository;
 

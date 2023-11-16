@@ -12,7 +12,6 @@ public class PushMessage {
     private String title;
     @NotNull
     private String message;
-    private Timestamp generatedTime;
 
     public static final PushMessage STORE_PAYMENT_COMPLETE = new PushMessage("결제완료", "음료를 준비해주세요.");
     public static final PushMessage MEMBER_PAYMENT_COMPLETE = new PushMessage("결제완료", "음료가 준비중입니다.");
@@ -22,6 +21,5 @@ public class PushMessage {
     public PushMessage(String title, String message) {
         this.title = title;
         this.message = message;
-        this.generatedTime = Timestamp.valueOf(LocalDateTime.now());
     }
 }
