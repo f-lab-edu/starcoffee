@@ -24,8 +24,8 @@ public class LogCardRepositoryImpl implements LogCardRepository {
     }
 
     @Override
-    public Optional<LogCard> findByCardId(UUID cardId) {
-        return logCardMapper.findByCardId(cardId);
+    public Optional<LogCard> findByCardId(UUID memberId, UUID cardId) {
+        return logCardMapper.findByCardId(memberId, cardId);
     }
 
     @Override

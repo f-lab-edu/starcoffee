@@ -148,7 +148,7 @@ public class MemberController {
      */
     @GetMapping("/logout")
     public void logout(HttpSession session) {
-        SessionUtil.logoutMember(session);
+        memberService.logout(session);
     }
 
     /**

@@ -6,11 +6,9 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.project.starcoffee.dao.FcmDAO;
 import com.project.starcoffee.dto.message.PushMessage;
-import com.project.starcoffee.dto.message.PushMessageForOne;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -73,26 +71,30 @@ public class PushService {
 
 
     /**
-     * 1명의 사용자에게 푸시 메세지를 전송한다.
+     * 고객 아이디로 로그인한 기기에 메세지를 보낸다.
      *
      * @param messageInfo 전송할 푸시 정보
      */
-    @Async("asyncTask")
-    public void sendByMember(PushMessageForOne messageInfo) {
-        Message message = Message.builder()
-                .setToken(messageInfo.getToken())
-                .putData("title", messageInfo.getTitle())
-                .putData("message", messageInfo.getMessage())
-                .putData("time", String.valueOf(Timestamp.valueOf(LocalDateTime.now())))
-                .build();
-        String response;
+    public void sendByMember(PushMessage messageInfo, String memberId) {
+        List<String> tokens = fcmDAO.getMemberTokens(memberId);
 
+        List<Message> messages = tokens.stream()
+                .map(token -> Message.builder()
+                        .putData("title", messageInfo.getTitle())
+                        .putData("message", messageInfo.getMessage())
+                        .putData("time", String.valueOf(Timestamp.valueOf(LocalDateTime.now())))
+                        .setToken(token)
+                        .build()).collect(Collectors.toList());
+
+        BatchResponse response;
         try {
-            response = FirebaseMessaging.getInstance().send(message);
-            log.info("Sent Message : " + response);
+            response = FirebaseMessaging.getInstance().sendEach(messages);
+            log.info("Member Sent message : " + response);
         } catch (FirebaseMessagingException e) {
-            log.error("고객에게 메세지가 전송되지 않았습니다. Error info : {}", e.getMessage());
+            log.error("토큰정보에 의해 메세지가 전송되지 않았습니다. : {}", e.getMessage());
+            addMemberErrorPush(memberId, messages);
         }
+
     }
 
 
@@ -101,37 +103,36 @@ public class PushService {
      * @param messageInfo
      * @param storeId
      */
-    @Async("asyncTask")
     public void sendByStore(PushMessage messageInfo, long storeId) {
         List<String> tokens = fcmDAO.getStoreTokens(storeId);
 
-        List<Message> messages = tokens.stream().map(token -> Message.builder()
-                .putData("title", messageInfo.getTitle())
-                .putData("message", messageInfo.getMessage())
-                .putData("time", String.valueOf(Timestamp.valueOf(LocalDateTime.now())))
-                .setToken(token)
-                .build()).collect(Collectors.toList());
+        List<Message> messages = tokens.stream()
+                .map(token -> Message.builder()
+                        .putData("title", messageInfo.getTitle())
+                        .putData("message", messageInfo.getMessage())
+                        .putData("time", String.valueOf(Timestamp.valueOf(LocalDateTime.now())))
+                        .setToken(token)
+                        .build()).collect(Collectors.toList());
 
         BatchResponse response;
         try {
-            response = FirebaseMessaging.getInstance().sendAll(messages);
-            log.info("Sent message : " + response);
+            response = FirebaseMessaging.getInstance().sendEach(messages);
+            log.info("Store Sent message : " + response);
         } catch (FirebaseMessagingException e) {
-            log.error("가게에 메세지를 전송되지 않았습니다. Error info : {}", e.getMessage());
+            log.error("토큰정보에 의해 메세지가 전송되지 않았습니다. : {}", e.getMessage());
             addStoreErrorPush(storeId, messages);
         }
     }
 
+    public void deleteMemberToken(String memberId) {
+        fcmDAO.deleteToken(memberId);
+    }
+
+    public void addMemberErrorPush(String memberId, List<Message> messages){
+        fcmDAO.addMemberErrorPush(memberId, messages);
+    }
     public void addStoreErrorPush(long storeId, List<Message> messages) {
         fcmDAO.addStoreErrorPush(storeId,messages);
     }
-
-
-
-
-
-
-
-
 
 }

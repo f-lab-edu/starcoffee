@@ -185,6 +185,7 @@
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.13.5" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-codec-http2:4.1.94.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.projectreactor.netty:reactor-netty-core:1.0.34" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-resolver-dns-native-macos:osx-x86_64:4.1.94.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-resolver-dns:4.1.94.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-transport-native-epoll:linux-x86_64:4.1.94.Final" level="project" />
     <orderEntry type="library" name="Gradle: net.minidev:accessors-smart:2.4.11" level="project" />
@@ -194,11 +195,11 @@
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-core:1.2.12" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-api:2.17.2" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-handler-proxy:4.1.94.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-resolver-dns-classes-macos:4.1.94.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-codec-dns:4.1.94.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-transport-classes-epoll:4.1.94.Final" level="project" />
     <orderEntry type="library" name="Gradle: org.ow2.asm:asm:9.3" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-codec-socks:4.1.94.Final" level="project" />
-    <orderEntry type="library" name="Gradle: io.netty:netty-resolver-dns-native-macos:4.1.9.Final" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.mysql:mysql-connector-j:8.0.33" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: io.perfmark:perfmark-api:0.26.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.google.android:annotations:4.1.1.4" level="project" />

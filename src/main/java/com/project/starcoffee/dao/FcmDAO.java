@@ -7,7 +7,10 @@ import com.project.starcoffee.utils.RedisKeyFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -44,28 +47,32 @@ public class FcmDAO implements FcmDAORepository {
     public void addMemberToken(String token, String memberId) {
         String key = RedisKeyFactory.generateFcmMemberKey(memberId);
 
-
-        // 낙관적 락 (Optimistic Lock)
-        redisTemplate.watch(key);
-
-        try {
-            if (getMemberTokens(memberId).contains(token)) {
-                log.info("이미 토큰이 존재합니다.");
-                return;
-            }
-
-            redisTemplate.multi();  // 트랜잭션 시작
-            redisTemplate.opsForList().rightPush(key, token); // List 형태로 오른쪽 추가
-            // 키의 만료시간 설정 -> 설정한 시간이 지나면 Redis 는 해당 키에 대한 데이터를 자동으로 삭제
-            redisTemplate.expire(key, memberTokenExpireSecond, TimeUnit.SECONDS);
-
-            redisTemplate.exec();   // 트랜잭션 실행
-        } catch (Exception e) {
-            log.error("Redis Add Member Token Error! Key : {}", key);
-            log.error("Error Info : {}", e.getMessage());
-            redisTemplate.discard();    // 트랜잭션 거부
-            throw new RuntimeException("고객의 토큰정보를 저장할 수 없습니다.");
+        if (getMemberTokens(memberId).contains(token)) {
+            log.info("이미 토큰이 존재합니다.");
+            return;
         }
+        redisTemplate.execute(new SessionCallback<Object>() {
+            @Override
+            public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
+                // 낙관적 락 (Optimistic Lock)
+                redisTemplate.watch(key);
+                try {
+                    redisTemplate.multi();                                  // 트랜잭션 시작
+                    redisTemplate.opsForList().rightPush(key, token);       // List 형태로 오른쪽 추가
+                    // 키의 만료시간 설정 -> 설정한 시간이 지나면 Redis 는 해당 키에 대한 데이터를 자동으로 삭제
+                    redisTemplate.expire(key, memberTokenExpireSecond, TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    log.error("Redis Add Member Token Error! Key : {}", key);
+                    log.error("Error Info : {}", e.getMessage());
+                    redisTemplate.discard();    // 트랜잭션 거부
+                    throw new RuntimeException("고객의 토큰정보를 저장할 수 없습니다.");
+                }
+
+                return redisTemplate.exec(); // 트랜잭션 실행
+            }
+        });
+
+
     }
 
     /**
@@ -76,24 +83,29 @@ public class FcmDAO implements FcmDAORepository {
      */
     public void addStoreToken(String token, long storeId) {
         String key = RedisKeyFactory.generateFcmStoreKey(storeId);
-        redisTemplate.watch(key);
 
-        try {
-            if (getStoreTokens(storeId).contains(key)) {
-                log.info("이미 토큰이 존재합니다.");
-                return;
-            }
-            redisTemplate.multi();
-            redisTemplate.opsForList().rightPush(key, token);
-            redisTemplate.expire(key, storeTokenExpireSecond, TimeUnit.SECONDS);
-
-            redisTemplate.exec();
-        } catch (Exception e) {
-            log.error("Redis Add Store Token Error! Key : {}", key);
-            log.error("ERROR Info : {}", e.getMessage());
-            redisTemplate.discard();
-            throw new RuntimeException("가게의 토큰정보를 저장할 수 없습니다.");
+        if (getStoreTokens(storeId).contains(key)) {
+            log.info("이미 토큰이 존재합니다.");
+            return;
         }
+
+        redisTemplate.execute(new SessionCallback<Object>() {
+            @Override
+            public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
+                redisTemplate.watch(key);
+                try {
+                    redisTemplate.multi();
+                    redisTemplate.opsForList().rightPush(key, token);
+                    // 가게 토큰은 유효하다고 가정한다.
+                } catch (Exception e) {
+                    log.error("Redis Add Store Token Error! Key : {}", key);
+                    log.error("ERROR Info : {}", e.getMessage());
+                    redisTemplate.discard();
+                    throw new RuntimeException("가게의 토큰정보를 저장할 수 없습니다.");
+                }
+                return redisTemplate.exec();
+            }
+        });
     }
 
 
@@ -108,6 +120,11 @@ public class FcmDAO implements FcmDAORepository {
                 .stream()
                 .map(e -> objectMapper.convertValue(e, String.class))
                 .collect(Collectors.toList());
+
+        if (resultList.isEmpty()) {
+            throw new RuntimeException("해당 멤버의 토큰이 존재하지 않습니다.");
+        }
+
         return resultList;
     }
 
@@ -123,7 +140,17 @@ public class FcmDAO implements FcmDAORepository {
                 .stream()
                 .map(e -> objectMapper.convertValue(e, String.class))
                 .collect(Collectors.toList());
+
+        if (resultList.isEmpty()) {
+            throw new RuntimeException("해당 가게의 토큰이 존재하지 않습니다.");
+        }
+
         return resultList;
+    }
+
+    public void deleteToken(String memberId) {
+        String key = RedisKeyFactory.generateFcmMemberKey(memberId);
+        redisTemplate.delete(key);
     }
 
     public void addMemberErrorPush(String memberId, List<Message> messages) {

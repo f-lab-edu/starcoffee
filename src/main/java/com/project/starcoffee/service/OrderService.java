@@ -101,6 +101,7 @@ public class OrderService {
         Mono<LogCard> monoLogCard = webClient.get()
                 .uri(uriBuilder -> {
                     return uriBuilder.path("/logcard/cardId")
+                            .queryParam("memberId",memberId)
                             .queryParam("cardId",requestCardId)
                             .build();
                 })

@@ -53,8 +53,6 @@ dependencies {
 	// FCM(Firebase Cloud Messaging)
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
 
-	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.9.Final:osx-aarch_64'
-
 
 
 }

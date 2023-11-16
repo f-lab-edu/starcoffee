@@ -22,6 +22,7 @@ import reactor.core.scheduler.Schedulers;
 
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,6 +45,7 @@ public class PayService {
     public PayResponse runPay(PayRequest payRequest) {
         long finalPrice = payRequest.getFinalPrice();    // 결제 금액
         UUID cardId = payRequest.getCardId();           // 카드 ID
+        UUID memberId = payRequest.getMemberId();       // 회원 ID
         long storeId = payRequest.getStoreId();         // 가게 ID
 
 
@@ -51,6 +53,7 @@ public class PayService {
         Mono<LogCard> monoLogCard = webClient.get()
                 .uri(uriBuilder -> {
                     return uriBuilder.path("/logcard/cardId")
+                            .queryParam("memberId",memberId)
                             .queryParam("cardId", cardId)
                             .build();
                 })
@@ -74,7 +77,6 @@ public class PayService {
             throw new RuntimeException("결제가 완료되지 못했습니다.");
         }
 
-
         // 회원카드 금액변경
         Mono<Integer> resultLogCard = webClient.patch()
                 .uri("/logcard/balance")
@@ -84,9 +86,13 @@ public class PayService {
                 .bodyToMono(Integer.class);
         resultLogCard.block();
 
-        // 가게에 푸시 알림
-        PushMessage payCompleteMsg = PushMessage.STORE_PAYMENT_COMPLETE;
-        pushService.sendByStore(payCompleteMsg, storeId);
+        // 고객에게 푸시 알림 ("음료가 준비중입니다.")
+        PushMessage memberCompleteMsg = PushMessage.MEMBER_PAYMENT_COMPLETE;
+        pushService.sendByMember(memberCompleteMsg, payRequest.getMemberId().toString());
+
+        // 가게에 푸시 알림 ("음료를 준비해주세요.")
+         PushMessage storeCompleteMsg = PushMessage.STORE_PAYMENT_COMPLETE;
+         pushService.sendByStore(storeCompleteMsg, storeId);
 
 
         return PayResponse.builder()

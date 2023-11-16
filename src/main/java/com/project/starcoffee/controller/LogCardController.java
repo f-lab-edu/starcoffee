@@ -47,7 +47,7 @@ public class LogCardController {
 
 
     /**
-     * 회원의 카드를 조회한다.
+     * 회원의 카드들(List<LogCard>)을 조회한다.
      * @param strMemberId aop -> 회원 아이디
      * @return
      */
@@ -58,10 +58,18 @@ public class LogCardController {
         return logCardService.findByMemberId(strMemberId);
     }
 
+
+    /**
+     * 카드가 회원의 소지인지 조회한다.
+     * @param memberId 회원 아이디
+     * @param cardId 카드 아이디
+     * @return
+     */
     @GetMapping("/cardId")
     @ResponseStatus(HttpStatus.OK)
-    public LogCard findByCardId(@RequestParam UUID cardId) {
-        return logCardService.findByCardId(cardId);
+    public LogCard findByCardId(@RequestParam UUID memberId,
+                                @RequestParam UUID cardId) {
+        return logCardService.findByCardId(memberId, cardId);
     }
 
 
