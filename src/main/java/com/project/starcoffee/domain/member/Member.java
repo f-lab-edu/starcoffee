@@ -1,22 +1,15 @@
 package com.project.starcoffee.domain.member;
 
 import com.project.starcoffee.domain.card.LogCard;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.utils.SHA256Util;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
+@Data
 public class Member {
 
     private UUID memberId;
@@ -51,15 +44,12 @@ public class Member {
      * @param beforePw 변경 전 비밀번호
      * @param afterPw 변경 하고자 하는 비밀번호
      */
-    public String matchesAndChangePassword(String beforePw, String afterPw) {
-        String encryptPassword = SHA256Util.encryptSHA256(beforePw);
+    public String matchesAndChangePassword(String memberPassword, String beforePw, String afterPw) {
 
-        if (!getPassword().equals(encryptPassword)) {
+        if (!memberPassword.equals(beforePw)) {
             throw new IllegalArgumentException("현재 비밀번호가 맞지않습니다.");
         }
 
         return SHA256Util.encryptSHA256(afterPw);
     }
-
-
 }

@@ -140,7 +140,7 @@ public class MemberController {
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
     public void updateMemberPhone(@RequestBody @Valid PhoneRequest phoneRequest, String memberId) {
-        memberService.updatePhone(memberId, phoneRequest);
+        memberService.updatePhone(memberId, phoneRequest.getAfterPhoneNumber());
     }
 
     /**
