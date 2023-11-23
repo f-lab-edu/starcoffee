@@ -52,6 +52,13 @@ dependencies {
 //	implementation 'org.springframework.session:spring-session-data-redis'
 //	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 
+	// kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+
+	// Distributed Transaction(Axon-framework)
+	implementation 'org.axonframework:axon-spring-boot-starter:4.6.4'
+	implementation 'org.axonframework:axon-server-connector:4.6.4'
+
 	// FCM(Firebase Cloud Messaging)
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
 

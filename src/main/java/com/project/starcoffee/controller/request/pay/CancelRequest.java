@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -14,6 +15,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CancelRequest {
     private UUID paymentId;
+
     private UUID orderId;
+
     private long cancelPay;
 }

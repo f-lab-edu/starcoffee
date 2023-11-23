@@ -4,21 +4,19 @@ import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.domain.card.LogCard;
-import com.project.starcoffee.domain.store.StoreStatus;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.repository.OrderRepository;
 
-import com.project.starcoffee.utils.SessionUtil;
+import com.project.starcoffee.saga.order.OrderProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
-import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,15 +28,17 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final OrderProducer orderProducer;
     private final WebClient webClient;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, WebClient webClient) {
+    public OrderService(OrderRepository orderRepository, OrderProducer orderProducer, WebClient webClient) {
         this.orderRepository = orderRepository;
+        this.orderProducer = orderProducer;
         this.webClient = webClient;
     }
 
-    @Transactional
+//    @Transactional
     public OrderResponse Order(RequestOrderData orderRequest, String strMemberId) {
         List<ItemDTO> itemList = orderRequest.getItemList();
         UUID memberId = UUID.fromString(strMemberId);
@@ -72,6 +72,9 @@ public class OrderService {
                 ).collect(Collectors.toList());
         orderRepository.insertOrderItems(orderItems);
 
+        // 주문번호 생성 이벤트 호출
+        orderProducer.order(orderId);
+
         return OrderResponse.builder()
                 .orderId(orderId)
                 .memberId(newOrder.getMemberId())
@@ -87,7 +90,8 @@ public class OrderService {
         return orderOptional.orElseThrow(() -> new RuntimeException("주문 리스트가 없습니다."));
     }
 
-    @Transactional
+//    @Transactional
+    @KafkaListener(topics = "order-create", groupId = "group-01")
     public Mono<PayResponse> requestPay(RequestPayData requestPayData) {
         UUID orderId = requestPayData.getOrderId();
         UUID requestCardId = requestPayData.getCardId();
@@ -128,13 +132,16 @@ public class OrderService {
         });
     }
 
-    @Transactional
+    //@Transactional
     public void requestCancel(UUID orderId, String strMemberId) {
         UUID memberId = UUID.fromString(strMemberId);
         int result = orderRepository.cancelOrder(orderId, memberId);
         if (result != 1) {
             throw new RuntimeException("주문취소가 실패했습니다.");
         }
+
+        log.info("{ } 번 주문ID -> 주문취소로 변경", orderId);
+
     }
 
 

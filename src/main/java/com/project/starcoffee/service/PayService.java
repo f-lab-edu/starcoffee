@@ -11,6 +11,8 @@ import com.project.starcoffee.domain.pay.PayStatus;
 import com.project.starcoffee.dto.message.PushMessage;
 import com.project.starcoffee.exception.BalanceException;
 import com.project.starcoffee.repository.PayRepository;
+import com.project.starcoffee.saga.payment.PaymentConsumer;
+import com.project.starcoffee.saga.payment.PaymentProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -30,82 +32,101 @@ public class PayService {
     private final PayRepository payRepository;
     private final WebClient webClient;
     private final PushService pushService;
+    private final PaymentProducer paymentProducer;
     private final ReentrantLock payLock = new ReentrantLock();
 
     @Autowired
-    public PayService(PayRepository payRepository, WebClient webClient, PushService pushService) {
+    public PayService(PayRepository payRepository, WebClient webClient, PushService pushService,
+                      PaymentProducer paymentProducer) {
         this.payRepository = payRepository;
         this.webClient = webClient;
         this.pushService = pushService;
+        this.paymentProducer = paymentProducer;
     }
 
     // 비동기
-    @Transactional
+//    @Transactional
     public PayResponse runPay(PayRequest payRequest) {
+        UUID paymentId = null;
+        UUID orderId = payRequest.getOrderId();                // 주문ID
         final long finalPrice = payRequest.getFinalPrice();    // 결제 금액
-        UUID cardId = payRequest.getCardId();           // 카드 ID
-        UUID memberId = payRequest.getMemberId();       // 회원 ID
-        long storeId = payRequest.getStoreId();         // 가게 ID
+        UUID cardId = payRequest.getCardId();                  // 카드 ID
+        UUID memberId = payRequest.getMemberId();              // 회원 ID
+        long storeId = payRequest.getStoreId();                // 가게 ID
 
 
-        // 회원카드잔액 과 결제금액의 차이 확인
-        Mono<LogCard> monoLogCard = webClient.get()
-                .uri(uriBuilder -> {
-                    return uriBuilder.path("/logcard/cardId")
-                            .queryParam("memberId",memberId)
-                            .queryParam("cardId", cardId)
-                            .build();
-                })
-                .retrieve()
-                .bodyToMono(LogCard.class);
-
-        LogCard memberCard = monoLogCard.block();
-        if (memberCard.getCardBalance() < finalPrice) {
-            throw new BalanceException("잔액이 부족합니다.");
-        }
-
-        payLock.lock();
         try {
-            // 결제 테이블 결제정보 저장
-            RequestPaySaveData paySaveRequest = RequestPaySaveData.builder()
-                    .orderId(payRequest.getOrderId())
-                    .finalPrice(payRequest.getFinalPrice())
-                    .status(PayStatus.COMPLETE)
-                    .build();
+            // 회원카드잔액 과 결제금액의 차이 확인
+            Mono<LogCard> monoLogCard = webClient.get()
+                    .uri(uriBuilder -> {
+                        return uriBuilder.path("/logcard/cardId")
+                                .queryParam("memberId",memberId)
+                                .queryParam("cardId", cardId)
+                                .build();
+                    })
+                    .retrieve()
+                    .bodyToMono(LogCard.class);
 
-            int result = payRepository.insertPay(paySaveRequest);
-            if (result != 1) {
-                throw new RuntimeException("결제가 완료되지 못했습니다.");
+            LogCard memberCard = monoLogCard.block();
+            if (memberCard.getCardBalance() < finalPrice) {
+                throw new BalanceException("잔액이 부족합니다.");
             }
-        } finally {
-            payLock.unlock();
-        }
+
+            payLock.lock();
+            try {
+                // 결제 테이블 결제정보 저장
+                RequestPaySaveData paySaveRequest = RequestPaySaveData.builder()
+                        .orderId(payRequest.getOrderId())
+                        .finalPrice(payRequest.getFinalPrice())
+                        .status(PayStatus.COMPLETE)
+                        .build();
+
+                int result = payRepository.insertPay(paySaveRequest);
+                paymentId = paySaveRequest.getPaymentId();
+                if (result != 1) {
+                    throw new RuntimeException("결제가 완료되지 못했습니다.");
+                }
+            } finally {
+                payLock.unlock();
+            }
 
 
-        // 회원카드 금액변경
-        Mono<Integer> resultLogCard = webClient.patch()
-                .uri("/logcard/balance")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new BalanceRequest(cardId, finalPrice))
-                .retrieve()
-                .bodyToMono(Integer.class)
-                .doOnError(error -> log.error("error has occurred : {}", error.getMessage()))
+            // 회원카드 금액변경
+            Mono<Integer> resultLogCard = webClient.patch()
+                    .uri("/logcard/balance")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(new BalanceRequest(cardId, finalPrice))
+                    .retrieve()
+                    .bodyToMono(Integer.class)
+                    .doOnError(error -> log.error("error has occurred : {}", error.getMessage()))
                     .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
                     .onErrorMap(e -> {
                         log.error("회원카드 금액변경 중 에러 발생: {}", e.getMessage());
                         return new RuntimeException("회원카드 금액변경 중에 오류가 발생했습니다.");
-                            });
-        resultLogCard.block();
+                    });
+            resultLogCard.block();
+
+            throwError();
 
 
+            // 고객에게 푸시 알림 ("음료가 준비중입니다.")
+            PushMessage memberCompleteMsg = PushMessage.MEMBER_PAYMENT_COMPLETE;
+            // pushService.sendByMember(memberCompleteMsg, payRequest.getMemberId().toString());
 
-        // 고객에게 푸시 알림 ("음료가 준비중입니다.")
-        PushMessage memberCompleteMsg = PushMessage.MEMBER_PAYMENT_COMPLETE;
-        // pushService.sendByMember(memberCompleteMsg, payRequest.getMemberId().toString());
+            // 가게에 푸시 알림 ("음료를 준비해주세요.")
+            PushMessage storeCompleteMsg = PushMessage.STORE_PAYMENT_COMPLETE;
+            // pushService.sendByStore(storeCompleteMsg, storeId);
 
-        // 가게에 푸시 알림 ("음료를 준비해주세요.")
-        PushMessage storeCompleteMsg = PushMessage.STORE_PAYMENT_COMPLETE;
-        // pushService.sendByStore(storeCompleteMsg, storeId);
+        } catch (Exception e) {
+            log.info("결제처리 중에 오류가 발생하였습니다. : {}", e);
+            CancelRequest cancelRequest = CancelRequest.builder()
+                    .paymentId(paymentId)
+                    .orderId(orderId)
+                    .cancelPay(finalPrice)
+                    .build();
+            runCancel(cancelRequest);
+            paymentProducer.rollbackOrder(orderId);
+        }
 
 
         return PayResponse.builder()
@@ -116,7 +137,11 @@ public class PayService {
                 .build();
     }
 
-    @Transactional
+    public static void throwError() {
+        throw new RuntimeException("결제중 오류발생!!!!!!!!!!!!!!!!!!");
+    }
+
+//    @Transactional
     public CancelResponse runCancel(CancelRequest cancelRequest) {
         UUID orderId = cancelRequest.getOrderId();
         // 결제 테이블에서 결제금액 확인

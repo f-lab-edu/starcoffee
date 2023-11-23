@@ -6,6 +6,12 @@
     <insert id="insertPay" parameterType="com.project.starcoffee.dto.RequestPaySaveData">
         INSERT INTO PAYMENT (order_id, pay_price, status)
         VALUES (uuid_to_bin(#{orderId},1), #{finalPrice}, #{status})
+
+        <selectKey keyProperty="paymentId" resultType="java.util.UUID" order="AFTER">
+            SELECT bin_to_uuid(payment_id,1)
+            FROM PAYMENT
+            WHERE created_at = (SELECT MAX(created_at) FROM PAYMENT)
+        </selectKey>
     </insert>
 
     <select id="findPay" parameterType="java.util.UUID">
@@ -21,7 +27,7 @@
         <selectKey keyProperty="paymentId" resultType="java.util.UUID" order="AFTER">
             SELECT bin_to_uuid(payment_id,1)
             FROM PAYMENT
-            WHERE created_at = (SELECT MAX(created_at) FROM PAYMENT)
+            WHERE order_id = uuid_to_bin(#{orderId},1) AND status = 'REFUND'
         </selectKey>
     </insert>
 

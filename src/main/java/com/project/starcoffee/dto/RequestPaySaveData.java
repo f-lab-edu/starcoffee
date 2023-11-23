@@ -12,6 +12,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestPaySaveData {
+
+    private UUID paymentId;
     private UUID orderId;
     private long finalPrice;
     private PayStatus status;

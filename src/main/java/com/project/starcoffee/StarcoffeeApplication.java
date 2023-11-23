@@ -1,10 +1,13 @@
 package com.project.starcoffee;
 
+import org.axonframework.commandhandling.CommandHandler;
+import org.axonframework.eventhandling.EventHandler;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
 
 @EnableAsync				// 비동기 방식 활성화
 @EnableScheduling			// 스케줄링 활성화
