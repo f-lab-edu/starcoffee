@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
@@ -60,7 +61,7 @@ public class CartService {
     }
 
 
-    public Mono<List<OrderResponse>> requestOrder(UUID cartId) {
+    public List<OrderResponse> requestOrder(UUID cartId) {
         List<ItemDTO> itemList = cartDAO.findItem(cartId);
         Long storeId = itemList.stream().findFirst().map(ItemDTO::getStoreId)
                 .orElseThrow(() -> new RuntimeException("가게정보가 없습니다."));
@@ -75,18 +76,19 @@ public class CartService {
                 .retrieve()
                 .bodyToMono(String.class).block();
 
-
         if (storeStatus.equals(StoreStatus.CLOSE.name())) {
             throw new RuntimeException("가게가 오픈되지 않아서 주문할 수 없습니다.");
         }
 
-        return webClient.post()
+        List<OrderResponse> orderResponseList = webClient.post()
                 .uri("/order/new")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new RequestOrderData(storeId, itemList))
                 .retrieve()
                 .bodyToFlux(OrderResponse.class)
-                .collectList();
+                .collectList().block();
+
+        return orderResponseList;
     }
 
 }

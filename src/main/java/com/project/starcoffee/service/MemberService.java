@@ -87,6 +87,7 @@ public class MemberService {
 
         SessionUtil.setMemberId(session, member.getMemberId());
 
+
         // 고객의 토큰정보 저장
         String token = TokenGenerator.generateToken();
         String memberId = member.getMemberId().toString();

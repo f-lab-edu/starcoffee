@@ -6,19 +6,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.time.Duration;
-
 @Configuration
 public class RedisConfig {
 
@@ -55,23 +49,22 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(ObjectMapper objectMapper) {
-        GenericJackson2JsonRedisSerializer serializer
-                = new GenericJackson2JsonRedisSerializer(objectMapper);
-
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, String> redisTemplate() {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
 
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
         redisTemplate.setEnableTransactionSupport(true);
 
         return redisTemplate;
     }
 
-    @Bean
+
+
+/*    @Bean
     public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory,
                                                ObjectMapper objectMapper) {
         RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig()
@@ -84,7 +77,7 @@ public class RedisConfig {
 
         return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(redisConnectionFactory)
                 .cacheDefaults(configuration).build();
-    }
+    }*/
 
 
 }

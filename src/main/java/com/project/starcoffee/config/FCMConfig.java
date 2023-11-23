@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,24 +23,27 @@ public class FCMConfig {
     @Bean
     FirebaseMessaging firebaseMessaging() throws IOException {
         ClassPathResource resource = new ClassPathResource(googleApplicationCredentials);
-
         InputStream refreshToken = resource.getInputStream();
-        FirebaseApp firebaseApp = null;
+
         List<FirebaseApp> firebaseAppList = FirebaseApp.getApps();
 
-        if (firebaseAppList != null && !firebaseAppList.isEmpty()) {
-            for (FirebaseApp app : firebaseAppList) {
-                if (app.getName().equals(FirebaseApp.DEFAULT_APP_NAME)) {
-                    firebaseApp = app;
-                }
-            }
-        } else {
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(refreshToken))
-                    .build();
-            firebaseApp = FirebaseApp.initializeApp(options);
-        }
+        FirebaseApp firebaseApp = firebaseAppList.stream()
+                .filter(app -> app.getName().equals(FirebaseApp.DEFAULT_APP_NAME))
+                .findFirst()
+                .orElseGet(() -> {
+                    FirebaseOptions options = null;
+                    try {
+                        options = FirebaseOptions.builder()
+                                .setCredentials(GoogleCredentials.fromStream(refreshToken))
+                                .build();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return FirebaseApp.initializeApp(options);
+                });
 
         return FirebaseMessaging.getInstance(firebaseApp);
+// 출처 : https://kbwplace.tistory.com/179
+
     }
 }

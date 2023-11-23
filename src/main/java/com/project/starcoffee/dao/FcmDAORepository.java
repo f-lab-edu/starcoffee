@@ -7,9 +7,9 @@ import java.util.List;
 public interface FcmDAORepository {
     void addMemberToken(String memberId, String token);
     void addStoreToken(long storeId, String token);
-    List<String> getMemberTokens(String memberId);
-    List<String> getStoreTokens(long storeId);
-    void addMemberErrorPush(String memberId, List<Message> messages);
-    void addStoreErrorPush(long storeId, List<Message> messages);
+    String getMemberTokens(String memberId);
+    String getStoreTokens(long storeId);
+    void addMemberErrorPush(String memberId, Message message);
+    void addStoreErrorPush(long storeId, Message message);
 
 }

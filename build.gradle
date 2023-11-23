@@ -49,11 +49,11 @@ dependencies {
 
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//	implementation 'org.springframework.session:spring-session-data-redis'
+//	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 
 	// FCM(Firebase Cloud Messaging)
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
-
-
 
 }
 

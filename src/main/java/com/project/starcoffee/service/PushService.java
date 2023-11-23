@@ -6,6 +6,7 @@ import com.project.starcoffee.dto.message.PushMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -51,7 +52,7 @@ public class PushService {
      * @param memberId 고객의 고유 아이디
      * @return
      */
-    public List<String> getMemberTokens(String memberId) {
+    public String getMemberTokens(String memberId) {
         return fcmDAO.getMemberTokens(memberId);
     }
 
@@ -62,7 +63,7 @@ public class PushService {
      * @param storeId 사장님의 고유 아이디
      * @return
      */
-    public List<String> getStoreTokens(long storeId) {
+    public String getStoreTokens(long storeId) {
         return fcmDAO.getStoreTokens(storeId);
     }
 
@@ -71,25 +72,24 @@ public class PushService {
      *
      * @param messageInfo 전송할 푸시 정보
      */
+    @Async("Async-Executor")
     public void sendByMember(PushMessage messageInfo, String memberId) {
-        List<String> tokens = fcmDAO.getMemberTokens(memberId);
+        String memberToken = fcmDAO.getMemberTokens(memberId);
 
-        List<Message> messages = tokens.stream()
-                .map(token -> Message.builder()
-                        .setToken(token)
-                        .setWebpushConfig(WebpushConfig.builder().putHeader("ttl", "300")
-                                .setNotification(new WebpushNotification(messageInfo.getTitle(),
-                                        messageInfo.getMessage())
-                                ).build()).build()).collect(Collectors.toList());
+        Message message = Message.builder()
+                .setToken(memberToken)
+                .setWebpushConfig(WebpushConfig.builder().putHeader("ttl", "300")
+                        .setNotification(new WebpushNotification(messageInfo.getTitle(), messageInfo.getMessage())
+                        ).build()).build();
 
-        BatchResponse response;
+        String response;
         try {
-            send(messages);
-            response = FirebaseMessaging.getInstance().sendEach(messages);
+            send(message);
+            response = FirebaseMessaging.getInstance().send(message);
             log.info("Member Sent message : " + response);
         } catch (FirebaseMessagingException e) {
             log.error("토큰정보에 의해 메세지가 전송되지 않았습니다. : {}", e.getMessage());
-            addMemberErrorPush(memberId, messages);
+            addMemberErrorPush(memberId, message);
         }
 
     }
@@ -100,39 +100,39 @@ public class PushService {
      * @param messageInfo
      * @param storeId
      */
+    @Async("Async-Executor")
     public void sendByStore(PushMessage messageInfo, long storeId) {
-        List<String> tokens = fcmDAO.getStoreTokens(storeId);
+        String storeTokens = fcmDAO.getStoreTokens(storeId);
 
-        List<Message> messages = tokens.stream()
-                .map(token -> Message.builder()
-                        .putData("title", messageInfo.getTitle())
-                        .putData("message", messageInfo.getMessage())
-                        .putData("time", String.valueOf(Timestamp.valueOf(LocalDateTime.now())))
-                        .setToken(token)
-                        .build()).collect(Collectors.toList());
+        Message message = Message.builder()
+                .setToken(storeTokens)
+                .setWebpushConfig(WebpushConfig.builder().putHeader("ttl", "300")
+                        .setNotification(new WebpushNotification(messageInfo.getTitle(), messageInfo.getMessage())
+                        ).build()).build();
 
-        BatchResponse response;
+        String response;
         try {
-            response = FirebaseMessaging.getInstance().sendEach(messages);
+            response = FirebaseMessaging.getInstance().send(message);
             log.info("Store Sent message : " + response);
         } catch (FirebaseMessagingException e) {
             log.error("토큰정보에 의해 메세지가 전송되지 않았습니다. : {}", e.getMessage());
-            addStoreErrorPush(storeId, messages);
+            addStoreErrorPush(storeId, message);
         }
     }
 
-    public void send(List<Message> message) throws FirebaseMessagingException {
-        FirebaseMessaging.getInstance().sendEach(message);
+    public void send(Message message) throws FirebaseMessagingException {
+        FirebaseMessaging.getInstance().send(message);
     }
 
     public void deleteMemberToken(String memberId) {
         fcmDAO.deleteToken(memberId);
     }
-    public void addMemberErrorPush(String memberId, List<Message> messages){
-        fcmDAO.addMemberErrorPush(memberId, messages);
+
+    public void addMemberErrorPush(String memberId, Message message){
+        fcmDAO.addMemberErrorPush(memberId, message);
     }
-    public void addStoreErrorPush(long storeId, List<Message> messages) {
-        fcmDAO.addStoreErrorPush(storeId,messages);
+    public void addStoreErrorPush(long storeId, Message message) {
+        fcmDAO.addStoreErrorPush(storeId,message);
     }
 
 }

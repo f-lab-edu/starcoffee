@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync				// 비동기 방식 활성화
 @EnableScheduling			// 스케줄링 활성화
 @EnableAspectJAutoProxy		// 최상위 클래스에서 적용해야 AOP 적용
+//@EnableRedisHttpSession     // 레디스 세션 추가
 @SpringBootApplication(scanBasePackages = "com.project.starcoffee")
 public class StarcoffeeApplication {
 

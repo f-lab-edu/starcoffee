@@ -13,18 +13,18 @@ import com.project.starcoffee.exception.BalanceException;
 import com.project.starcoffee.repository.PayRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 
-import javax.servlet.http.HttpSession;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
+import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 @Service
@@ -32,6 +32,7 @@ public class PayService {
     private final PayRepository payRepository;
     private final WebClient webClient;
     private final PushService pushService;
+    private final ReentrantLock payLock = new ReentrantLock();
 
     @Autowired
     public PayService(PayRepository payRepository, WebClient webClient, PushService pushService) {
@@ -43,7 +44,7 @@ public class PayService {
     // 비동기
     @Transactional
     public PayResponse runPay(PayRequest payRequest) {
-        long finalPrice = payRequest.getFinalPrice();    // 결제 금액
+        final long finalPrice = payRequest.getFinalPrice();    // 결제 금액
         UUID cardId = payRequest.getCardId();           // 카드 ID
         UUID memberId = payRequest.getMemberId();       // 회원 ID
         long storeId = payRequest.getStoreId();         // 가게 ID
@@ -65,17 +66,23 @@ public class PayService {
             throw new BalanceException("잔액이 부족합니다.");
         }
 
-        // 결제 테이블 결제정보 저장
-        RequestPaySaveData paySaveRequest = RequestPaySaveData.builder()
-                .orderId(payRequest.getOrderId())
-                .finalPrice(payRequest.getFinalPrice())
-                .status(PayStatus.COMPLETE)
-                .build();
+        payLock.lock();
+        try {
+            // 결제 테이블 결제정보 저장
+            RequestPaySaveData paySaveRequest = RequestPaySaveData.builder()
+                    .orderId(payRequest.getOrderId())
+                    .finalPrice(payRequest.getFinalPrice())
+                    .status(PayStatus.COMPLETE)
+                    .build();
 
-        int result = payRepository.insertPay(paySaveRequest);
-        if (result != 1) {
-            throw new RuntimeException("결제가 완료되지 못했습니다.");
+            int result = payRepository.insertPay(paySaveRequest);
+            if (result != 1) {
+                throw new RuntimeException("결제가 완료되지 못했습니다.");
+            }
+        } finally {
+            payLock.unlock();
         }
+
 
         // 회원카드 금액변경
         Mono<Integer> resultLogCard = webClient.patch()
@@ -83,16 +90,24 @@ public class PayService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new BalanceRequest(cardId, finalPrice))
                 .retrieve()
-                .bodyToMono(Integer.class);
+                .bodyToMono(Integer.class)
+                .doOnError(error -> log.error("error has occurred : {}", error.getMessage()))
+                    .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
+                    .onErrorMap(e -> {
+                        log.error("회원카드 금액변경 중 에러 발생: {}", e.getMessage());
+                        return new RuntimeException("회원카드 금액변경 중에 오류가 발생했습니다.");
+                            });
         resultLogCard.block();
+
+
 
         // 고객에게 푸시 알림 ("음료가 준비중입니다.")
         PushMessage memberCompleteMsg = PushMessage.MEMBER_PAYMENT_COMPLETE;
-        pushService.sendByMember(memberCompleteMsg, payRequest.getMemberId().toString());
+        // pushService.sendByMember(memberCompleteMsg, payRequest.getMemberId().toString());
 
         // 가게에 푸시 알림 ("음료를 준비해주세요.")
-         PushMessage storeCompleteMsg = PushMessage.STORE_PAYMENT_COMPLETE;
-         pushService.sendByStore(storeCompleteMsg, storeId);
+        PushMessage storeCompleteMsg = PushMessage.STORE_PAYMENT_COMPLETE;
+        // pushService.sendByStore(storeCompleteMsg, storeId);
 
 
         return PayResponse.builder()

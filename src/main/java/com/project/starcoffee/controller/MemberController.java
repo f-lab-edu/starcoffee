@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.WebSession;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -27,9 +29,6 @@ public class MemberController {
     public MemberController(MemberService memberService) {
         this.memberService = memberService;
     }
-
-
-
 
     /**
      * 회원가입 진행
@@ -165,6 +164,13 @@ public class MemberController {
         String memberId = SessionUtil.getMemberId(session);
         memberService.deleteMember(memberId);
         SessionUtil.logoutMember(session);
+    }
+
+    @GetMapping("/session")
+    public String getSessionAttribute(WebSession session) {
+        // WebSession을 통해 세션 데이터에 접근할 수 있습니다.
+        String value = session.getAttribute("key");
+        return "Session Attribute Value: " + value;
     }
 
 }

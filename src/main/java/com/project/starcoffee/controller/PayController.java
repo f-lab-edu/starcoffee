@@ -9,6 +9,7 @@ import com.project.starcoffee.service.PayService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,9 +34,9 @@ public class PayController {
 
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)
-    public PayResponse doPay(@RequestBody PayRequest payRequest) {
+    public ResponseEntity<PayResponse> doPay(@RequestBody PayRequest payRequest) {
         PayResponse payResponse = payService.runPay(payRequest);
-        return payResponse;
+        return ResponseEntity.ok(payResponse);
     }
 
     @PostMapping("/cancelling")
