@@ -1,4 +1,4 @@
-package com.project.starcoffee.config.aop;
+package com.project.starcoffee.aop;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

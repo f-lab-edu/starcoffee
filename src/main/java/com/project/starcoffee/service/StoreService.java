@@ -1,13 +1,16 @@
 package com.project.starcoffee.service;
 
+import com.project.starcoffee.controller.request.store.StoreRequest;
 import com.project.starcoffee.controller.response.store.StoreStatusResponse;
 import com.project.starcoffee.domain.store.Store;
 import com.project.starcoffee.domain.store.StoreStatus;
 import com.project.starcoffee.exception.CanNotOpenShopException;
 import com.project.starcoffee.repository.StoreRepository;
+import com.project.starcoffee.utils.TokenGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -16,17 +19,35 @@ import java.util.Optional;
 public class StoreService {
 
     private final StoreRepository storeRepository;
+    private final PushService pushService;
 
     @Autowired
-    public StoreService(StoreRepository storeRepository) {
+    public StoreService(StoreRepository storeRepository, PushService pushService) {
         this.storeRepository = storeRepository;
+        this.pushService = pushService;
     }
 
+
+    public void saveStore(StoreRequest storeRequest) {
+        int result = storeRepository.saveStore(storeRequest);
+        if (result != 1) {
+            throw new RuntimeException("가게입점이 실패하였습니다.");
+        }
+
+        // 가게의 토큰정보 저장
+        long storeId = storeRequest.getStoreId();
+        String token = TokenGenerator.generateToken();
+        pushService.addStoreToken(storeId, token);
+    }
 
     public Store getStoreInfo(long storeId) {
         Optional<Store> storeOptional = storeRepository.findById(storeId);
         storeOptional.orElseThrow(() -> new RuntimeException("가게 정보를 찾을 수 없습니다."));
         return storeOptional.get();
+    }
+
+    public String getStoreStatus(long storeId) {
+        return storeRepository.confirmStoreStatus(storeId);
     }
 
     private boolean isClose(long storeId) {
@@ -84,6 +105,7 @@ public class StoreService {
         return storeStatusResponse;
 
     }
+
 
 
 }

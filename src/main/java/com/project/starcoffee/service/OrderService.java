@@ -4,6 +4,7 @@ import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.domain.card.LogCard;
+import com.project.starcoffee.domain.store.StoreStatus;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.repository.OrderRepository;
 
@@ -101,6 +102,7 @@ public class OrderService {
         Mono<LogCard> monoLogCard = webClient.get()
                 .uri(uriBuilder -> {
                     return uriBuilder.path("/logcard/cardId")
+                            .queryParam("memberId",memberId)
                             .queryParam("cardId",requestCardId)
                             .build();
                 })
@@ -134,4 +136,6 @@ public class OrderService {
             throw new RuntimeException("주문취소가 실패했습니다.");
         }
     }
+
+
 }

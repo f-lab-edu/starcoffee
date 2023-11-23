@@ -5,21 +5,15 @@ import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.repository.LogCardRepository;
-import com.project.starcoffee.utils.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -45,12 +39,11 @@ public class LogCardService {
         return cardList;
     }
 
-    public LogCard findByCardId(UUID cardId) {
-        Optional<LogCard> cardInfoOptional = logCardRepository.findByCardId(cardId);
+    public LogCard findByCardId(UUID memberId, UUID cardId) {
+        Optional<LogCard> cardInfoOptional = logCardRepository.findByCardId(memberId, cardId);
 
-        cardInfoOptional.ifPresentOrElse(card -> {},
-                ()-> { throw new RuntimeException("회원으로 등록된 카드를 찾을 수 없습니다."); }
-        );
+        cardInfoOptional.orElseThrow(
+                ()-> { throw new RuntimeException("회원으로 등록된 카드를 찾을 수 없습니다."); });
 
         return cardInfoOptional.get();
     }

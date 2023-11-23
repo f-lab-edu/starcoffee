@@ -2,6 +2,7 @@ package com.project.starcoffee.service;
 
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.dao.CartDAO;
+import com.project.starcoffee.domain.store.StoreStatus;
 import com.project.starcoffee.dto.ItemDTO;
 import com.project.starcoffee.dto.RequestOrderData;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
@@ -59,21 +61,34 @@ public class CartService {
     }
 
 
-    public Mono<List<OrderResponse>> requestOrder(UUID cartId) {
+    public List<OrderResponse> requestOrder(UUID cartId) {
+        List<ItemDTO> itemList = cartDAO.findItem(cartId);
+        Long storeId = itemList.stream().findFirst().map(ItemDTO::getStoreId)
+                .orElseThrow(() -> new RuntimeException("가게정보가 없습니다."));
 
-        return Mono.defer(() -> {
-            List<ItemDTO> itemList = cartDAO.findItem(cartId);
-            Long storeId = itemList.stream().findFirst().map(ItemDTO::getStoreId)
-                    .orElseThrow(() -> new RuntimeException("가게정보가 없습니다."));
+        // 가게 오픈 여부 확인
+        String storeStatus = webClient.get()
+                .uri(uriBuilder -> {
+                    return uriBuilder.path("/store/status")
+                            .queryParam("storeId", storeId)
+                            .build();
+                })
+                .retrieve()
+                .bodyToMono(String.class).block();
 
-            return webClient.post()
-                    .uri("/order/new")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(new RequestOrderData(storeId, itemList))
-                    .retrieve()
-                    .bodyToFlux(OrderResponse.class)
-                    .collectList();
-        });
+        if (storeStatus.equals(StoreStatus.CLOSE.name())) {
+            throw new RuntimeException("가게가 오픈되지 않아서 주문할 수 없습니다.");
+        }
+
+        List<OrderResponse> orderResponseList = webClient.post()
+                .uri("/order/new")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new RequestOrderData(storeId, itemList))
+                .retrieve()
+                .bodyToFlux(OrderResponse.class)
+                .collectList().block();
+
+        return orderResponseList;
     }
 
 }

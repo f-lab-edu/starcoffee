@@ -1,4 +1,4 @@
-package com.project.starcoffee.config.aop;
+package com.project.starcoffee.aop;
 
 import com.project.starcoffee.utils.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 @Component
 public class HttpSessionAspect {
 
-    @Around("@annotation(com.project.starcoffee.config.aop.SessionMemberId)")
+    @Around("@annotation(com.project.starcoffee.aop.SessionMemberId)")
     public Object injectHttpSession(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpSession session = ((ServletRequestAttributes)(RequestContextHolder.currentRequestAttributes()))
                 .getRequest().getSession();

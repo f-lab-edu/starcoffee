@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -51,6 +52,6 @@ public class MemberDTO {
     private String password;
 
     @DateTimeFormat(iso = ISO.DATE_TIME)
-    private ZonedDateTime birth;    // 생년월일
+    private Timestamp birth;    // 생년월일
 
 }

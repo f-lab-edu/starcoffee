@@ -100,7 +100,7 @@ public class MockWebServerTest {
 
 
         // when
-        List<OrderResponse> orderResponses = cartService.requestOrder(cartId).block();
+        List<OrderResponse> orderResponses = cartService.requestOrder(cartId);
 
         // then
         assertThat(orderResponses).isNotNull().hasSize(1);

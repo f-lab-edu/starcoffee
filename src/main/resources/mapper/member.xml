@@ -33,9 +33,21 @@
     <insert id="saveMember" parameterType="com.project.starcoffee.controller.request.member.MemberRequest">
         INSERT INTO MEMBERS (name, login_id, password, tel, email, birth,  nick_name, gender)
         VALUES (#{name}, #{loginId}, #{password}, #{tel}, #{email}, #{birth}, #{nickName}, #{gender})
+
+        <selectKey keyProperty="memberId" resultType="java.util.UUID" order="AFTER">
+            SELECT bin_to_uuid(member_id,1) as memberId
+            FROM MEMBERS
+            WHERE created_at = (SELECT MAX(created_at) FROM MEMBERS)
+        </selectKey>
     </insert>
 
-    <select id="findById" resultMap="memberInfo">
+    <select id="findById" resultType="java.lang.String">
+        SELECT login_id
+        FROM MEMBERS
+        WHERE login_id = #{loginId}
+    </select>
+
+    <select id="findByMember" resultMap="memberInfo">
         SELECT bin_to_uuid(member_id,1) as member_id, name, login_id, password, tel, email, status, birth, created_at, updated_at, nick_name, gender
         FROM MEMBERS
         WHERE member_id = uuid_to_bin(#{memberId},1)

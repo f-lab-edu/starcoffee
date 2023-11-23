@@ -1,5 +1,6 @@
 package com.project.starcoffee.repository;
 
+import com.project.starcoffee.controller.request.store.StoreRequest;
 import com.project.starcoffee.domain.store.Store;
 import com.project.starcoffee.mapper.StoreMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,11 @@ public class StoreRepositoryImpl implements StoreRepository {
     }
 
     @Override
+    public int saveStore(StoreRequest storeRequest) {
+        return storeMapper.saveStore(storeRequest);
+    }
+
+    @Override
     public int storeNotOpen(long storeId) {
         return storeMapper.storeNotOpen(storeId);
     }
@@ -30,5 +36,10 @@ public class StoreRepositoryImpl implements StoreRepository {
     @Override
     public int updateStoreStatus(Store store) {
         return storeMapper.updateStoreStatus(store);
+    }
+
+    @Override
+    public String confirmStoreStatus(long storeId) {
+        return storeMapper.confirmStoreStatus(storeId);
     }
 }

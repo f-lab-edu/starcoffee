@@ -1,6 +1,6 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.config.aop.SessionMemberId;
+import com.project.starcoffee.aop.SessionMemberId;
 import com.project.starcoffee.controller.request.member.*;
 import com.project.starcoffee.controller.response.member.LoginResponse;
 import com.project.starcoffee.domain.member.Member;
@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.WebSession;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -63,15 +65,16 @@ public class MemberController {
 
 
     /**
-     * 로그인 아이디를 기준으로 회원정보를 찾는다.
+     * 회원ID를 기준으로 회원정보를 찾는다.
+     *
      * @param memberId aop -> 회원 아이디
      * @return
      */
     @GetMapping("/member")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Member> findById(String memberId) {
-        Member memberInfo = memberService.findById(memberId);
+    public ResponseEntity<Member> findByMember(String memberId) {
+        Member memberInfo = memberService.findByMember(memberId);
 
         return Stream.of(memberInfo)
                 .findFirst()
@@ -83,7 +86,7 @@ public class MemberController {
      * 로그인 된 사용자가 비밀번호를 변경하고자 할 경우
      *
      * @param passwordRequest 이전 비밀번호, 변경 비밀번호을 담은 DTO
-     * @param memberId aop -> 회원 아이디
+     * @param memberId        aop -> 회원 아이디
      */
     @PatchMapping("/password")
     @SessionMemberId
@@ -101,8 +104,9 @@ public class MemberController {
 
     /**
      * 회원의 닉네임을 변경한다.
+     *
      * @param nickNameRequest 변경할 닉네임
-     * @param memberId aop -> 회원 아이디
+     * @param memberId        aop -> 회원 아이디
      */
     @PatchMapping("/nickname")
     @SessionMemberId
@@ -116,7 +120,7 @@ public class MemberController {
      * 이메일 주소가 형식이 맞지 않으면 예외를 던진다.
      *
      * @param emailRequest 변경할 이메일
-     * @param memberId aop -> 회원 아이디
+     * @param memberId     aop -> 회원 아이디
      */
     @PatchMapping("/email")
     @SessionMemberId
@@ -127,14 +131,15 @@ public class MemberController {
 
     /**
      * 회원의 휴대폰번호를 변경한다.
+     *
      * @param phoneRequest 변경할 휴대폰번호
-     * @param memberId aop -> 회원 아이디
+     * @param memberId     aop -> 회원 아이디
      */
     @PatchMapping("/phoneNumber")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
     public void updateMemberPhone(@RequestBody @Valid PhoneRequest phoneRequest, String memberId) {
-        memberService.updatePhone(memberId, phoneRequest);
+        memberService.updatePhone(memberId, phoneRequest.getAfterPhoneNumber());
     }
 
     /**
@@ -144,7 +149,7 @@ public class MemberController {
      */
     @GetMapping("/logout")
     public void logout(HttpSession session) {
-        SessionUtil.logoutMember(session);
+        memberService.logout(session);
     }
 
     /**
@@ -160,4 +165,12 @@ public class MemberController {
         memberService.deleteMember(memberId);
         SessionUtil.logoutMember(session);
     }
+
+    @GetMapping("/session")
+    public String getSessionAttribute(WebSession session) {
+        // WebSession을 통해 세션 데이터에 접근할 수 있습니다.
+        String value = session.getAttribute("key");
+        return "Session Attribute Value: " + value;
+    }
+
 }
