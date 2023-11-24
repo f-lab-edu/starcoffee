@@ -114,4 +114,15 @@ public class LogCardService {
         }
         return result;
     }
+
+
+    public void requestCancel(BalanceRequest balanceRequest) {
+        UUID cardId = balanceRequest.getCardId();
+        long cardAmount = balanceRequest.getFinalPrice();
+
+        int result = logCardRepository.withDrawAmount(cardId, cardAmount);
+        if (result != 1) {
+            throw new RuntimeException("데이터베이스에 취소금액이 업데이트되지 못했습니다.");
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.project.starcoffee.service;
 
+import com.project.starcoffee.aop.SessionMemberId;
 import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
@@ -7,13 +8,11 @@ import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.repository.OrderRepository;
 
-import com.project.starcoffee.saga.order.OrderProducer;
+import com.project.starcoffee.saga.order.LogCardProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -28,13 +27,11 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final OrderProducer orderProducer;
     private final WebClient webClient;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, OrderProducer orderProducer, WebClient webClient) {
+    public OrderService(OrderRepository orderRepository, WebClient webClient) {
         this.orderRepository = orderRepository;
-        this.orderProducer = orderProducer;
         this.webClient = webClient;
     }
 
@@ -72,9 +69,6 @@ public class OrderService {
                 ).collect(Collectors.toList());
         orderRepository.insertOrderItems(orderItems);
 
-        // 주문번호 생성 이벤트 호출
-        orderProducer.order(orderId);
-
         return OrderResponse.builder()
                 .orderId(orderId)
                 .memberId(newOrder.getMemberId())
@@ -91,7 +85,6 @@ public class OrderService {
     }
 
 //    @Transactional
-    @KafkaListener(topics = "order-create", groupId = "group-01")
     public Mono<PayResponse> requestPay(RequestPayData requestPayData) {
         UUID orderId = requestPayData.getOrderId();
         UUID requestCardId = requestPayData.getCardId();
@@ -133,15 +126,13 @@ public class OrderService {
     }
 
     //@Transactional
-    public void requestCancel(UUID orderId, String strMemberId) {
-        UUID memberId = UUID.fromString(strMemberId);
-        int result = orderRepository.cancelOrder(orderId, memberId);
+    public void requestCancel(UUID orderId) {
+        int result = orderRepository.cancelOrder(orderId);
         if (result != 1) {
             throw new RuntimeException("주문취소가 실패했습니다.");
         }
 
-        log.info("{ } 번 주문ID -> 주문취소로 변경", orderId);
-
+        log.info("{}번 주문ID -> 주문취소로 변경", orderId);
     }
 
 

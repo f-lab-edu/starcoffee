@@ -16,7 +16,7 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1 # 싱글 브로커 환경
       KAFKA_ADVERTISED_PORT: 9092
       # Topic 명 : Partition 개수 : Replica 개수
-      KAFKA_CREATE_TOPICS: "order-create:1:1, order-rollback:1:1, payment-rollback:1:1"
+      KAFKA_CREATE_TOPICS: "logcard-rollback:1:1, order-rollback:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

@@ -6,18 +6,19 @@ import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.pay.CancelResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.domain.card.LogCard;
+import com.project.starcoffee.dto.OrderIDDTO;
 import com.project.starcoffee.dto.RequestPaySaveData;
 import com.project.starcoffee.domain.pay.PayStatus;
 import com.project.starcoffee.dto.message.PushMessage;
 import com.project.starcoffee.exception.BalanceException;
 import com.project.starcoffee.repository.PayRepository;
-import com.project.starcoffee.saga.payment.PaymentConsumer;
+import com.project.starcoffee.saga.order.LogCardProducer;
 import com.project.starcoffee.saga.payment.PaymentProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -33,15 +34,17 @@ public class PayService {
     private final WebClient webClient;
     private final PushService pushService;
     private final PaymentProducer paymentProducer;
+    private final LogCardProducer logCardProducer;
     private final ReentrantLock payLock = new ReentrantLock();
 
     @Autowired
     public PayService(PayRepository payRepository, WebClient webClient, PushService pushService,
-                      PaymentProducer paymentProducer) {
+                      PaymentProducer paymentProducer, LogCardProducer logCardProducer) {
         this.payRepository = payRepository;
         this.webClient = webClient;
         this.pushService = pushService;
         this.paymentProducer = paymentProducer;
+        this.logCardProducer = logCardProducer;
     }
 
     // 비동기
@@ -108,7 +111,6 @@ public class PayService {
 
             throwError();
 
-
             // 고객에게 푸시 알림 ("음료가 준비중입니다.")
             PushMessage memberCompleteMsg = PushMessage.MEMBER_PAYMENT_COMPLETE;
             // pushService.sendByMember(memberCompleteMsg, payRequest.getMemberId().toString());
@@ -118,14 +120,28 @@ public class PayService {
             // pushService.sendByStore(storeCompleteMsg, storeId);
 
         } catch (Exception e) {
-            log.info("결제처리 중에 오류가 발생하였습니다. : {}", e);
+            log.error("결제처리 중에 오류가 발생하였습니다. : {}", e.getMessage());
+            // payService 자체 롤백
             CancelRequest cancelRequest = CancelRequest.builder()
                     .paymentId(paymentId)
                     .orderId(orderId)
                     .cancelPay(finalPrice)
                     .build();
             runCancel(cancelRequest);
-            paymentProducer.rollbackOrder(orderId);
+
+            // order-rollback 요청
+            OrderIDDTO orderIdDTO = OrderIDDTO.builder()
+                    .orderId(orderId)
+                    .build();
+            paymentProducer.rollbackOrder(orderIdDTO);
+
+            // logcard-rollback 요청
+            BalanceRequest balanceRequest = BalanceRequest.builder()
+                    .cardId(cardId)
+                    .finalPrice(finalPrice)
+                    .build();
+            logCardProducer.rollbackLogcard(balanceRequest);
+            throw new RuntimeException("결제처리 오류, 다시 결제진행해주세요.");
         }
 
 
@@ -164,15 +180,15 @@ public class PayService {
         }
 
         // 주문 서비스에 주문취소 요청
-        Mono<Void> cancelOrder = webClient.post()
-                .uri(uriBuilder -> {
-                    return uriBuilder.path("/order/cancelling")
-                            .queryParam("orderId", orderId)
-                            .build();
-                })
-                .retrieve()
-                .bodyToMono(void.class);
-        cancelOrder.block();
+//        Mono<Void> cancelOrder = webClient.post()
+//                .uri(uriBuilder -> {
+//                    return uriBuilder.path("/order/cancelling")
+//                            .queryParam("orderId", orderId)
+//                            .build();
+//                })
+//                .retrieve()
+//                .bodyToMono(void.class);
+//        cancelOrder.block();
 
         return CancelResponse.builder()
                 .paymentId(requestPay.getPaymentId())

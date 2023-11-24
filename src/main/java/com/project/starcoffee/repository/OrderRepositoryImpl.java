@@ -37,8 +37,8 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public int cancelOrder(UUID orderId, UUID memberId) {
-        return orderMapper.cancelOrder(orderId, memberId);
+    public int cancelOrder(UUID orderId) {
+        return orderMapper.cancelOrder(orderId);
     }
 
 }

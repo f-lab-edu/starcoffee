@@ -80,6 +80,7 @@ public class CartService {
             throw new RuntimeException("가게가 오픈되지 않아서 주문할 수 없습니다.");
         }
 
+        // 장바구니 -> 주문 요청
         List<OrderResponse> orderResponseList = webClient.post()
                 .uri("/order/new")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -34,6 +34,11 @@ public class LogCardRepositoryImpl implements LogCardRepository {
     }
 
     @Override
+    public Integer requestCancel(UUID cardId, long cardAmount) {
+        return logCardMapper.requestCancel(cardId, cardAmount);
+    }
+
+    @Override
     public Integer findByBalance(UUID cardId) {
         return logCardMapper.findByBalance(cardId);
     }

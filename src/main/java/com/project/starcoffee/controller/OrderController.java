@@ -66,7 +66,7 @@ public class OrderController {
     @PostMapping("/cancelling")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
-    public void requestCancel(@RequestParam UUID orderId, String strMemberId) {
-        orderService.requestCancel(orderId, strMemberId);
+    public void requestCancel(@RequestParam UUID orderId) {
+        orderService.requestCancel(orderId);
     }
 }
