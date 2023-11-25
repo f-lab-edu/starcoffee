@@ -8,7 +8,11 @@ import com.project.starcoffee.dto.RollbackRequest;
 import com.project.starcoffee.repository.LogCardRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -117,14 +121,23 @@ public class LogCardService {
     }
 
 
+    @Transactional
+    @Retryable(value = DataAccessException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void requestCancel(RollbackRequest rollbackRequest) {
         UUID cardId = rollbackRequest.getCardId();
         long cardAmount = rollbackRequest.getFinalPrice();
 
-        int result = logCardRepository.requestCancel(cardId, cardAmount);
-        if (result != 1) {
-            throw new RuntimeException("데이터베이스에 취소금액이 업데이트되지 못했습니다.");
+        try {
+            int result = logCardRepository.requestCancel(cardId, cardAmount);
+            if (result != 1) {
+                throw new RuntimeException("데이터베이스에 취소금액이 업데이트되지 못했습니다.");
+            }
+        } catch (DataAccessException e) {
+            log.error("결제금액 복원 중 재시도 중 에러 발생", e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("결제금액 업데이트 중 자체 에러발생", e.getMessage());
         }
+
 
         log.info("{}번 카드ID와 {}금액 -> 카드취소 업데이트", cardId, cardAmount);
     }

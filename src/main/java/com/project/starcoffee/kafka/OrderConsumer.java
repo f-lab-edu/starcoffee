@@ -21,5 +21,4 @@ public class OrderConsumer {
         log.error("======== [Rollback] order-rollback, orderId :{}======== ", orderId.getOrderId());
         orderService.requestCancel(orderId.getOrderId());
     }
-
 }

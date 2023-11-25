@@ -174,15 +174,15 @@ public class PayService {
         }
 
         // 주문 서비스에 주문취소 요청
-//        Mono<Void> cancelOrder = webClient.post()
-//                .uri(uriBuilder -> {
-//                    return uriBuilder.path("/order/cancelling")
-//                            .queryParam("orderId", orderId)
-//                            .build();
-//                })
-//                .retrieve()
-//                .bodyToMono(void.class);
-//        cancelOrder.block();
+        Mono<Void> cancelOrder = webClient.post()
+                .uri(uriBuilder -> {
+                    return uriBuilder.path("/order/cancelling")
+                            .queryParam("orderId", orderId)
+                            .build();
+                })
+                .retrieve()
+                .bodyToMono(void.class);
+        cancelOrder.block();
 
         return CancelResponse.builder()
                 .paymentId(requestPay.getPaymentId())

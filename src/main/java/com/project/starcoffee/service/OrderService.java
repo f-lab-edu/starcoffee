@@ -9,7 +9,10 @@ import com.project.starcoffee.repository.OrderRepository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -125,11 +128,19 @@ public class OrderService {
     }
 
     @Transactional
+    @Retryable(value = DataAccessException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void requestCancel(UUID orderId) {
-        int result = orderRepository.cancelOrder(orderId);
-        if (result != 1) {
-            throw new RuntimeException("주문취소가 실패했습니다.");
+        try {
+            int result = orderRepository.cancelOrder(orderId);
+            if (result != 1) {
+                throw new RuntimeException("주문취소가 실패했습니다.");
+            }
+        } catch (DataAccessException e) {
+            log.error("주문 취소 중 재시도 중 에러 발생", e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("주문 취소 중 주문취소 자체 에러발생", e.getMessage());
         }
+
 
         log.info("{}번 주문ID -> 주문취소로 업데이트", orderId);
     }
