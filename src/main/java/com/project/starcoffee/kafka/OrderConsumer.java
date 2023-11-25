@@ -1,7 +1,6 @@
-package com.project.starcoffee.saga.order;
+package com.project.starcoffee.kafka;
 
-import com.project.starcoffee.aop.SessionMemberId;
-import com.project.starcoffee.dto.OrderIDDTO;
+import com.project.starcoffee.dto.OrderIdDTO;
 import com.project.starcoffee.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +17,9 @@ public class OrderConsumer {
     private final OrderService orderService;
 
     @KafkaListener(topics = "order-rollback", groupId = "group-01")
-    public void rollbackOrder(OrderIDDTO orderIDDTO) {
-        log.error("======== [Rollback] order-rollback, orderId :{}======== ", orderIDDTO.getOrderId());
-        orderService.requestCancel(orderIDDTO.getOrderId());
+    public void rollbackOrder(OrderIdDTO orderId) {
+        log.error("======== [Rollback] order-rollback, orderId :{}======== ", orderId.getOrderId());
+        orderService.requestCancel(orderId.getOrderId());
     }
 
 }

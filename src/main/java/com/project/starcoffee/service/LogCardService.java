@@ -4,6 +4,7 @@ import com.project.starcoffee.controller.request.card.CardNumberRequest;
 import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.card.LogCard;
+import com.project.starcoffee.dto.RollbackRequest;
 import com.project.starcoffee.repository.LogCardRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,13 +117,15 @@ public class LogCardService {
     }
 
 
-    public void requestCancel(BalanceRequest balanceRequest) {
-        UUID cardId = balanceRequest.getCardId();
-        long cardAmount = balanceRequest.getFinalPrice();
+    public void requestCancel(RollbackRequest rollbackRequest) {
+        UUID cardId = rollbackRequest.getCardId();
+        long cardAmount = rollbackRequest.getFinalPrice();
 
-        int result = logCardRepository.withDrawAmount(cardId, cardAmount);
+        int result = logCardRepository.requestCancel(cardId, cardAmount);
         if (result != 1) {
             throw new RuntimeException("데이터베이스에 취소금액이 업데이트되지 못했습니다.");
         }
+
+        log.info("{}번 카드ID와 {}금액 -> 카드취소 업데이트", cardId, cardAmount);
     }
 }

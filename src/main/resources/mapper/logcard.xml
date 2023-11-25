@@ -79,7 +79,7 @@
             SELECT 1 FROM LOG_CARD WHERE card_id = uuid_to_bin(#{cardId},1) FOR UPDATE
         </selectKey>
         UPDATE LOG_CARD
-            SET card_amount = card_amount - #{cardAmount}
+            SET card_amount = #{cardAmount},
                 card_balance = card_balance + #{cardAmount},
                 money_status = 'DEPOSIT',
                 updated_at = NOW()

@@ -1,6 +1,5 @@
 package com.project.starcoffee.service;
 
-import com.project.starcoffee.aop.SessionMemberId;
 import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
@@ -8,11 +7,11 @@ import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.repository.OrderRepository;
 
-import com.project.starcoffee.saga.order.LogCardProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -35,7 +34,7 @@ public class OrderService {
         this.webClient = webClient;
     }
 
-//    @Transactional
+    @Transactional
     public OrderResponse Order(RequestOrderData orderRequest, String strMemberId) {
         List<ItemDTO> itemList = orderRequest.getItemList();
         UUID memberId = UUID.fromString(strMemberId);
@@ -84,7 +83,7 @@ public class OrderService {
         return orderOptional.orElseThrow(() -> new RuntimeException("주문 리스트가 없습니다."));
     }
 
-//    @Transactional
+    @Transactional
     public Mono<PayResponse> requestPay(RequestPayData requestPayData) {
         UUID orderId = requestPayData.getOrderId();
         UUID requestCardId = requestPayData.getCardId();
@@ -125,14 +124,14 @@ public class OrderService {
         });
     }
 
-    //@Transactional
+    @Transactional
     public void requestCancel(UUID orderId) {
         int result = orderRepository.cancelOrder(orderId);
         if (result != 1) {
             throw new RuntimeException("주문취소가 실패했습니다.");
         }
 
-        log.info("{}번 주문ID -> 주문취소로 변경", orderId);
+        log.info("{}번 주문ID -> 주문취소로 업데이트", orderId);
     }
 
 

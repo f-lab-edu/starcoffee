@@ -6,19 +6,20 @@ import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.pay.CancelResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.domain.card.LogCard;
-import com.project.starcoffee.dto.OrderIDDTO;
+import com.project.starcoffee.dto.OrderIdDTO;
 import com.project.starcoffee.dto.RequestPaySaveData;
 import com.project.starcoffee.domain.pay.PayStatus;
+import com.project.starcoffee.dto.RollbackRequest;
 import com.project.starcoffee.dto.message.PushMessage;
 import com.project.starcoffee.exception.BalanceException;
 import com.project.starcoffee.repository.PayRepository;
-import com.project.starcoffee.saga.order.LogCardProducer;
-import com.project.starcoffee.saga.payment.PaymentProducer;
+import com.project.starcoffee.kafka.LogCardProducer;
+import com.project.starcoffee.kafka.OrderProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -33,22 +34,22 @@ public class PayService {
     private final PayRepository payRepository;
     private final WebClient webClient;
     private final PushService pushService;
-    private final PaymentProducer paymentProducer;
+    private final OrderProducer orderProducer;
     private final LogCardProducer logCardProducer;
     private final ReentrantLock payLock = new ReentrantLock();
 
     @Autowired
     public PayService(PayRepository payRepository, WebClient webClient, PushService pushService,
-                      PaymentProducer paymentProducer, LogCardProducer logCardProducer) {
+                      OrderProducer orderProducer, LogCardProducer logCardProducer) {
         this.payRepository = payRepository;
         this.webClient = webClient;
         this.pushService = pushService;
-        this.paymentProducer = paymentProducer;
+        this.orderProducer = orderProducer;
         this.logCardProducer = logCardProducer;
     }
 
     // 비동기
-//    @Transactional
+    @Transactional
     public PayResponse runPay(PayRequest payRequest) {
         UUID paymentId = null;
         UUID orderId = payRequest.getOrderId();                // 주문ID
@@ -121,26 +122,19 @@ public class PayService {
 
         } catch (Exception e) {
             log.error("결제처리 중에 오류가 발생하였습니다. : {}", e.getMessage());
-            // payService 자체 롤백
-            CancelRequest cancelRequest = CancelRequest.builder()
-                    .paymentId(paymentId)
-                    .orderId(orderId)
-                    .cancelPay(finalPrice)
-                    .build();
-            runCancel(cancelRequest);
 
-            // order-rollback 요청
-            OrderIDDTO orderIdDTO = OrderIDDTO.builder()
+            // order-rollback(kafka) 요청
+            OrderIdDTO orderIdDTO = OrderIdDTO.builder()
                     .orderId(orderId)
                     .build();
-            paymentProducer.rollbackOrder(orderIdDTO);
+            orderProducer.rollbackOrder(orderIdDTO);
 
-            // logcard-rollback 요청
-            BalanceRequest balanceRequest = BalanceRequest.builder()
+            // logcard-rollback(kafka) 요청
+            RollbackRequest rollbackRequest = RollbackRequest.builder()
                     .cardId(cardId)
                     .finalPrice(finalPrice)
                     .build();
-            logCardProducer.rollbackLogcard(balanceRequest);
+            logCardProducer.rollbackLogcard(rollbackRequest);
             throw new RuntimeException("결제처리 오류, 다시 결제진행해주세요.");
         }
 
@@ -157,7 +151,7 @@ public class PayService {
         throw new RuntimeException("결제중 오류발생!!!!!!!!!!!!!!!!!!");
     }
 
-//    @Transactional
+    @Transactional
     public CancelResponse runCancel(CancelRequest cancelRequest) {
         UUID orderId = cancelRequest.getOrderId();
         // 결제 테이블에서 결제금액 확인
