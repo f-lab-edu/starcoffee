@@ -35,6 +35,7 @@ public class PayController {
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PayResponse> doPay(@RequestBody PayRequest payRequest) {
+        // 인터페이스 타입으로 받기, 추상 클래스
         PayResponse payResponse = payService.runPay(payRequest);
         return ResponseEntity.ok(payResponse);
     }

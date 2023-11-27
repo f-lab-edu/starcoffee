@@ -5,6 +5,7 @@ import com.project.starcoffee.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.serializer.DeserializationException;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;

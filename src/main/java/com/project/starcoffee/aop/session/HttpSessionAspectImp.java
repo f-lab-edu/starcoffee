@@ -1,13 +1,11 @@
-package com.project.starcoffee.aop;
+package com.project.starcoffee.aop.session;
 
 import com.project.starcoffee.utils.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -17,9 +15,9 @@ import java.util.Arrays;
 @Slf4j
 @Aspect
 @Component
-public class HttpSessionAspect {
+public class HttpSessionAspectImp {
 
-    @Around("@annotation(com.project.starcoffee.aop.SessionMemberId)")
+    @Around("@annotation(com.project.starcoffee.aop.session.SessionMemberId)")
     public Object injectHttpSession(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpSession session = ((ServletRequestAttributes)(RequestContextHolder.currentRequestAttributes()))
                 .getRequest().getSession();

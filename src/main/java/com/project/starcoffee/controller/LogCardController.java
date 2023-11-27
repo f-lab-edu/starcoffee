@@ -1,6 +1,6 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.aop.SessionMemberId;
+import com.project.starcoffee.aop.session.SessionMemberId;
 import com.project.starcoffee.controller.request.card.CardNumberRequest;
 import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.domain.card.Card;

@@ -133,6 +133,7 @@ public class OrderService {
         try {
             int result = orderRepository.cancelOrder(orderId);
             if (result != 1) {
+                //
                 throw new RuntimeException("주문취소가 실패했습니다.");
             }
         } catch (DataAccessException e) {

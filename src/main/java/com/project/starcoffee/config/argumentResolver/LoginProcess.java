@@ -1,4 +1,4 @@
-package com.project.starcoffee.config.argument;
+package com.project.starcoffee.config.argumentResolver;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

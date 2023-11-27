@@ -1,6 +1,6 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.aop.SessionMemberId;
+import com.project.starcoffee.aop.session.SessionMemberId;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.dto.*;

@@ -1,4 +1,4 @@
-package com.project.starcoffee.config.argument;
+package com.project.starcoffee.config.argumentResolver;
 
 import com.project.starcoffee.controller.request.member.MemberLoginRequest;
 import com.project.starcoffee.domain.member.Member;

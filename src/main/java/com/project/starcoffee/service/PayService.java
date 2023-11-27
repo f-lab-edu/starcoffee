@@ -1,5 +1,6 @@
 package com.project.starcoffee.service;
 
+import com.project.starcoffee.aop.distributeLock.DistributedLock;
 import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.controller.request.pay.CancelRequest;
 import com.project.starcoffee.controller.request.pay.PayRequest;
@@ -36,7 +37,6 @@ public class PayService {
     private final PushService pushService;
     private final OrderProducer orderProducer;
     private final LogCardProducer logCardProducer;
-    private final ReentrantLock payLock = new ReentrantLock();
 
     @Autowired
     public PayService(PayRepository payRepository, WebClient webClient, PushService pushService,
@@ -51,8 +51,7 @@ public class PayService {
     // 비동기
     @Transactional
     public PayResponse runPay(PayRequest payRequest) {
-        UUID paymentId = null;
-        UUID orderId = payRequest.getOrderId();                // 주문ID
+        UUID orderId = payRequest.getOrderId();                // 주문 ID
         final long finalPrice = payRequest.getFinalPrice();    // 결제 금액
         UUID cardId = payRequest.getCardId();                  // 카드 ID
         UUID memberId = payRequest.getMemberId();              // 회원 ID
@@ -76,24 +75,8 @@ public class PayService {
                 throw new BalanceException("잔액이 부족합니다.");
             }
 
-            payLock.lock();
-            try {
-                // 결제 테이블 결제정보 저장
-                RequestPaySaveData paySaveRequest = RequestPaySaveData.builder()
-                        .orderId(payRequest.getOrderId())
-                        .finalPrice(payRequest.getFinalPrice())
-                        .status(PayStatus.COMPLETE)
-                        .build();
-
-                int result = payRepository.insertPay(paySaveRequest);
-                paymentId = paySaveRequest.getPaymentId();
-                if (result != 1) {
-                    throw new RuntimeException("결제가 완료되지 못했습니다.");
-                }
-            } finally {
-                payLock.unlock();
-            }
-
+            // 결제 진행 Method
+            realPayment(payRequest);
 
             // 회원카드 금액변경
             Mono<Integer> resultLogCard = webClient.patch()
@@ -110,7 +93,7 @@ public class PayService {
                     });
             resultLogCard.block();
 
-            throwError();
+            // throwError();
 
             // 고객에게 푸시 알림 ("음료가 준비중입니다.")
             PushMessage memberCompleteMsg = PushMessage.MEMBER_PAYMENT_COMPLETE;
@@ -145,6 +128,24 @@ public class PayService {
                 .storeId(payRequest.getStoreId())
                 .orderPrice(finalPrice)
                 .build();
+    }
+
+
+    @DistributedLock(key = "#payRequest.getOrderId()")
+    public UUID realPayment(PayRequest payRequest) {
+        // 결제 테이블 결제정보 저장
+        RequestPaySaveData paySaveRequest = RequestPaySaveData.builder()
+                .orderId(payRequest.getOrderId())
+                .finalPrice(payRequest.getFinalPrice())
+                .status(PayStatus.COMPLETE)
+                .build();
+
+        int result = payRepository.insertPay(paySaveRequest);
+        UUID paymentId = paySaveRequest.getPaymentId();
+        if (result != 1) {
+            throw new RuntimeException("결제가 완료되지 못했습니다.");
+        }
+        return paymentId;
     }
 
     public static void throwError() {

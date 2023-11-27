@@ -20,6 +20,12 @@
         WHERE order_id = uuid_to_bin(#{orderId},1) AND status != 'REFUND'
     </select>
 
+    <select id="findByPayment" parameterType="java.util.UUID">
+        SELECT bin_to_uuid(#{paymentId},1)
+        FROM PAYMENT
+        WHERE order_id = uuid_to_bin(#{orderId},1) AND status != 'REFUND'
+    </select>
+
     <insert id="cancelPay" parameterType="com.project.starcoffee.controller.request.pay.CancelRequest">
         INSERT INTO PAYMENT (order_id, pay_price, status)
         VALUES (uuid_to_bin(#{orderId},1), -#{cancelPay}, 'REFUND')

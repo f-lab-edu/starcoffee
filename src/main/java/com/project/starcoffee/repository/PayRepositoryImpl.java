@@ -30,6 +30,11 @@ public class PayRepositoryImpl implements PayRepository {
     }
 
     @Override
+    public UUID findByPayment(UUID paymentId) {
+        return payMapper.findByPayment(paymentId);
+    }
+
+    @Override
     public int cancelPay(CancelRequest cancelRequest) {
         return payMapper.cancelPay(cancelRequest);
     }

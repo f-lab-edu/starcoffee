@@ -1,4 +1,4 @@
-package com.project.starcoffee.aop;
+package com.project.starcoffee.aop.session;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
