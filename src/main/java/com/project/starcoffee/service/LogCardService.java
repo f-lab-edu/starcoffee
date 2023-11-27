@@ -139,6 +139,6 @@ public class LogCardService {
         }
 
 
-        log.info("{}번 카드ID와 {}금액 -> 카드취소 업데이트", cardId, cardAmount);
+        log.info("{}번 카드ID와 {}원 -> 카드취소 업데이트", cardId, cardAmount);
     }
 }

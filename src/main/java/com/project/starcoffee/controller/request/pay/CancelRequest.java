@@ -15,8 +15,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CancelRequest {
     private UUID paymentId;
-
+    @NotNull
     private UUID orderId;
-
+    @NotNull
     private long cancelPay;
 }

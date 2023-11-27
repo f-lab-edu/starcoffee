@@ -52,6 +52,12 @@ public class MemberService {
             throw new RuntimeException("insert Member ERROR! 회원가입 메서드를 확인해주세요.\n"
                     + "Param : " + memberRequest);
         }
+
+        // 고객의 토큰정보 저장
+        String token = TokenGenerator.generateToken();
+        String memberId = memberRequest.getMemberId().toString();
+
+        pushService.addMemberToken(token, memberId);
     }
 
     /**
@@ -86,13 +92,6 @@ public class MemberService {
         }
 
         SessionUtil.setMemberId(session, member.getMemberId());
-
-
-        // 고객의 토큰정보 저장
-        String token = TokenGenerator.generateToken();
-        String memberId = member.getMemberId().toString();
-
-        pushService.addMemberToken(token, memberId);
 
         return member;
     }

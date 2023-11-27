@@ -3,6 +3,7 @@ package com.project.starcoffee.service;
 import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
+import com.project.starcoffee.controller.response.pay.PaymentResponse;
 import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.repository.OrderRepository;
@@ -87,7 +88,7 @@ public class OrderService {
     }
 
     @Transactional
-    public Mono<PayResponse> requestPay(RequestPayData requestPayData) {
+    public PaymentResponse requestPay(RequestPayData requestPayData) {
         UUID orderId = requestPayData.getOrderId();
         UUID requestCardId = requestPayData.getCardId();
 
@@ -115,16 +116,17 @@ public class OrderService {
         }
 
         // PayController 로 결제 요청
-        return Mono.defer(() -> {
-            UUID cardId = memberCard.getCardId();
-            return webClient.post()
-                    .uri("/pay/paying")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(new PayRequest(memberId, cardId, orderId,
-                            storeId, finalPrice, Timestamp.valueOf(LocalDateTime.now())))
-                    .retrieve()
-                    .bodyToMono(PayResponse.class);
-        });
+        UUID cardId = memberCard.getCardId();
+        Mono<PaymentResponse> paymentResponseMono = webClient.post()
+                .uri("/pay/paying/card")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new PayRequest(memberId, cardId, orderId,
+                        storeId, finalPrice, Timestamp.valueOf(LocalDateTime.now())))
+                .retrieve()
+                .bodyToMono(PaymentResponse.class);
+
+        PaymentResponse paymentResponse = paymentResponseMono.block();
+        return paymentResponse;
     }
 
     @Transactional
@@ -133,7 +135,6 @@ public class OrderService {
         try {
             int result = orderRepository.cancelOrder(orderId);
             if (result != 1) {
-                //
                 throw new RuntimeException("주문취소가 실패했습니다.");
             }
         } catch (DataAccessException e) {

@@ -4,8 +4,9 @@ import com.project.starcoffee.controller.request.pay.CancelRequest;
 import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.pay.CancelResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
+import com.project.starcoffee.controller.response.pay.PaymentResponse;
 import com.project.starcoffee.domain.card.LogCard;
-import com.project.starcoffee.service.PayService;
+import com.project.starcoffee.service.pay.PayService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,12 +33,12 @@ public class PayController {
     }
 
 
-    @PostMapping("/paying")
+    @PostMapping("/paying/card")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<PayResponse> doPay(@RequestBody PayRequest payRequest) {
+    public ResponseEntity<PaymentResponse> doPay(@RequestBody PayRequest payRequest) {
         // 인터페이스 타입으로 받기, 추상 클래스
-        PayResponse payResponse = payService.runPay(payRequest);
-        return ResponseEntity.ok(payResponse);
+        PaymentResponse paymentResponse = payService.runPay(payRequest);
+        return ResponseEntity.ok(paymentResponse);
     }
 
     @PostMapping("/cancelling")

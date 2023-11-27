@@ -3,6 +3,7 @@ package com.project.starcoffee.controller;
 import com.project.starcoffee.aop.session.SessionMemberId;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
+import com.project.starcoffee.controller.response.pay.PaymentResponse;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class OrderController {
      */
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<PayResponse> requestPay(@RequestBody RequestPayData requestPayData) {
+    public PaymentResponse requestPay(@RequestBody RequestPayData requestPayData) {
         return orderService.requestPay(requestPayData);
     }
 

@@ -70,6 +70,7 @@ public class RedisConfig {
     public RedissonClient redissonClient() {
         RedissonClient redisson = null;
         Config config = new Config();
+        // 단일 서버에서 사용
         config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host + ":" + port);
         redisson = Redisson.create(config);
         return redisson;
