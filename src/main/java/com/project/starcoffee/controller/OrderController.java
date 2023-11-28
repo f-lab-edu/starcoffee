@@ -50,8 +50,7 @@ public class OrderController {
         OrderDTO orderList = orderService.findByOrder(orderId);
         return orderList;
     }
-
-
+    
     /**
      * 주문에서 결제요청을 한다.
      *

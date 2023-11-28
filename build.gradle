@@ -36,6 +36,12 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
+	// swagger
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
+	implementation 'io.springfox:springfox-swagger2:3.0.0'
+	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+
+
 	// webClient
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 

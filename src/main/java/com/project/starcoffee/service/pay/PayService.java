@@ -1,36 +1,22 @@
 package com.project.starcoffee.service.pay;
 
-import com.project.starcoffee.aop.distributeLock.DistributedLock;
-import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.controller.request.pay.CancelRequest;
 import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.pay.CancelResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.controller.response.pay.PaymentResponse;
-import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.dto.OrderIdDTO;
-import com.project.starcoffee.dto.RequestPaySaveData;
-import com.project.starcoffee.domain.pay.PayStatus;
 import com.project.starcoffee.dto.RollbackRequest;
 import com.project.starcoffee.dto.message.PushMessage;
-import com.project.starcoffee.exception.BalanceException;
 import com.project.starcoffee.repository.PayRepository;
 import com.project.starcoffee.kafka.LogCardProducer;
 import com.project.starcoffee.kafka.OrderProducer;
 import com.project.starcoffee.service.PushService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
-import java.time.Duration;
 import java.util.UUID;
 
 @Slf4j
