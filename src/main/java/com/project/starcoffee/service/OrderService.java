@@ -6,6 +6,7 @@ import com.project.starcoffee.controller.response.pay.PayResponse;
 import com.project.starcoffee.controller.response.pay.PaymentResponse;
 import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.dto.*;
+import com.project.starcoffee.kafka.OrderProducer;
 import com.project.starcoffee.repository.OrderRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +31,13 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final OrderProducer orderProducer;
     private final WebClient webClient;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, WebClient webClient) {
+    public OrderService(OrderRepository orderRepository, OrderProducer orderProducer, WebClient webClient) {
         this.orderRepository = orderRepository;
+        this.orderProducer = orderProducer;
         this.webClient = webClient;
     }
 
@@ -102,6 +105,7 @@ public class OrderService {
         Mono<LogCard> monoLogCard = webClient.get()
                 .uri(uriBuilder -> {
                     return uriBuilder.path("/logcard/cardId")
+                            .queryParam("orderId", orderId)
                             .queryParam("memberId",memberId)
                             .queryParam("cardId",requestCardId)
                             .build();
@@ -112,6 +116,12 @@ public class OrderService {
         // 요청한 카드와 회원이 등록한 카드가 일치하는지 확인
         LogCard memberCard = monoLogCard.block();
         if (!memberCard.getCardId().equals(requestPayData.getCardId())) {
+
+            // 보상트랜잭션 이벤트 발행(주문취소)
+            OrderIdDTO orderIdDTO = OrderIdDTO.builder()
+                    .orderId(orderId)
+                    .build();
+            orderProducer.rollbackOrder(orderIdDTO);
             throw new RuntimeException("선택하신 카드와 회원의 카드가 일치하지 않습니다.");
         }
 

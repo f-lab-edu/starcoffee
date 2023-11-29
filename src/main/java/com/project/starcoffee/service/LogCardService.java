@@ -4,10 +4,13 @@ import com.project.starcoffee.controller.request.card.CardNumberRequest;
 import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.card.LogCard;
+import com.project.starcoffee.dto.OrderIdDTO;
 import com.project.starcoffee.dto.RollbackRequest;
+import com.project.starcoffee.kafka.OrderProducer;
 import com.project.starcoffee.repository.LogCardRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.dao.DataAccessException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -24,14 +27,15 @@ import java.util.UUID;
 @Service
 public class LogCardService {
     private final LogCardRepository logCardRepository;
+    private final OrderProducer orderProducer;
     private final WebClient webClient;
 
     @Autowired
-    public LogCardService(LogCardRepository logCardRepository, WebClient webClient) {
+    public LogCardService(LogCardRepository logCardRepository, OrderProducer orderProducer, WebClient webClient) {
         this.logCardRepository = logCardRepository;
+        this.orderProducer = orderProducer;
         this.webClient = webClient;
     }
-
 
     public List<LogCard> findByMemberId(String strMemberId) {
         UUID memberId = UUID.fromString(strMemberId);
@@ -44,11 +48,18 @@ public class LogCardService {
         return cardList;
     }
 
-    public LogCard findByCardId(UUID memberId, UUID cardId) {
+    public LogCard findByCardId(UUID memberId, UUID cardId, UUID orderId) {
         Optional<LogCard> cardInfoOptional = logCardRepository.findByCardId(memberId, cardId);
 
-        cardInfoOptional.orElseThrow(
-                ()-> { throw new RuntimeException("회원으로 등록된 카드를 찾을 수 없습니다."); });
+        cardInfoOptional.orElseThrow(()-> {
+            // 보상 트랜잭션 이벤트 발행 (주문취소)
+            OrderIdDTO orderIdDTO = OrderIdDTO.builder()
+                    .orderId(orderId)
+                    .build();
+            orderProducer.rollbackOrder(orderIdDTO);
+
+            throw new RuntimeException("회원으로 등록된 카드를 찾을 수 없습니다.");
+        });
 
         return cardInfoOptional.get();
     }

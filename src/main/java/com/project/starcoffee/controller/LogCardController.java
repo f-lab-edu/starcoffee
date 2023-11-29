@@ -68,8 +68,9 @@ public class LogCardController {
     @GetMapping("/cardId")
     @ResponseStatus(HttpStatus.OK)
     public LogCard findByCardId(@RequestParam UUID memberId,
-                                @RequestParam UUID cardId) {
-        return logCardService.findByCardId(memberId, cardId);
+                                @RequestParam UUID cardId,
+                                @RequestParam UUID orderId) {
+        return logCardService.findByCardId(memberId, cardId, orderId);
     }
 
 

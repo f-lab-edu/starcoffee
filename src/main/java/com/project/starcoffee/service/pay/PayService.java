@@ -23,16 +23,14 @@ import java.util.UUID;
 @Service
 public class PayService {
     private final PayRepository payRepository;
-    private final WebClient webClient;
     private final PushService pushService;
     private final OrderProducer orderProducer;
     private final LogCardProducer logCardProducer;
     private final PaymentStrategy paymentStrategy;
 
-    public PayService(PayRepository payRepository, WebClient webClient, PushService pushService,
+    public PayService(PayRepository payRepository, PushService pushService,
                       OrderProducer orderProducer, LogCardProducer logCardProducer, PaymentStrategy paymentStrategy) {
         this.payRepository = payRepository;
-        this.webClient = webClient;
         this.pushService = pushService;
         this.orderProducer = orderProducer;
         this.logCardProducer = logCardProducer;
