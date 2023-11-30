@@ -42,6 +42,7 @@ public class DistributedLockAspectImp {
 
             log.info("Redisson Lock Key : {}", key);
 
+            // 새로운 트랜잭션 생성(Propagation.REQUIRES_NEW) 후, 기존 로직 실행
             return newTransaction.proceed(joinPoint);
         } catch (InterruptedException e) {
             throw new InterruptedException();

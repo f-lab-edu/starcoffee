@@ -48,7 +48,7 @@ public class PayService {
 
         try {
             // 회원카드잔액 과 결제금액의 차이 확인
-            paymentStrategy.checkCardBalance(memberId, cardId, finalPrice);
+            paymentStrategy.checkCardBalance(memberId, cardId, finalPrice, orderId);
 
             // 결제 진행 Method
             paymentStrategy.processPayment(payRequest);
@@ -59,11 +59,8 @@ public class PayService {
             /* 분산 트랜잭션 작동확인 */
             // throwError();
 
-            // 고객에게 푸시 알림 ("음료가 준비중입니다."), 가게에 푸시 알림 ("음료를 준비해주세요.")
-            PushMessage memberCompleteMsg = PushMessage.MEMBER_PAYMENT_COMPLETE;
-            // pushService.sendByMember(memberCompleteMsg, payRequest.getMemberId().toString());
-            PushMessage storeCompleteMsg = PushMessage.STORE_PAYMENT_COMPLETE;
-            // pushService.sendByStore(storeCompleteMsg, storeId);
+            // 회원,가게 Push 메세지
+            sendPushMessages(payRequest, storeId);
 
             return PayResponse.builder()
                     .memberId(payRequest.getMemberId())
@@ -81,8 +78,12 @@ public class PayService {
         }
     }
 
-    public static void throwError() {
-        throw new RuntimeException("결제중 오류발생!!!!!!!!!!!!!!!!!!");
+    /* 고객에게 푸시 알림 ("음료가 준비중입니다."), 가게에 푸시 알림 ("음료를 준비해주세요.") */
+    private void sendPushMessages(PayRequest payRequest, long storeId) {
+        PushMessage memberCompleteMsg = PushMessage.MEMBER_PAYMENT_COMPLETE;
+        // pushService.sendByMember(memberCompleteMsg, payRequest.getMemberId().toString());
+        PushMessage storeCompleteMsg = PushMessage.STORE_PAYMENT_COMPLETE;
+        // pushService.sendByStore(storeCompleteMsg, storeId);
     }
 
     public CancelResponse handlePaymentFailure(UUID orderId, long finalPrice, UUID cardId) {
@@ -131,6 +132,10 @@ public class PayService {
                 .orderId(orderId)
                 .finalPrice(-cancelPay)
                 .build();
+    }
+
+    public static void throwError() {
+        throw new RuntimeException("결제중 오류발생!!!!!!!!!!!!!!!!!!");
     }
 
 }

@@ -19,8 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +44,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse Order(RequestOrderData orderRequest, String strMemberId) {
+    public OrderResponse newOrder(RequestOrderData orderRequest, String strMemberId) {
         List<ItemDTO> itemList = orderRequest.getItemList();
         UUID memberId = UUID.fromString(strMemberId);
         Long storeId = orderRequest.getStoreId();
@@ -111,12 +113,17 @@ public class OrderService {
                             .build();
                 })
                 .retrieve()
-                .bodyToMono(LogCard.class);
+                .bodyToMono(LogCard.class)
+                .doOnError(error -> log.error("error has occurred : {}", error.getMessage()))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
+                .onErrorMap(e -> {
+                    log.error("회원카드 여부 중 에러 발생: {}", e.getMessage());
+                    return new RuntimeException("회원카드 여부 중에 오류가 발생했습니다.");
+                });
 
         // 요청한 카드와 회원이 등록한 카드가 일치하는지 확인
         LogCard memberCard = monoLogCard.block();
         if (!memberCard.getCardId().equals(requestPayData.getCardId())) {
-
             // 보상트랜잭션 이벤트 발행(주문취소)
             OrderIdDTO orderIdDTO = OrderIdDTO.builder()
                     .orderId(orderId)
@@ -133,7 +140,13 @@ public class OrderService {
                 .bodyValue(new PayRequest(memberId, cardId, orderId,
                         storeId, finalPrice, Timestamp.valueOf(LocalDateTime.now())))
                 .retrieve()
-                .bodyToMono(PaymentResponse.class);
+                .bodyToMono(PaymentResponse.class)
+                .doOnError(error -> log.error("error has occurred : {}", error.getMessage()))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
+                .onErrorMap(e -> {
+                    log.error("결제진행 중 에러 발생: {}", e.getMessage());
+                    return new RuntimeException("결제진행 중에 오류가 발생했습니다.");
+                });
 
         PaymentResponse paymentResponse = paymentResponseMono.block();
         return paymentResponse;

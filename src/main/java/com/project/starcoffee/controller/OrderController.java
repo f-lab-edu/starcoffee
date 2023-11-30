@@ -34,8 +34,8 @@ public class OrderController {
     @PostMapping("/new")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
-    public OrderResponse Order(@RequestBody RequestOrderData orderRequest, String strMemberId) {
-        return orderService.Order(orderRequest, strMemberId);
+    public OrderResponse newOrder(@RequestBody RequestOrderData orderRequest, String strMemberId) {
+        return orderService.newOrder(orderRequest, strMemberId);
     }
 
     /**
@@ -50,7 +50,7 @@ public class OrderController {
         OrderDTO orderList = orderService.findByOrder(orderId);
         return orderList;
     }
-    
+
     /**
      * 주문에서 결제요청을 한다.
      *

@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -66,6 +68,7 @@ public class LogCardService {
 
 
     public Mono<Card> requestFindCard(CardNumberRequest cardNumberRequest) {
+        // 스타카드가 존재하는지 확인
         Mono<Card> cardMono = webClient.get()
                 .uri(uriBuilder -> {
                     return uriBuilder.path("/cards/find")
@@ -73,7 +76,13 @@ public class LogCardService {
                             .build();
                 })
                 .retrieve()
-                .bodyToMono(Card.class);
+                .bodyToMono(Card.class)
+                .doOnError(error -> log.error("error has occurred : {}", error.getMessage()))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
+                .onErrorMap(e -> {
+                    log.error("스타카드 존재여부 중 에러 발생: {}", e.getMessage());
+                    return new RuntimeException("스타카드 존재여부 중에 오류가 발생했습니다.");
+                });
 
 /* 비동기 시 나타나는 에러 확인
         No thread-bound request found:

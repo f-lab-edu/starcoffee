@@ -22,7 +22,6 @@ import java.util.UUID;
 @Slf4j
 @Component
 public class DefaultPaymentStrategy implements PaymentStrategy {
-
     private final WebClient webClient;
     private final PayRepository payRepository;
 
@@ -40,24 +39,36 @@ public class DefaultPaymentStrategy implements PaymentStrategy {
      * @param finalPrice
      * @return
      */
+    @DistributedLock(key = "#cardId")
     @Override
-    public void checkCardBalance(UUID memberId, UUID cardId, long finalPrice) {
+    public void checkCardBalance(UUID memberId, UUID cardId, long finalPrice, UUID orderId) {
         Mono<LogCard> monoLogCard = webClient.get()
                 .uri(uriBuilder -> {
                     return uriBuilder.path("/logcard/cardId")
                             .queryParam("memberId", memberId)
                             .queryParam("cardId", cardId)
+                            .queryParam("orderId", orderId)
                             .build();
                 })
                 .retrieve()
-                .bodyToMono(LogCard.class);
-
+                .bodyToMono(LogCard.class)
+                .doOnError(error -> log.error("error has occurred : {}", error.getMessage()))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
+                .onErrorMap(e -> {
+                    log.error("회원카드 잔액확인 중 에러 발생: {}", e.getMessage());
+                    return new RuntimeException("회원카드 잔액확인 중에 오류가 발생했습니다.");
+                });
         LogCard logCard = monoLogCard.block();
         if (logCard.getCardBalance() < finalPrice) {
             throw new BalanceException("잔액이 부족합니다.");
         }
     }
 
+    /**
+     * 실제 결제가 이루어지는 메서드
+     * (결제 테이블에 결제정보가 저장되는 것으로 구현 / 취소 시 -결제 금액이 저장)
+     * @param payRequest
+     */
     @Override
     @DistributedLock(key = "#payRequest.getOrderId()")
     public void processPayment(PayRequest payRequest) {
@@ -74,7 +85,13 @@ public class DefaultPaymentStrategy implements PaymentStrategy {
         }
     }
 
+    /**
+     * 실제로 결제가 완료되었기 때문에 회원카드에 결제금액이 차감된다.
+     * @param cardId
+     * @param finalPrice
+     */
     @Override
+    @DistributedLock(key = "#cardId")
     public void updateCardBalance(UUID cardId, long finalPrice) {
         Mono<Integer> resultLogCard = webClient.patch()
                 .uri("/logcard/balance")
