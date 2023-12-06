@@ -100,8 +100,8 @@ public class CartService {
                 .doOnError(error -> log.error("error has occurred : {}", error.getMessage()))
                 .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
                 .onErrorMap(e -> {
-                    log.error("가게 오픈 여부확인 중 에러 발생: {}", e.getMessage());
-                    return new RuntimeException("가게 오픈중에 오류가 발생했습니다.");
+                    log.error("장바구니에서 주문 중 에러 발생: {}", e.getMessage());
+                    return new RuntimeException("장바구니에서 주문 중에 오류가 발생했습니다.");
                 });
 
         List<OrderResponse> orderResponseList = monoOrderResponseList.block();

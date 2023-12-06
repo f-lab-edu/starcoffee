@@ -31,7 +31,6 @@ public class DefaultPaymentStrategy implements PaymentStrategy {
         this.payRepository = payRepository;
     }
 
-
     /**
      * 회원카드 잔액과 결제금액의 차이 확인
      * @param memberId
@@ -39,8 +38,8 @@ public class DefaultPaymentStrategy implements PaymentStrategy {
      * @param finalPrice
      * @return
      */
-    @DistributedLock(key = "#cardId")
     @Override
+    @DistributedLock(key = "#cardId")
     public void checkCardBalance(UUID memberId, UUID cardId, long finalPrice, UUID orderId) {
         Mono<LogCard> monoLogCard = webClient.get()
                 .uri(uriBuilder -> {

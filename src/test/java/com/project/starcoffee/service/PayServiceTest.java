@@ -42,7 +42,6 @@ public class PayServiceTest {
                 .build();
     }
 
-
     @Test
     void 동시결제_분산락_적용_테스트() throws InterruptedException {
         int numberOfThreads = 10;

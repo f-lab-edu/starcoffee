@@ -1,5 +1,6 @@
 package com.project.starcoffee.service;
 
+import com.project.starcoffee.aop.distributeLock.DistributedLock;
 import com.project.starcoffee.controller.request.pay.PayRequest;
 import com.project.starcoffee.controller.response.order.OrderResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
@@ -44,6 +45,7 @@ public class OrderService {
     }
 
     @Transactional
+    @DistributedLock(key = "#strMemberId")
     public OrderResponse newOrder(RequestOrderData orderRequest, String strMemberId) {
         List<ItemDTO> itemList = orderRequest.getItemList();
         UUID memberId = UUID.fromString(strMemberId);
@@ -103,6 +105,11 @@ public class OrderService {
         long storeId = order.getStoreId();
         long finalPrice = order.getFinalPrice();
 
+        // 주문ID 객체 (보상 트랜잭션)
+        OrderIdDTO orderIdDTO = OrderIdDTO.builder()
+                .orderId(orderId)
+                .build();
+
         // 회원 카드 확인
         Mono<LogCard> monoLogCard = webClient.get()
                 .uri(uriBuilder -> {
@@ -118,16 +125,15 @@ public class OrderService {
                 .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
                 .onErrorMap(e -> {
                     log.error("회원카드 여부 중 에러 발생: {}", e.getMessage());
+                    // 보상트랜잭션 이벤트 발행(주문취소)
+                    orderProducer.rollbackOrder(orderIdDTO);
                     return new RuntimeException("회원카드 여부 중에 오류가 발생했습니다.");
                 });
 
         // 요청한 카드와 회원이 등록한 카드가 일치하는지 확인
         LogCard memberCard = monoLogCard.block();
         if (!memberCard.getCardId().equals(requestPayData.getCardId())) {
-            // 보상트랜잭션 이벤트 발행(주문취소)
-            OrderIdDTO orderIdDTO = OrderIdDTO.builder()
-                    .orderId(orderId)
-                    .build();
+            // 보상 트랜잭션 이벤트 발행(주문취소)
             orderProducer.rollbackOrder(orderIdDTO);
             throw new RuntimeException("선택하신 카드와 회원의 카드가 일치하지 않습니다.");
         }
@@ -145,6 +151,8 @@ public class OrderService {
                 .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
                 .onErrorMap(e -> {
                     log.error("결제진행 중 에러 발생: {}", e.getMessage());
+                    // 보상 트랜잭션 이벤트 발행(주문취소)
+                    orderProducer.rollbackOrder(orderIdDTO);
                     return new RuntimeException("결제진행 중에 오류가 발생했습니다.");
                 });
 

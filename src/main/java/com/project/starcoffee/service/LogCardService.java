@@ -158,7 +158,6 @@ public class LogCardService {
             log.error("결제금액 업데이트 중 자체 에러발생", e.getMessage());
         }
 
-
         log.info("{}번 카드ID와 {}원 -> 카드취소 업데이트", cardId, cardAmount);
     }
 }
