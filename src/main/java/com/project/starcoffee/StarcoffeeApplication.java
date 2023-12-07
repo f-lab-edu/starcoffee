@@ -6,6 +6,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+
 @EnableAsync				// 비동기 방식 활성화
 @EnableScheduling			// 스케줄링 활성화
 @EnableAspectJAutoProxy		// 최상위 클래스에서 적용해야 AOP 적용

@@ -1,6 +1,6 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.aop.SessionMemberId;
+import com.project.starcoffee.aop.session.SessionMemberId;
 import com.project.starcoffee.controller.request.card.CardNumberRequest;
 import com.project.starcoffee.controller.request.pay.BalanceRequest;
 import com.project.starcoffee.domain.card.Card;
@@ -68,8 +68,9 @@ public class LogCardController {
     @GetMapping("/cardId")
     @ResponseStatus(HttpStatus.OK)
     public LogCard findByCardId(@RequestParam UUID memberId,
-                                @RequestParam UUID cardId) {
-        return logCardService.findByCardId(memberId, cardId);
+                                @RequestParam UUID cardId,
+                                @RequestParam UUID orderId) {
+        return logCardService.findByCardId(memberId, cardId, orderId);
     }
 
 

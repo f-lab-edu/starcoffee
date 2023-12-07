@@ -20,6 +20,8 @@ public interface LogCardMapper {
 
     Integer withDrawAmount(@Param("cardId") UUID cardId, @Param("cardAmount") long cardAmount);
 
+    Integer requestCancel(@Param("cardId") UUID cardId, @Param("cardAmount") long cardAmount);
+
     Integer findByBalance(UUID cardId);
 
     boolean duplicatedCard(UUID cardId);

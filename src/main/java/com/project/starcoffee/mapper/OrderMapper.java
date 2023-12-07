@@ -18,6 +18,6 @@ public interface OrderMapper {
 
     Optional<OrderDTO> findByOrder(UUID orderId);
 
-    int cancelOrder(@Param("orderId") UUID orderId, @Param("memberId") UUID memberId);
+    int cancelOrder(UUID orderId);
 
 }

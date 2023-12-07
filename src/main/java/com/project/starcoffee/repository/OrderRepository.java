@@ -16,5 +16,5 @@ public interface OrderRepository {
 
     Optional<OrderDTO> findByOrder(UUID orderId);
 
-    int cancelOrder(UUID orderId, UUID memberId);
+    int cancelOrder(UUID orderId);
 }

@@ -1,4 +1,4 @@
-package com.project.starcoffee.config.argument;
+package com.project.starcoffee.config.argumentResolver;
 
 import com.project.starcoffee.domain.card.LogCard;
 import com.project.starcoffee.service.LogCardService;
@@ -15,7 +15,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Component

@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,27 +69,42 @@ public class CartService {
                 .orElseThrow(() -> new RuntimeException("가게정보가 없습니다."));
 
         // 가게 오픈 여부 확인
-        String storeStatus = webClient.get()
+        Mono<String> monoStoreStatus = webClient.get()
                 .uri(uriBuilder -> {
                     return uriBuilder.path("/store/status")
                             .queryParam("storeId", storeId)
                             .build();
                 })
                 .retrieve()
-                .bodyToMono(String.class).block();
+                .bodyToMono(String.class)
+                .doOnError(error -> log.error("error has occurred : {}", error.getMessage()))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
+                .onErrorMap(e -> {
+                    log.error("가게 오픈 여부확인 중 에러 발생: {}", e.getMessage());
+                    return new RuntimeException("가게 오픈중에 오류가 발생했습니다.");
+                });
 
+        String storeStatus = monoStoreStatus.block();
         if (storeStatus.equals(StoreStatus.CLOSE.name())) {
             throw new RuntimeException("가게가 오픈되지 않아서 주문할 수 없습니다.");
         }
 
-        List<OrderResponse> orderResponseList = webClient.post()
+        // 장바구니 -> 주문 요청
+        Mono<List<OrderResponse>> monoOrderResponseList = webClient.post()
                 .uri("/order/new")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new RequestOrderData(storeId, itemList))
                 .retrieve()
                 .bodyToFlux(OrderResponse.class)
-                .collectList().block();
+                .collectList()
+                .doOnError(error -> log.error("error has occurred : {}", error.getMessage()))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
+                .onErrorMap(e -> {
+                    log.error("장바구니에서 주문 중 에러 발생: {}", e.getMessage());
+                    return new RuntimeException("장바구니에서 주문 중에 오류가 발생했습니다.");
+                });
 
+        List<OrderResponse> orderResponseList = monoOrderResponseList.block();
         return orderResponseList;
     }
 

@@ -1,14 +1,12 @@
 package com.project.starcoffee.config;
 
-import com.project.starcoffee.config.argument.CardArgumentResolver;
+import com.project.starcoffee.config.argumentResolver.CardArgumentResolver;
 import com.project.starcoffee.config.login.LoginCheckInterceptor;
-import com.project.starcoffee.config.argument.LoginProcessArgumentResolver;
+import com.project.starcoffee.config.argumentResolver.LoginProcessArgumentResolver;
 import com.project.starcoffee.repository.MemberRepository;
 import com.project.starcoffee.service.LogCardService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -28,8 +26,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .order(1)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/",
-                        "/members", "/members/home", "/members/login",
-                        "/cards/**", "/store/**", "/error");
+                        "/members", "/members/home", "/members/login", "/cards/**", "/store/**",
+                        "/error", "/swagger-ui/**", "/api-docs/**");
     }
 
     @Override

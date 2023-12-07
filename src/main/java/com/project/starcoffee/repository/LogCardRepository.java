@@ -18,6 +18,8 @@ public interface LogCardRepository {
 
     Integer withDrawAmount(UUID cardId, long cardAmount);
 
+    Integer requestCancel(UUID cardId, long cardAmount);
+
     Integer findByBalance(UUID cardId);
 
     boolean duplicatedCard(UUID cardId);

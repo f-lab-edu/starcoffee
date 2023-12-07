@@ -1,4 +1,4 @@
-package com.project.starcoffee.controller.request.pay;
+package com.project.starcoffee.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,11 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class BalanceRequest {
+public class OrderIdDTO {
 
-    private UUID cardId;
-    private long finalPrice;
+    @NotNull
+    private UUID orderId;
 }
