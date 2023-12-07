@@ -1,11 +1,11 @@
-package com.project.starcoffee.config.aop;
+package com.project.starcoffee.config.argumentResolver;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface SessionMemberId {
+public @interface LoginProcess {
 }

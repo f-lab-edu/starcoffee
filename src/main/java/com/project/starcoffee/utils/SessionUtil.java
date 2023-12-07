@@ -44,7 +44,6 @@ public class SessionUtil {
      */
     public static void logoutMember(HttpSession session) {
         session.removeAttribute(LOGIN_MEMBER);
-
     }
 
     /**

@@ -13,8 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class BalanceRequest {
-    @NotNull
+
     private UUID cardId;
-    @NotNull
     private long finalPrice;
 }

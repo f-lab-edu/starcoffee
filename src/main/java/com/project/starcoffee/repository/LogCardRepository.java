@@ -1,8 +1,6 @@
 package com.project.starcoffee.repository;
 
-import com.project.starcoffee.domain.card.Card;
 import com.project.starcoffee.domain.card.LogCard;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,9 +14,11 @@ public interface LogCardRepository {
 
     List<LogCard> findByMemberId(UUID memberId);
 
-    Optional<LogCard> findByCardId(UUID cardId);
+    Optional<LogCard> findByCardId(UUID memberId, UUID cardId);
 
     Integer withDrawAmount(UUID cardId, long cardAmount);
+
+    Integer requestCancel(UUID cardId, long cardAmount);
 
     Integer findByBalance(UUID cardId);
 

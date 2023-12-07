@@ -1,9 +1,9 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.config.aop.SessionMemberId;
+import com.project.starcoffee.aop.session.SessionMemberId;
 import com.project.starcoffee.controller.response.order.OrderResponse;
-import com.project.starcoffee.controller.response.pay.CancelResponse;
 import com.project.starcoffee.controller.response.pay.PayResponse;
+import com.project.starcoffee.controller.response.pay.PaymentResponse;
 import com.project.starcoffee.dto.*;
 import com.project.starcoffee.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpSession;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -36,8 +34,8 @@ public class OrderController {
     @PostMapping("/new")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
-    public OrderResponse Order(@RequestBody RequestOrderData orderRequest, String strMemberId) {
-        return orderService.Order(orderRequest, strMemberId);
+    public OrderResponse newOrder(@RequestBody RequestOrderData orderRequest, String strMemberId) {
+        return orderService.newOrder(orderRequest, strMemberId);
     }
 
     /**
@@ -53,7 +51,6 @@ public class OrderController {
         return orderList;
     }
 
-
     /**
      * 주문에서 결제요청을 한다.
      *
@@ -62,14 +59,14 @@ public class OrderController {
      */
     @PostMapping("/paying")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<PayResponse> requestPay(@RequestBody RequestPayData requestPayData) {
+    public PaymentResponse requestPay(@RequestBody RequestPayData requestPayData) {
         return orderService.requestPay(requestPayData);
     }
 
     @PostMapping("/cancelling")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
-    public void requestCancel(@RequestParam UUID orderId, String strMemberId) {
-        orderService.requestCancel(orderId, strMemberId);
+    public void requestCancel(@RequestParam UUID orderId) {
+        orderService.requestCancel(orderId);
     }
 }

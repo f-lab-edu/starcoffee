@@ -53,9 +53,10 @@ public class CartController {
         cartService.deleteItem(cartId);
     }
 
+
     @PostMapping("/order/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<List<OrderResponse>> requestOrder(@PathVariable("id") UUID cartId) {
+    public List<OrderResponse> requestOrder(@PathVariable("id") UUID cartId) {
         return cartService.requestOrder(cartId);
     }
 }

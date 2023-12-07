@@ -15,6 +15,8 @@ public interface PayRepository {
 
     Long findPay(UUID orderId);
 
+    UUID findByPayment(UUID paymentId);
+
     int cancelPay(CancelRequest cancelRequest);
 
 }

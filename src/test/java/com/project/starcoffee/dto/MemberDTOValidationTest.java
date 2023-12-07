@@ -8,6 +8,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Set;
@@ -29,7 +30,7 @@ public class MemberDTOValidationTest {
                 .nickName("nickName")
                 .loginId("testId")
                 .password("1234")
-                .birth(ZonedDateTime.from(LocalDateTime.now()))
+                .birth(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
     }
 

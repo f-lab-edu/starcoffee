@@ -1,22 +1,26 @@
 package com.project.starcoffee.controller;
 
-import com.project.starcoffee.config.aop.SessionMemberId;
+import com.project.starcoffee.aop.session.SessionMemberId;
 import com.project.starcoffee.controller.request.member.*;
 import com.project.starcoffee.controller.response.member.LoginResponse;
 import com.project.starcoffee.domain.member.Member;
 import com.project.starcoffee.service.MemberService;
 import com.project.starcoffee.utils.SessionUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.WebSession;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.stream.Stream;
 
+@Tag(name = "Member Controller", description = "회원관리 API")
 @Slf4j
 @RestController
 @RequestMapping("/members")
@@ -28,25 +32,16 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    /**
-     * 회원가입 진행
-     * 필수입력 정보에 누락이 있으면 GrolbalExceptionHandler 에서 각각의 필드에 대해서 처리한다.
-     *
-     * @param memberRequest 사용자가 입력한 고객정보
-     */
+    @Operation(summary = "회원가입 API",
+               description = "회원가입 기능을 제공합니다. " +
+                             "필수입력 정보에 누락이 있으면 GrolbalExceptionHandler 에서 각각의 필드에 대해서 처리합니다.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void signUp(@RequestBody @Valid MemberRequest memberRequest) {
         memberService.saveMember(memberRequest);
     }
 
-    /**
-     * 로그인 진행
-     *
-     * @param loginRequest ID, PW가 포함된 DTO
-     * @param session      세션
-     * @return
-     */
+    @Operation(summary = "로그인 API", description = "로그인 기능을 제공합니다.")
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @NotNull MemberLoginRequest loginRequest,
                                                HttpSession session) {
@@ -62,16 +57,12 @@ public class MemberController {
     }
 
 
-    /**
-     * 로그인 아이디를 기준으로 회원정보를 찾는다.
-     * @param memberId aop -> 회원 아이디
-     * @return
-     */
+    @Operation(summary = "회원조회 API", description = "회원ID를 기준으로 회원정보를 조회하는 기능을 제공합니다.")
     @GetMapping("/member")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Member> findById(String memberId) {
-        Member memberInfo = memberService.findById(memberId);
+    public ResponseEntity<Member> findByMember(String memberId) {
+        Member memberInfo = memberService.findByMember(memberId);
 
         return Stream.of(memberInfo)
                 .findFirst()
@@ -79,12 +70,10 @@ public class MemberController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    /**
-     * 로그인 된 사용자가 비밀번호를 변경하고자 할 경우
-     *
-     * @param passwordRequest 이전 비밀번호, 변경 비밀번호을 담은 DTO
-     * @param memberId aop -> 회원 아이디
-     */
+
+    @Operation(summary = "회원 비밀번호 변경 API",
+               description = "로그인 사용자가 비밀번호를 변경하는 기능을 제공합니다. " +
+                             "이전 비밀번호를 입력하면 예외사항이 발생하게 됩니다.")
     @PatchMapping("/password")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
@@ -99,11 +88,9 @@ public class MemberController {
         memberService.updatePassword(memberId, beforePassword, afterPassword);
     }
 
-    /**
-     * 회원의 닉네임을 변경한다.
-     * @param nickNameRequest 변경할 닉네임
-     * @param memberId aop -> 회원 아이디
-     */
+    @Operation(summary = "회원 닉네임 변경 API",
+            description = "로그인 사용자가 닉네임을 변경하는 기능을 제공합니다." +
+                    "이전 닉네임을 입력하면 예외사항이 발생하게 됩니다.")
     @PatchMapping("/nickname")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
@@ -111,13 +98,10 @@ public class MemberController {
         memberService.updateNickName(memberId, nickNameRequest.getAfterNickname());
     }
 
-    /**
-     * 회원의 이메일을 변경한다.
-     * 이메일 주소가 형식이 맞지 않으면 예외를 던진다.
-     *
-     * @param emailRequest 변경할 이메일
-     * @param memberId aop -> 회원 아이디
-     */
+
+    @Operation(summary = "회원 이메일 변경 API",
+            description = "로그인 사용자가 이메일을 변경하는 기능을 제공합니다. " +
+                    "이전 이메일주소를 입력하면 예외사항이 발생하게 됩니다.")
     @PatchMapping("/email")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
@@ -127,14 +111,18 @@ public class MemberController {
 
     /**
      * 회원의 휴대폰번호를 변경한다.
+     *
      * @param phoneRequest 변경할 휴대폰번호
-     * @param memberId aop -> 회원 아이디
+     * @param memberId     aop -> 회원 아이디
      */
+    @Operation(summary = "회원 휴대폰번호 변경 API",
+            description = "로그인 사용자가 휴대폰번호를 변경하는 기능을 제공합니다. " +
+                    "이전 휴대폰번호를 입력하면 예외사항이 발생하게 됩니다.")
     @PatchMapping("/phoneNumber")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
     public void updateMemberPhone(@RequestBody @Valid PhoneRequest phoneRequest, String memberId) {
-        memberService.updatePhone(memberId, phoneRequest);
+        memberService.updatePhone(memberId, phoneRequest.getAfterPhoneNumber());
     }
 
     /**
@@ -142,16 +130,17 @@ public class MemberController {
      *
      * @param session 세션
      */
+    @Operation(summary = "로그아웃 API",
+            description = "로그인 사용자가 서비스에서 로그아웃 기능을 할 수 있는 기능을 제공합니다.")
     @GetMapping("/logout")
     public void logout(HttpSession session) {
-        SessionUtil.logoutMember(session);
+        memberService.logout(session);
     }
 
-    /**
-     * 회원이 탈퇴를 한다.
-     *
-     * @param session 세션
-     */
+
+    @Operation(summary = "회원 탈퇴 API",
+            description = "회원인 사용자가 서비스에서 탈퇴하게 됩니다. " +
+                    "데이터베이스에서 삭제되지 않으며 삭제태그로 변경됩니다.")
     @DeleteMapping("/member")
     @SessionMemberId
     @ResponseStatus(HttpStatus.OK)
@@ -160,4 +149,5 @@ public class MemberController {
         memberService.deleteMember(memberId);
         SessionUtil.logoutMember(session);
     }
+
 }

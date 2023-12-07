@@ -36,6 +36,10 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
+	// swagger
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
+
+
 	// webClient
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
@@ -47,7 +51,17 @@ dependencies {
 	// AOP
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
-	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.9.Final:osx-aarch_64'
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.redisson:redisson-spring-boot-starter:3.18.0'
+//	implementation 'org.springframework.session:spring-session-data-redis'
+//	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+
+	// kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+
+	// FCM(Firebase Cloud Messaging)
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
 
 }
 
