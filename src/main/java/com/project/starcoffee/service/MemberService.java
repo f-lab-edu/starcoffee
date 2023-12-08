@@ -13,8 +13,10 @@ import com.project.starcoffee.utils.SessionUtil;
 import com.project.starcoffee.utils.TokenGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
@@ -31,6 +33,7 @@ public class MemberService {
         this.memberRepository = memberRepository;
         this.pushService = pushService;
     }
+
 
     /**
      * 회원 가입을 진행한다.
@@ -56,8 +59,7 @@ public class MemberService {
         // 고객의 토큰정보 저장
         String token = TokenGenerator.generateToken();
         String memberId = memberRequest.getMemberId().toString();
-
-        pushService.addMemberToken(token, memberId);
+        // pushService.addMemberToken(token, memberId);
     }
 
     /**
