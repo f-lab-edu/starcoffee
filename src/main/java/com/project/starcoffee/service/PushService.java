@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -82,14 +81,13 @@ public class PushService {
                 .setWebpushConfig(WebpushConfig.builder().putHeader("ttl", "300")
                         .setNotification(new WebpushNotification(messageInfo.getTitle(), messageInfo.getMessage())
                         ).build()).build();
+
         String response;
         try {
-            response = FirebaseMessaging.getInstance().sendAsync(message).get();
+            send(message);
+            response = FirebaseMessaging.getInstance().send(message);
             log.info("Member Sent message : " + response);
-        } catch (ExecutionException e) {
-            log.error("토큰정보에 의해 메세지가 전송되지 않았습니다. : {}", e.getMessage());
-            addMemberErrorPush(memberId, message);
-        } catch (InterruptedException e) {
+        } catch (FirebaseMessagingException e) {
             log.error("토큰정보에 의해 메세지가 전송되지 않았습니다. : {}", e.getMessage());
             addMemberErrorPush(memberId, message);
         }
@@ -114,20 +112,22 @@ public class PushService {
 
         String response;
         try {
-            response = FirebaseMessaging.getInstance().sendAsync(message).get();
+            response = FirebaseMessaging.getInstance().send(message);
             log.info("Store Sent message : " + response);
-        } catch (ExecutionException e) {
-            log.error("토큰정보에 의해 메세지가 전송되지 않았습니다. : {}", e.getMessage());
-            addStoreErrorPush(storeId, message);
-        } catch (InterruptedException e) {
+        } catch (FirebaseMessagingException e) {
             log.error("토큰정보에 의해 메세지가 전송되지 않았습니다. : {}", e.getMessage());
             addStoreErrorPush(storeId, message);
         }
     }
 
+    public void send(Message message) throws FirebaseMessagingException {
+        FirebaseMessaging.getInstance().send(message);
+    }
+
     public void deleteMemberToken(String memberId) {
         fcmDAO.deleteToken(memberId);
     }
+
     public void addMemberErrorPush(String memberId, Message message){
         fcmDAO.addMemberErrorPush(memberId, message);
     }
