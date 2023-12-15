@@ -93,7 +93,7 @@ public class MemberService {
         // 고객의 토큰정보 저장
         String token = TokenGenerator.generateToken();
         String memberId = loginRequest.getLoginId();
-        pushService.addMemberToken(token, memberId);
+        // pushService.addMemberToken(token, memberId);
 
         return member;
     }
