@@ -27,7 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/",
                         "/members", "/members/home", "/members/login", "/cards/**", "/store/**",
-                        "/error", "/swagger-ui/**", "/api-docs/**", "/favicon.ico");
+                        "/error", "/swagger-ui/**", "/api-docs/**");
     }
 
     @Override
