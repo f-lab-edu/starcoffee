@@ -1,18 +1,13 @@
 package com.project.starcoffee.service;
 
 import com.google.firebase.messaging.*;
-import com.project.starcoffee.dao.FcmDAO;
+import com.project.starcoffee.redis.FcmDAO;
 import com.project.starcoffee.dto.message.PushMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service

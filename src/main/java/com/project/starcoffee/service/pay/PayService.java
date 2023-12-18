@@ -57,7 +57,7 @@ public class PayService {
             paymentStrategy.updateCardBalance(cardId, finalPrice);
 
             /* 분산 트랜잭션 작동확인 */
-            // throwError();
+            throwError();
 
             // 회원,가게 Push 메세지
             sendPushMessages(payRequest, storeId);

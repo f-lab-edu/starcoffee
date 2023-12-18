@@ -5,8 +5,10 @@ import com.project.starcoffee.dao.CartDAO;
 import com.project.starcoffee.domain.store.StoreStatus;
 import com.project.starcoffee.dto.ItemDTO;
 import com.project.starcoffee.dto.RequestOrderData;
+import com.project.starcoffee.redis.CartRedisDAO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,47 +26,39 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class CartService {
-    private final CartDAO cartDAO;
+    // private final CartDAO cartDAO;
+    private final CartRedisDAO cartRedisDAO;
     private final WebClient webClient;
 
-    private static final long SCHEDULE_DELETE_CART_SECOND = 86400000; // 24시간 뒤 실행
-
     @Autowired
-    public CartService(CartDAO cartDAO, WebClient webClient) {
-        this.cartDAO = cartDAO;
+    public CartService(CartRedisDAO cartRedisDAO, WebClient webClient) {
+        this.cartRedisDAO = cartRedisDAO;
         this.webClient = webClient;
     }
 
+
     public UUID insertCart(List<ItemDTO> itemDTO) {
         UUID newCartId = UUID.randomUUID();
-        if (cartDAO.duplicatedId(newCartId)) {
+        if (cartRedisDAO.duplicated(newCartId)) {
             throw new RuntimeException("기존의 장바구니가 존재합니다.");
         }
 
-        UUID cartId = cartDAO.saveItem(newCartId, itemDTO);
-        return cartId;
+        cartRedisDAO.addCart(newCartId, itemDTO);
+        return newCartId;
     }
 
     public List<ItemDTO> findCart(UUID cartId) {
-        List<ItemDTO> items = cartDAO.findItem(cartId);
-        return items;
+        return cartRedisDAO.getCartItems(cartId);
     }
 
     public void deleteItem(UUID cartId) {
-        cartDAO.deleteItem(cartId);
-    }
-
-    /**
-     * 일주일동안 주문하지 않은 장바구니는 24시간 뒤에 자동으로 삭제된다.
-     */
-    @Scheduled(fixedRate = SCHEDULE_DELETE_CART_SECOND)
-    public void deleteBySchedule() {
-        cartDAO.autoDeleteItem();
+        cartRedisDAO.deleteCartItems(cartId);
     }
 
 
     public List<OrderResponse> requestOrder(UUID cartId) {
-        List<ItemDTO> itemList = cartDAO.findItem(cartId);
+        List<ItemDTO> itemList = findCart(cartId);
+
         Long storeId = itemList.stream().findFirst().map(ItemDTO::getStoreId)
                 .orElseThrow(() -> new RuntimeException("가게정보가 없습니다."));
 

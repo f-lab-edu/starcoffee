@@ -1,5 +1,7 @@
 package com.project.starcoffee.utils;
 
+import java.util.UUID;
+
 public class RedisKeyFactory {
 
     public enum Key {
@@ -13,9 +15,9 @@ public class RedisKeyFactory {
         return id + ":" + key;
     }
 
-    // 장바구니 Redis로 변경 예정
-    public static String generateCartKey(String memberId) {
-        return generateKey(memberId, Key.CART);
+    public static String generateCartKey(UUID cartId) {
+        String key = cartId.toString();
+        return generateKey(key, Key.CART);
     }
 
     public static String generateFcmMemberKey(String memberId) {

@@ -1,4 +1,4 @@
-package com.project.starcoffee.dao;
+package com.project.starcoffee.redis;
 
 import com.google.firebase.messaging.Message;
 

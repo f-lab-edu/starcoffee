@@ -9,15 +9,6 @@
     <facet type="Spring" name="Spring">
       <configuration />
     </facet>
-    <facet type="jpa" name="JPA">
-      <configuration>
-        <setting name="validation-enabled" value="true" />
-        <datasource-mapping>
-          <factory-entry name="starcoffee.main" value="ba061f24-a144-4dae-b06a-5d9a4ee21d19" />
-        </datasource-mapping>
-        <naming-strategy-map />
-      </configuration>
-    </facet>
   </component>
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/../../out/production/classes" />

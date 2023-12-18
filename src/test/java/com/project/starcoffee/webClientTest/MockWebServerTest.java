@@ -8,6 +8,7 @@ import com.project.starcoffee.domain.order.CupSize;
 import com.project.starcoffee.domain.order.ItemSize;
 import com.project.starcoffee.dto.ItemDTO;
 import com.project.starcoffee.dto.OrderItemDTO;
+import com.project.starcoffee.redis.CartRedisDAO;
 import com.project.starcoffee.service.CartService;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -15,6 +16,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -34,14 +36,16 @@ public class MockWebServerTest {
 
     private MockWebServer mockWebServer;
     private CartService cartService;
+    private RedisTemplate<String, List<ItemDTO>> redisListTemplate;
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void initialize() {
         this.mockWebServer = new MockWebServer();
+        CartRedisDAO cartRedisDAO = new CartRedisDAO(redisListTemplate);
         final String baseUrl = String.format("http://localhost:%s", mockWebServer.getPort());
         final WebClient webClient = WebClient.create(baseUrl);
-        cartService = new CartService(mockCartDAO(), webClient);
+        cartService = new CartService(mockCartDAO(),webClient);
         this.objectMapper = new ObjectMapper();
     }
 
@@ -52,12 +56,12 @@ public class MockWebServerTest {
         }
     }
 
-    private CartDAO mockCartDAO() {
-        CartDAO cartDAO = mock(CartDAO.class);
+    private CartRedisDAO mockCartDAO() {
+        CartRedisDAO cartDAO = mock(CartRedisDAO.class);
 
         // 테스트에 필요한 대로 cartDAO 메서드의 동작을 목업
         // 예를 들어, cartDAO.findItem이 호출되면 샘플 List<ItemDTO>를 반환하도록 설정
-        when(cartDAO.findItem(any(UUID.class))).thenReturn(Arrays.asList(new ItemDTO()));
+        when(cartDAO.getCartItems(any(UUID.class))).thenReturn(Arrays.asList(new ItemDTO()));
         return cartDAO;
     }
 
