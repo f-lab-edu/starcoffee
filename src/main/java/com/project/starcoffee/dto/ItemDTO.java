@@ -1,18 +1,20 @@
 package com.project.starcoffee.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.starcoffee.domain.item.ItemType;
 import com.project.starcoffee.domain.order.CupSize;
 import com.project.starcoffee.domain.order.ItemSize;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemDTO {
+public class ItemDTO implements Serializable {
 
     @NotNull
     private long storeId;
@@ -33,6 +35,7 @@ public class ItemDTO {
     @NotNull
     private int finalPrice;
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private Timestamp createdAt;
 
 }
